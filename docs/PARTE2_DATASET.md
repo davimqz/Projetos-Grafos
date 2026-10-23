@@ -34,11 +34,27 @@ Se o peso do arco for a **diferença de um atributo dos nós**, ou seja `w(u→v
 Esse peso **nunca** gera ciclo negativo, nem no grafo de carteiras. Para existir ciclo negativo,
 o peso precisa depender do **arco** (ou do destino de um jeito que não se cancele).
 
+## Decisões tomadas (23/10)
+
+- **Grafo de carteiras (addr → addr)**, porque tem ciclos e permite um ciclo negativo vindo dos próprios dados.
+- **Recorte de 25.000 arestas.** O grafo completo tem 2,87 milhões, então a amostragem é obrigatória e precisa ser justificada no PDF.
+- Download: `python scripts/baixar_dataset.py` (os CSVs brutos ficam em `data/dataset_parte2/raw/`, fora do git).
+
+## Fatos do grafo completo (conferidos em 23/10)
+
+| Item | Valor | Implicação |
+|---|---|---|
+| Arestas em `AddrAddr_edgelist.csv` | 2.868.964 | |
+| Laços (carteira → ela mesma) | 45.981 | são **troco** de transação; com peso negativo, cada laço vira sozinho um ciclo negativo. Tratamento precisa ser decidido |
+| Arestas duplicadas | 84.620 | o mesmo par interagiu em mais de uma transação: agregar ou manter? |
+| Linhas em `wallets_features.csv` | 1.268.260 para 822.942 endereços | features são **por (endereço, time step)**: é preciso agregar por endereço |
+| `btc_received_total − btc_sent_total` por endereço | < 0: 24,3% · = 0: 22,3% · > 0: 53,5% | o dado já tem uma grandeza com sinal |
+
 ## Decisões em aberto (o grupo decide)
 
-1. **Qual grafo:** tx → tx (acíclico, rótulos por transação) ou addr → addr (tem ciclos, rótulos por carteira)?
+1. ~~Qual grafo~~: decidido, carteiras.
 2. **Qual peso** e o que significam, no domínio, um *caminho mínimo* e um *ciclo negativo*.
-3. **Tamanho e estratégia do recorte:** o mínimo do enunciado é ≥ 20 mil arestas. Amostrar arestas ao acaso
+3. **Estratégia do recorte** (tamanho decidido: 25 mil arestas): o mínimo do enunciado é ≥ 20 mil arestas. Amostrar arestas ao acaso
    quebra os caminhos. Uma alternativa é expandir por BFS ("bola de neve") a partir de sementes
    (ex.: nós ilícitos) até o tamanho alvo, preservando a conectividade.
    As frações de 10%/50%/100% da escalabilidade saem desse recorte.
