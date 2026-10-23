@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Dataset bruto da Parte 2 (baixado pelo script, grande demais para o git)
+data/dataset_parte2/raw/
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
