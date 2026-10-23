@@ -20,6 +20,7 @@ ARQUIVOS = {
     "wallets_features.csv": "1mhrrobYdnaxYBIVK06EpKB2EwV-ERlce",
     "wallets_classes.csv": "1ZaACVE4wSIx7r8Z9ze7ExQnJ0wzGrVkp",
     "AddrTx_edgelist.csv": "16eWZTe-dsjEqgsOqFtg78m4fYhcxKlmZ",
+    "txs_features.csv": "19q09IFhfkOOBOXvn_dKhWjILJtjCcsjc",
     "TxAddr_edgelist.csv": "1SYpun0DMDt-h3sbI60G55jNsfwnFTHXg",
 }
 
