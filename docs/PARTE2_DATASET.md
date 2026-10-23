@@ -36,9 +36,46 @@ o peso precisa depender do **arco** (ou do destino de um jeito que não se cance
 
 ## Decisões tomadas (23/10)
 
-- **Grafo de carteiras (addr → addr)**, porque tem ciclos e permite um ciclo negativo vindo dos próprios dados.
-- **Recorte de 25.000 arestas.** O grafo completo tem 2,87 milhões, então a amostragem é obrigatória e precisa ser justificada no PDF.
-- Download: `python scripts/baixar_dataset.py` (os CSVs brutos ficam em `data/dataset_parte2/raw/`, fora do git).
+| # | Decisão | O que foi feito |
+|---|---|---|
+| 1 | **Grafo** | carteiras (addr → addr): tem ciclos, então o ciclo negativo pode vir dos próprios dados |
+| 2 | **Peso (Bellman-Ford)** | `peso(A → B) = saldo líquido de B = btc_received_total − btc_sent_total` (somado em todos os time steps). Positivo: B acumula BTC. Negativo: B repassa mais do que recebe. Ciclo negativo: grupo de carteiras que ficam repassando dinheiro entre si |
+| 3 | **Peso (Dijkstra)** | `valor_btc` = soma do `total_BTC` das transações do par A → B. Já vem ≥ 0 dos dados; caminho mínimo = rota que movimenta menos dinheiro |
+| 4 | **Laços** (A → A) | removidos: são troco e virariam ciclos negativos falsos (45.981) |
+| 5 | **Arestas duplicadas** | agregadas em um arco por par: `valor_btc` = soma, `n_txs` = nº de transações (47.346 linhas a menos) |
+| 6 | **Atributos por carteira** | somados em todos os time steps (`*_total`, `total_txs`); máximo para `lifetime_in_blocks` e `num_timesteps_appeared_in` |
+| 7 | **Transações sem valor** | tenta `in_BTC_total − fees`; nas 965, todas as colunas de valor faltam juntas, então ficam marcadas em `valor_faltante`. No recorte atual nenhum arco é afetado |
+| 8 | **Recorte** | bola de neve a partir de 50 carteiras ilícitas sorteadas (seed 42), expandindo por vizinhos de entrada e saída até ≥ 25.000 arestas no subgrafo induzido |
+| 9 | **Pergunta de pesquisa** | *Carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?* (confirmar se é a mesma do checkpoint) |
+
+Como reproduzir:
+
+```bash
+python scripts/baixar_dataset.py
+python scripts/amostrar_dataset.py   # --arestas 25000 --sementes 50 --seed 42
+```
+
+## Recorte gerado (`data/dataset_parte2/`)
+
+| Arquivo | Conteúdo |
+|---|---|
+| `arestas.csv` | `origem, destino, peso, valor_btc, n_txs, valor_faltante` |
+| `nos.csv` | `endereco, classe, saldo_btc, btc_received_total, btc_sent_total, total_txs, fees_total, lifetime_in_blocks, num_timesteps_appeared_in` |
+| `recorte_info.json` | parâmetros, sementes e contagens |
+
+| Métrica | Valor |
+|---|---|
+| Carteiras (nós) | 14.182 (ilícitas 5.208 · desconhecidas 4.713 · lícitas 4.261) |
+| Arcos | 25.111 |
+| Arcos com peso negativo | 3.279 (13%) |
+| Arcos com peso zero | 8.658 (34%) |
+
+**Pontos para o PDF (limitações):**
+- **Viés da amostra:** ilícitas são 37% do recorte, mas 1,7% do dataset completo, porque as sementes são ilícitas. É intencional (a pergunta é sobre elas), mas precisa ser dito.
+- O peso depende só da carteira de **destino**: todos os arcos que chegam em B têm o mesmo peso.
+- O `valor_btc` é da transação inteira, não do valor exato enviado de A para B.
+- **Falta conferir** com o Bellman-Ford do grupo se o recorte tem ciclo negativo. Se não tiver, o enunciado permite montar o caso a partir de um sub-recorte documentado.
+- Para a escalabilidade (10/50/100%), sortear nós do recorte e usar o subgrafo induzido.
 
 ## Fatos do grafo completo (conferidos em 23/10)
 
@@ -52,14 +89,3 @@ o peso precisa depender do **arco** (ou do destino de um jeito que não se cance
 | Valor da transação (`total_BTC` = `out_BTC_total`, `in_BTC_total`, `fees`) | mínimo ≥ 0 em todas; `fees` = `in_BTC_total − out_BTC_total` | **não existe valor negativo**; o valor é da transação inteira, não de cada saída para cada carteira |
 | Transações sem valor (NaN) | 965 | dado faltante para discutir (AVD) |
 | `btc_received_total − btc_sent_total` por endereço | < 0: 24,3% · = 0: 22,3% · > 0: 53,5% | o dado já tem uma grandeza com sinal |
-
-## Decisões em aberto (o grupo decide)
-
-1. ~~Qual grafo~~: decidido, carteiras.
-2. **Qual peso** e o que significam, no domínio, um *caminho mínimo* e um *ciclo negativo*.
-3. **Estratégia do recorte** (tamanho decidido: 25 mil arestas): o mínimo do enunciado é ≥ 20 mil arestas. Amostrar arestas ao acaso
-   quebra os caminhos. Uma alternativa é expandir por BFS ("bola de neve") a partir de sementes
-   (ex.: nós ilícitos) até o tamanho alvo, preservando a conectividade.
-   As frações de 10%/50%/100% da escalabilidade saem desse recorte.
-4. **Transformação para o Dijkstra** (pesos ≥ 0): ex.: somar uma constante, usar |w| ou só a parte não negativa. Precisa ser justificada.
-5. **Pergunta de pesquisa** final, alinhada com a proposta aprovada no checkpoint.
