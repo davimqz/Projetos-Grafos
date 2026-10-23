@@ -46,7 +46,7 @@ o peso precisa depender do **arco** (ou do destino de um jeito que não se cance
 | 6 | **Atributos por carteira** | somados em todos os time steps (`*_total`, `total_txs`); máximo para `lifetime_in_blocks` e `num_timesteps_appeared_in` |
 | 7 | **Transações sem valor** | tenta `in_BTC_total − fees`; nas 965, todas as colunas de valor faltam juntas, então ficam marcadas em `valor_faltante`. No recorte atual nenhum arco é afetado |
 | 8 | **Recorte** | bola de neve a partir de 50 carteiras ilícitas sorteadas (seed 42), expandindo por vizinhos de entrada e saída até ≥ 25.000 arestas no subgrafo induzido |
-| 9 | **Pergunta de pesquisa** | *Carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?* (confirmar se é a mesma do checkpoint) |
+| 9 | **Pergunta de pesquisa** | *Carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?* (confirmada pelo grupo) |
 
 Como reproduzir:
 
