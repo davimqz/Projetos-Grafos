@@ -2,6 +2,9 @@
 
 **Parte 1:** Labirinto com Chaves (grafo de estados) · **Parte 2:** dataset Elliptic++ (rede de transações Bitcoin)
 
+> **👉 Acabou de clonar? Leia [`docs/PROXIMOS_PASSOS.md`](docs/PROXIMOS_PASSOS.md):** status atual, como preparar o ambiente
+> e o passo a passo de cada integrante. **Agora é a vez do Thomaz (algoritmos).**
+
 ## Equipe
 
 | Integrante | Frente principal |
