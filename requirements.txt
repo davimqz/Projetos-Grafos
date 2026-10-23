@@ -1,0 +1,9 @@
+# Python 3.11+
+pandas>=2.1
+numpy>=1.26
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.18
+gdown>=5.1          # download do dataset Elliptic++ (Google Drive)
+pytest>=8.0
+networkx>=3.2       # SOMENTE em tests/, como oráculo
