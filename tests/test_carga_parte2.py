@@ -1,5 +1,5 @@
 """Carga do recorte da Parte 2 (P4a)."""
-# [IA] Claude Code – testes da leitura dos CSVs (IO)
+
 import pytest
 
 from src.carga_parte2 import carregar_grafo, ler_arestas, ler_nos

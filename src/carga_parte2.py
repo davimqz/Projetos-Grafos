@@ -9,7 +9,7 @@ Pacote P4a — Dados.
 O nome do método adicionar_arco ainda precisa ser confirmado com o Thomaz (P2, graph.py).
 Os nós são os endereços das carteiras (str).
 """
-# [IA] Claude Code – leitura e validação dos CSVs do recorte com pandas (IO)
+
 from pathlib import Path
 
 import pandas as pd
