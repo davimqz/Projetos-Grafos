@@ -14,3 +14,8 @@ data/dataset_parte2/raw/
 Thumbs.db
 .vscode/
 .idea/
+
+# Documentos locais e configuração local dos agentes
+/local/
+/.agents/
+/AGENTS.md
