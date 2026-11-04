@@ -92,3 +92,46 @@ def test_origem_invalida():
 
     with pytest.raises(ValueError, match="não existe"):
         dfs(grafo, "B")
+
+
+# [IA] Codex – testes de profundidade, alcance de ciclos e floresta DFS.
+def test_caminho_profundo():
+    grafo = Grafo()
+    for i in range(2000):
+        grafo.adicionar_aresta(str(i), str(i + 1), 1)
+
+    resultado = dfs(grafo, "0")
+
+    assert len(resultado["ordem"]) == 2001
+    assert resultado["ordem"] == [str(i) for i in range(2001)]
+    assert resultado["pai"]["2000"] == "1999"
+    assert resultado["contagem_arcos"]["arvore"] == 2000
+    assert resultado["tem_ciclo"] is False
+
+
+def test_ciclo_fora_do_alcance_da_origem():
+    grafo = Grafo()
+    for origem, destino in (("A", "B"), ("C", "D"), ("D", "C")):
+        grafo.adicionar_aresta(origem, destino, 1)
+
+    a_partir_de_a = dfs(grafo, "A")
+    floresta = dfs(grafo)
+
+    assert a_partir_de_a["ordem"] == ["A", "B"]
+    assert a_partir_de_a["tem_ciclo"] is False
+    assert a_partir_de_a["estado"]["C"] == "NAO_VISITADO"
+    assert floresta["tem_ciclo"] is True
+    assert floresta["arcos"]["retorno"] == [("D", "C")]
+
+
+def test_arco_de_cruzamento_entre_arvores_da_floresta():
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "B", 1)
+    grafo.adicionar_aresta("C", "B", 1)
+
+    resultado = dfs(grafo)
+
+    assert resultado["ordem"] == ["A", "B", "C"]
+    assert resultado["pai"] == {"A": None, "B": "A", "C": None}
+    assert resultado["arcos"]["cruzamento"] == [("C", "B")]
+    assert resultado["tem_ciclo"] is False

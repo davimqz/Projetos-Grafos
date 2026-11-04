@@ -27,26 +27,40 @@ def dfs(grafo: Grafo, origem: str | None = None) -> dict:
     descoberta = {no: None for no in nos}
     termino = {no: None for no in nos}
     ordem = []
-    arcos = {
-        "arvore": [],
-        "retorno": [],
-        "avanco": [],
-        "cruzamento": [],
-    }
+    arcos = {"arvore": [], "retorno": [], "avanco": [], "cruzamento": []}
     tempo = -1
 
-    def visitar(vi: str) -> None:
+    def descobrir(no: str) -> list:
+        """Registra a descoberta e cria uma posição na pilha."""
         nonlocal tempo
         tempo += 1
-        estado[vi] = "VISITADO"
-        descoberta[vi] = tempo
-        ordem.append(vi)
+        estado[no] = "VISITADO"
+        descoberta[no] = tempo
+        ordem.append(no)
+        return [no, grafo.vizinhos(no), 0]
 
-        for vj, _peso in grafo.vizinhos(vi):
+    def percorrer(inicio: str) -> None:
+        """Executa a DFS guardando o próximo vizinho de cada vértice."""
+        nonlocal tempo
+        pilha = [descobrir(inicio)]
+
+        while pilha:
+            vi, vizinhos, posicao = pilha[-1]
+
+            if posicao == len(vizinhos):
+                estado[vi] = "ENCERRADO"
+                tempo += 1
+                termino[vi] = tempo
+                pilha.pop()
+                continue
+
+            vj = vizinhos[posicao][0]
+            pilha[-1][2] += 1
+
             if estado[vj] == "NAO_VISITADO":
                 pai[vj] = vi
                 arcos["arvore"].append((vi, vj))
-                visitar(vj)
+                pilha.append(descobrir(vj))
             elif estado[vj] == "VISITADO":
                 arcos["retorno"].append((vi, vj))
             elif descoberta[vi] < descoberta[vj]:
@@ -54,16 +68,12 @@ def dfs(grafo: Grafo, origem: str | None = None) -> dict:
             else:
                 arcos["cruzamento"].append((vi, vj))
 
-        estado[vi] = "ENCERRADO"
-        tempo += 1
-        termino[vi] = tempo
-
     if origem is not None:
-        visitar(origem)
+        percorrer(origem)
     else:
         for no in nos:
             if estado[no] == "NAO_VISITADO":
-                visitar(no)
+                percorrer(no)
 
     contagem_arcos = {tipo: len(lista) for tipo, lista in arcos.items()}
     return {
@@ -75,4 +85,5 @@ def dfs(grafo: Grafo, origem: str | None = None) -> dict:
         "arcos": arcos,
         "contagem_arcos": contagem_arcos,
         "tem_ciclo": bool(arcos["retorno"]),
+        "escopo_ciclo": "alcancaveis_da_origem" if origem is not None else "grafo_inteiro",
     }
