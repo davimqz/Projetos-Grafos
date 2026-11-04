@@ -1,4 +1,4 @@
-# Registro de uso de IA
+﻿# Registro de uso de IA
 
 Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf`. Os trechos de código ficam marcados com `# [IA] <ferramenta> – <finalidade>`.
 
@@ -12,3 +12,5 @@ Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf
 | 23/10/2026 | Davi | Claude Code | Revisão de clareza/precisão de texto escrito pelo grupo (3 ajustes pontuais de redação) | `docs/relatorio/parte2.md` | Permitido (revisão de texto) |
 | 02/11/2026 | Matheus | Codex | Revisão incremental da implementação da classe Grafo escrita pelo integrante: inserção de nós e arestas, consultas, métricas, transposto e subgrafo induzido; verificações pontuais com grafos sintéticos e sugestões de correção e eficiência | `src/graphs/graph.py` | Permitido (revisão de código e depuração) |
 | 02/11/2026 | Matheus | Codex | Geração dos testes unitários e code review da classe Grafo escrita pelo integrante, com ajustes de tipagem, legibilidade e desempenho aplicados durante a revisão | `src/graphs/graph.py`, `tests/test_graph.py` | Permitido (revisão de código e testes unitários) |
+| 04/11/2026 | Thomaz | Codex | Revisão da implementação de DFS e de seus testes frente ao plano de trabalho; identificação de limitações e sugestões conceituais, sem geração de algoritmo | `src/graphs/algorithms.py`, `tests/test_dfs.py` (revisão) | Permitido (revisão de código e testes unitários) |
+| 04/11/2026 | Thomaz | Codex | Criação e execução de testes para caminho profundo, ciclo inalcançável e cruzamento entre árvores da floresta DFS | `tests/test_dfs.py` | Permitido (revisão de código e testes unitários) |
