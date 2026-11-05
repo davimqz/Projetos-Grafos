@@ -11,7 +11,7 @@ class GrafoFalso:
     def __init__(self):
         self.arcos = []
 
-    def adicionar_arco(self, u, v, peso):
+    def adicionar_aresta(self, u, v, peso):
         self.arcos.append((u, v, peso))
 
 
