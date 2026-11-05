@@ -2,13 +2,13 @@
 
 - tempo médio de 5 execuções de cada algoritmo
 - escalabilidade em 10% / 50% / 100% dos nós, comparada com a complexidade teórica
-  pela coluna tempo_por_elemento_s = tempo / (V + E)
+  pela coluna tempo_por_elemento_us = tempo / (V + E), em microssegundos
 """
 # [IA] Claude Code – benchmark da Parte 2
 
 import json
 import random
-import time
+import timeit
 from pathlib import Path
 
 import matplotlib
@@ -35,12 +35,12 @@ def amostrar(grafo, fracao):
 
 
 def tempo_medio(funcao, grafo, repeticoes=5):
-    """Roda funcao(grafo) `repeticoes` vezes e devolve o tempo médio em segundos."""
-    tempos = []
-    for _ in range(repeticoes):
-        inicio = time.perf_counter()
-        funcao(grafo)
-        tempos.append(time.perf_counter() - inicio)
+    """Roda funcao(grafo) `repeticoes` vezes e devolve o tempo médio em segundos.
+
+    O timeit desliga o coletor de lixo enquanto mede; sem isso ele às vezes roda no meio
+    de uma execução e infla o tempo (o ponto de 50% saía com ~22 ms em vez de ~12 ms).
+    """
+    tempos = timeit.repeat(lambda: funcao(grafo), number=1, repeat=repeticoes)
     return sum(tempos) / repeticoes
 
 
@@ -56,8 +56,8 @@ def executar_benchmark(pasta, saida):
             resultados.append({
                 "algoritmo": nome, "fracao": fracao, "nos": v, "arestas": e,
                 "complexidade": complexidade,
-                "tempo_medio_s": t,
-                "tempo_por_elemento_s": t / (v + e),
+                "tempo_medio_ms": round(t * 1000, 2),
+                "tempo_por_elemento_us": round(t / (v + e) * 1_000_000, 2),
             })
     Path(saida).mkdir(parents=True, exist_ok=True)
     with open(Path(saida) / "parte2_report.json", "w", encoding="utf-8") as f:
@@ -72,7 +72,7 @@ def gerar_grafico(resultados, saida):
     for nome in ALGORITMOS:
         linhas = [r for r in resultados if r["algoritmo"] == nome]
         x = [r["nos"] + r["arestas"] for r in linhas]
-        y = [r["tempo_medio_s"] * 1000 for r in linhas]
+        y = [r["tempo_medio_ms"] for r in linhas]
         plt.plot(x, y, "o-", label=nome)
     plt.title("Tempo médio x tamanho do grafo")
     plt.xlabel("|V| + |E|")
