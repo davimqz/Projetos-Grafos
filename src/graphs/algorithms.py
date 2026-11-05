@@ -9,6 +9,7 @@ A implementar pelo grupo:
 - Bellman-Ford: distâncias + detecção e reconstrução do ciclo negativo
 """
 
+from collections import deque
 from src.graphs.graph import Grafo
 
 def dfs(grafo: Grafo, origem: str | None = None) -> dict:
@@ -86,4 +87,53 @@ def dfs(grafo: Grafo, origem: str | None = None) -> dict:
         "contagem_arcos": contagem_arcos,
         "tem_ciclo": bool(arcos["retorno"]),
         "escopo_ciclo": "alcancaveis_da_origem" if origem is not None else "grafo_inteiro",
+    }
+
+def bfs(grafo: Grafo, origem: str) -> dict:
+    """Os pesos das arestas nao sao utilizados.
+    """
+    nos = grafo.nos()
+
+    if origem not in nos:
+        raise ValueError(f"Nó '{origem}' não existe no grafo.")
+
+    estado = {no: "NAO_VISITADO" for no in nos}
+    pai = {no: None for no in nos}
+    distancia = {no: float("inf") for no in nos}
+    nivel = {no: None for no in nos}
+    ordem = []
+    arvore = []
+    camadas = {0: [origem]}
+
+    estado[origem] = "VISITADO"
+    distancia[origem] = 0
+    nivel[origem] = 0
+    fila = deque([origem])
+
+    while fila:
+        vi = fila.popleft()
+        ordem.append(vi)
+
+        for aresta in grafo.vizinhos(vi):
+            vj = aresta[0]
+
+            if estado[vj] == "NAO_VISITADO":
+                estado[vj] = "VISITADO"
+                distancia[vj] = distancia[vi] + 1
+                nivel[vj] = distancia[vj]
+                pai[vj] = vi
+                arvore.append((vi, vj))
+                camadas.setdefault(nivel[vj], []).append(vj)
+                fila.append(vj)
+
+        estado[vi] = "ENCERRADO"
+
+    return {
+        "ordem": ordem,
+        "pai": pai,
+        "distancia": distancia,
+        "nivel": nivel,
+        "camadas": camadas,
+        "arvore": arvore,
+        "estado": estado,
     }
