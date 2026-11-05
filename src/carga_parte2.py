@@ -4,9 +4,8 @@ Pacote P4a — Dados.
 
 - ler_arestas: arestas.csv -> lista de (origem, destino, peso), na ordem do arquivo
 - ler_nos: nos.csv -> {endereco: {atributos}} (classe, saldo etc.), para as análises
-- carregar_grafo: insere as arestas em um grafo que tenha adicionar_arco(u, v, peso)
+- carregar_grafo: insere as arestas em um grafo que tenha adicionar_aresta(u, v, peso)
 
-O nome do método adicionar_arco ainda precisa ser confirmado com o Thomaz (P2, graph.py).
 Os nós são os endereços das carteiras (str).
 """
 
@@ -50,5 +49,5 @@ def ler_nos(pasta: str | Path = PASTA_PADRAO) -> dict[str, dict]:
 def carregar_grafo(grafo, pasta: str | Path = PASTA_PADRAO):
     """Insere em `grafo` todas as arestas do recorte e devolve o próprio grafo."""
     for origem, destino, peso in ler_arestas(pasta):
-        grafo.adicionar_arco(origem, destino, peso)
+        grafo.adicionar_aresta(origem, destino, peso)
     return grafo

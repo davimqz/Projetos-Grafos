@@ -31,6 +31,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.dataset and args.benchmark:
+        # chamada do benchmark da Parte 2 (P4b)
+        from src.benchmark import executar_benchmark
+        executar_benchmark(args.dataset, args.out)
+        print("Relatório gravado em", args.out)
+        return 0
     raise NotImplementedError("orquestração ainda não implementada (ver src/solve.py)")
 
 

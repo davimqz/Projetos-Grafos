@@ -1,0 +1,29 @@
+[
+  {
+    "algoritmo": "DFS",
+    "fracao": 0.1,
+    "nos": 1418,
+    "arestas": 130,
+    "complexidade": "O(V + E)",
+    "tempo_medio_s": 0.001641299994662404,
+    "tempo_por_elemento_s": 1.060271314381398e-06
+  },
+  {
+    "algoritmo": "DFS",
+    "fracao": 0.5,
+    "nos": 7091,
+    "arestas": 6477,
+    "complexidade": "O(V + E)",
+    "tempo_medio_s": 0.020678560016676784,
+    "tempo_por_elemento_s": 1.5240683974555413e-06
+  },
+  {
+    "algoritmo": "DFS",
+    "fracao": 1.0,
+    "nos": 14182,
+    "arestas": 25111,
+    "complexidade": "O(V + E)",
+    "tempo_medio_s": 0.03715888001024723,
+    "tempo_por_elemento_s": 9.456870183047166e-07
+  }
+]
