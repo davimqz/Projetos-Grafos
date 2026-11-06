@@ -143,6 +143,20 @@ def test_outra_origem():
     assert resultado["estado"]["A"] == "NAO_VISITADO"
 
 
+# [IA] Codex - teste de cruzamento entre árvores da floresta DFS.
+def test_arco_de_cruzamento_entre_arvores_da_floresta():
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "B", 1)
+    grafo.adicionar_aresta("C", "B", 1)
+
+    resultado = dfs(grafo)
+
+    assert resultado["ordem"] == ["A", "B", "C"]
+    assert resultado["pai"] == {"A": None, "B": "A", "C": None}
+    assert resultado["arcos"]["cruzamento"] == [("C", "B")]
+    assert resultado["tem_ciclo"] is False
+
+
 @pytest.mark.parametrize("semente", range(10))
 def test_dfs_com_networkx_como_oraculo(semente):
     """Confere árvore DFS, descoberta e ciclos em grafos dirigidos."""
