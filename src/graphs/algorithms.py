@@ -137,3 +137,80 @@ def bfs(grafo: Grafo, origem: str) -> dict:
         "arvore": arvore,
         "estado": estado,
     }
+
+def bellman_ford(grafo: Grafo, origem: str) -> dict:
+    nos = grafo.nos()
+
+    if origem not in nos:
+        raise ValueError(f"Nó '{origem}' nao existe.")
+
+    distancia = {no: float("inf") for no in nos}
+    pai = {no: None for no in nos}
+    peso_pai = {no: None for no in nos}
+    distancia[origem] = 0
+
+    arestas = [
+        (vi, vj, peso)
+        for vi in nos
+        for vj, peso in grafo.vizinhos(vi)
+    ]
+
+    for _ in range(len(nos) - 1):
+        alterou = False
+
+        for vi, vj, peso in arestas:
+            if distancia[vi] == float("inf"):
+                continue
+
+            novo_custo = distancia[vi] + peso
+            if novo_custo < distancia[vj]:
+                distancia[vj] = novo_custo
+                pai[vj] = vi
+                peso_pai[vj] = peso
+                alterou = True
+
+        if not alterou:
+            break
+
+    ultimo_atualizado = None
+    for vi, vj, peso in arestas:
+        if distancia[vi] == float("inf"):
+            continue
+
+        novo_custo = distancia[vi] + peso
+        if novo_custo < distancia[vj]:
+            distancia[vj] = novo_custo
+            pai[vj] = vi
+            peso_pai[vj] = peso
+            ultimo_atualizado = vj
+
+    ciclo_negativo = []
+    custo_ciclo = None
+
+    if ultimo_atualizado is not None:
+        atual = ultimo_atualizado
+        for _ in range(len(nos)):
+            atual = pai[atual]
+
+        inicio_ciclo = atual
+        ciclo_inverso = [inicio_ciclo]
+        atual = pai[inicio_ciclo]
+
+        while atual != inicio_ciclo:
+            ciclo_inverso.append(atual)
+            atual = pai[atual]
+
+        ciclo_inverso.append(inicio_ciclo)
+        ciclo_negativo = list(reversed(ciclo_inverso))
+        custo_ciclo = sum(peso_pai[vj] for vj in ciclo_negativo[1:])
+
+    tem_ciclo_negativo = bool(ciclo_negativo)
+
+    return {
+        "distancia": distancia,
+        "pai": pai,
+        "tem_ciclo_negativo": tem_ciclo_negativo,
+        "ciclo_negativo": ciclo_negativo,
+        "custo_ciclo": custo_ciclo,
+        "status": "CICLO_NEGATIVO" if tem_ciclo_negativo else "OK",
+    }
