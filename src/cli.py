@@ -30,12 +30,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
     if args.dataset and args.benchmark:
         # chamada do benchmark da Parte 2 (P4b)
         from src.benchmark import executar_benchmark
         executar_benchmark(args.dataset, args.out)
         print("Relatório gravado em", args.out)
+        return 0
+    if args.dataset and args.alg in ("BFS", "DFS"):
+        # casos obrigatórios da Parte 2 (P4a): uma execução por fonte
+        if not args.source:
+            parser.error(f"--alg {args.alg} exige --source")
+        from src.casos_parte2 import executar_busca
+        try:
+            caminho = executar_busca(args.alg, args.dataset, args.source, args.out)
+        except ValueError as erro:
+            parser.error(str(erro))
+        print("Resultado gravado em", caminho)
         return 0
     raise NotImplementedError("orquestração ainda não implementada (ver src/solve.py)")
 
