@@ -4,6 +4,9 @@
 
 # [IA] ChatGPT - casos de teste sugeridos e escritos para o Bellman-Ford.
 
+import random
+
+import networkx as nx
 import pytest
 
 from src.graphs.graph import Grafo
@@ -186,3 +189,93 @@ def test_ciclo_de_custo_zero_nao_e_negativo():
     assert resultado["tem_ciclo_negativo"] is False
     assert resultado["ciclo_negativo"] == []
     assert resultado["custo_ciclo"] is None
+
+
+# [IA] Codex - regressões de nó único, frações e oráculo aleatório persistente.
+@pytest.mark.parametrize("peso", [-1, 0, 1])
+def test_no_unico_com_laco(peso):
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "A", peso)
+
+    resultado = bellman_ford(grafo, "A")
+
+    assert resultado["tem_ciclo_negativo"] is (peso < 0)
+    assert resultado["status"] == ("CICLO_NEGATIVO" if peso < 0 else "OK")
+    if peso < 0:
+        assert resultado["ciclo_negativo"] == ["A", "A"]
+        assert resultado["custo_ciclo"] == peso
+    else:
+        assert resultado["distancia"] == {"A": 0}
+        assert resultado["pai"] == {"A": None}
+        assert resultado["ciclo_negativo"] == []
+        assert resultado["custo_ciclo"] is None
+
+
+def test_pesos_fracionarios():
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "B", 0.9)
+    grafo.adicionar_aresta("A", "C", 0.5)
+    grafo.adicionar_aresta("C", "B", -0.2)
+
+    resultado = bellman_ford(grafo, "A")
+
+    assert resultado["status"] == "OK"
+    assert resultado["distancia"]["B"] == pytest.approx(0.3)
+    assert resultado["pai"]["B"] == "C"
+
+
+@pytest.mark.parametrize("semente", range(20))
+def test_bellman_ford_com_networkx_como_oraculo(semente):
+    sorteio = random.Random(semente)
+    grafo = Grafo()
+    referencia = nx.DiGraph()
+    nos = [f"N{i}" for i in range(6)]
+    for no in nos:
+        grafo.adicionar_no(no)
+        referencia.add_node(no)
+    for vi in nos:
+        for vj in nos:
+            if sorteio.random() < 0.2:
+                peso = sorteio.randint(-3, 6)
+                grafo.adicionar_aresta(vi, vj, peso)
+                referencia.add_edge(vi, vj, weight=peso)
+
+    for origem in nos:
+        resultado = bellman_ford(grafo, origem)
+        try:
+            distancias = nx.single_source_bellman_ford_path_length(referencia, origem)
+        except nx.NetworkXUnbounded:
+            assert resultado["status"] == "CICLO_NEGATIVO"
+            assert resultado["tem_ciclo_negativo"] is True
+            ciclo = resultado["ciclo_negativo"]
+            assert len(ciclo) >= 2
+            assert ciclo[0] == ciclo[-1]
+            assert len(ciclo[:-1]) == len(set(ciclo[:-1]))
+            assert nx.has_path(referencia, origem, ciclo[0])
+            assert all(referencia.has_edge(vi, vj) for vi, vj in zip(ciclo, ciclo[1:]))
+            custo = sum(referencia[vi][vj]["weight"] for vi, vj in zip(ciclo, ciclo[1:]))
+            assert resultado["custo_ciclo"] == custo
+            assert custo < 0
+        else:
+            assert resultado["status"] == "OK"
+            assert resultado["tem_ciclo_negativo"] is False
+            assert resultado["ciclo_negativo"] == []
+            assert resultado["custo_ciclo"] is None
+            assert resultado["distancia"] == {
+                no: distancias.get(no, float("inf")) for no in nos
+            }
+            for no in nos:
+                if no not in distancias:
+                    assert resultado["pai"][no] is None
+                    continue
+                # Percorrer até a origem detecta também ciclos indevidos nos pais.
+                atual = no
+                caminho = set()
+                while atual != origem:
+                    assert atual not in caminho
+                    caminho.add(atual)
+                    pai = resultado["pai"][atual]
+                    assert referencia.has_edge(pai, atual)
+                    assert distancias[atual] == distancias[pai] + referencia[pai][atual]["weight"]
+                    atual = pai
+                assert resultado["pai"][origem] is None
