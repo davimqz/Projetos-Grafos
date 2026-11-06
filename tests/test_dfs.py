@@ -1,6 +1,9 @@
 """DFS (P2) — detecção de ciclo e classificação de arcos em grafo dirigido:
 árvore, retorno, avanço e cruzamento."""
 
+import random
+
+import networkx as nx
 import pytest
 
 from src.graphs.graph import Grafo
@@ -82,8 +85,10 @@ def test_laco():
 
 
 def test_vazio():
-    assert dfs(Grafo())["ordem"] == []
-    assert dfs(Grafo())["tem_ciclo"] is False
+    resultado = dfs(Grafo())
+    assert resultado["ordem"] == []
+    assert resultado["tem_ciclo"] is False
+    assert resultado["escopo_ciclo"] == "grafo_inteiro"
 
 
 def test_origem_invalida():
@@ -93,37 +98,52 @@ def test_origem_invalida():
     with pytest.raises(ValueError, match="não existe"):
         dfs(grafo, "B")
 
-
-# [IA] Codex – testes de profundidade, alcance de ciclos e floresta DFS.
-def test_caminho_profundo():
+# [IA] ChatGPT - casos de regressão para a DFS com pilha explícita.
+def test_caminho_longo():
     grafo = Grafo()
-    for i in range(2000):
-        grafo.adicionar_aresta(str(i), str(i + 1), 1)
+    for n in range(2500):
+        grafo.adicionar_aresta(str(n), str(n + 1), 1)
 
     resultado = dfs(grafo, "0")
 
-    assert len(resultado["ordem"]) == 2001
-    assert resultado["ordem"] == [str(i) for i in range(2001)]
-    assert resultado["pai"]["2000"] == "1999"
-    assert resultado["contagem_arcos"]["arvore"] == 2000
+    assert len(resultado["ordem"]) == 2501
+    assert resultado["ordem"][0] == "0"
+    assert resultado["ordem"][-1] == "2500"
+    assert resultado["termino"]["0"] == 5001
     assert resultado["tem_ciclo"] is False
 
 
-def test_ciclo_fora_do_alcance_da_origem():
+def test_ciclo_fora_da_origem():
     grafo = Grafo()
-    for origem, destino in (("A", "B"), ("C", "D"), ("D", "C")):
-        grafo.adicionar_aresta(origem, destino, 1)
+    grafo.adicionar_aresta("A", "B", 1)
+    grafo.adicionar_aresta("X", "Y", 1)
+    grafo.adicionar_aresta("Y", "X", 1)
 
-    a_partir_de_a = dfs(grafo, "A")
-    floresta = dfs(grafo)
+    parcial = dfs(grafo, "A")
+    completo = dfs(grafo)
 
-    assert a_partir_de_a["ordem"] == ["A", "B"]
-    assert a_partir_de_a["tem_ciclo"] is False
-    assert a_partir_de_a["estado"]["C"] == "NAO_VISITADO"
-    assert floresta["tem_ciclo"] is True
-    assert floresta["arcos"]["retorno"] == [("D", "C")]
+    assert parcial["tem_ciclo"] is False
+    assert parcial["escopo_ciclo"] == "alcancaveis_da_origem"
+    assert parcial["estado"]["X"] == "NAO_VISITADO"
+    assert completo["tem_ciclo"] is True
+    assert completo["escopo_ciclo"] == "grafo_inteiro"
+    assert completo["arcos"]["retorno"] == [("Y", "X")]
 
 
+def test_outra_origem():
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "B", 1)
+    grafo.adicionar_aresta("B", "C", 1)
+    grafo.adicionar_aresta("C", "B", 1)
+
+    resultado = dfs(grafo, "B")
+
+    assert resultado["ordem"] == ["B", "C"]
+    assert resultado["tem_ciclo"] is True
+    assert resultado["estado"]["A"] == "NAO_VISITADO"
+
+
+# [IA] Codex - teste de cruzamento entre árvores da floresta DFS.
 def test_arco_de_cruzamento_entre_arvores_da_floresta():
     grafo = Grafo()
     grafo.adicionar_aresta("A", "B", 1)
@@ -135,3 +155,44 @@ def test_arco_de_cruzamento_entre_arvores_da_floresta():
     assert resultado["pai"] == {"A": None, "B": "A", "C": None}
     assert resultado["arcos"]["cruzamento"] == [("C", "B")]
     assert resultado["tem_ciclo"] is False
+
+
+@pytest.mark.parametrize("semente", range(10))
+def test_dfs_com_networkx_como_oraculo(semente):
+    """Confere árvore DFS, descoberta e ciclos em grafos dirigidos."""
+    aleatorio = random.Random(semente)
+    grafo = Grafo()
+    referencia = nx.DiGraph()
+    nos = [str(i) for i in range(9)]
+
+    for no in nos:
+        grafo.adicionar_no(no)
+        referencia.add_node(no)
+
+    for inicio in nos:
+        for fim in nos:
+            if aleatorio.random() < 0.2:
+                peso = aleatorio.choice([-3, 0, 1, 5])
+                grafo.adicionar_aresta(inicio, fim, peso)
+                referencia.add_edge(inicio, fim, weight=peso)
+
+    for origem in ("0", "4", "8"):
+        resultado = dfs(grafo, origem)
+        alcancaveis = nx.descendants(referencia, origem) | {origem}
+        recorte = referencia.subgraph(alcancaveis)
+
+        assert resultado["ordem"] == list(
+            nx.dfs_preorder_nodes(referencia, source=origem)
+        )
+        assert resultado["arcos"]["arvore"] == list(
+            nx.dfs_edges(referencia, source=origem)
+        )
+        assert resultado["tem_ciclo"] == (
+            not nx.is_directed_acyclic_graph(recorte)
+        )
+
+    completo = dfs(grafo)
+    assert completo["arcos"]["arvore"] == list(nx.dfs_edges(referencia))
+    assert completo["tem_ciclo"] == (
+        not nx.is_directed_acyclic_graph(referencia)
+    )
