@@ -142,7 +142,7 @@ def bellman_ford(grafo: Grafo, origem: str) -> dict:
     nos = grafo.nos()
 
     if origem not in nos:
-        raise ValueError(f"Nó '{origem}' nao existe.")
+        raise ValueError(f"Nó '{origem}' não existe.")
 
     distancia = {no: float("inf") for no in nos}
     pai = {no: None for no in nos}

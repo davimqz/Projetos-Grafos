@@ -107,3 +107,82 @@ def test_origem_invalida(origem_invalida):
 def test_grafo_vazio():
     with pytest.raises(ValueError, match="não existe"):
         bellman_ford(Grafo(), "A")
+
+
+def test_caminho_precisa_de_todas_as_n_menos_uma_passadas():
+    grafo = Grafo()
+    # A ordem dos nós faz cada passada alcançar apenas mais um nó do caminho.
+    for no in ("E", "D", "C", "B", "A"):
+        grafo.adicionar_no(no)
+    for vi, vj, peso in (
+        ("A", "B", 2), ("B", "C", -1), ("C", "D", 3), ("D", "E", -2),
+    ):
+        grafo.adicionar_aresta(vi, vj, peso)
+
+    resultado = bellman_ford(grafo, "A")
+
+    assert resultado["distancia"] == {"A": 0, "B": 2, "C": 1, "D": 4, "E": 2}
+    assert resultado["pai"] == {"A": None, "B": "A", "C": "B", "D": "C", "E": "D"}
+    assert resultado["status"] == "OK"
+    assert resultado["tem_ciclo_negativo"] is False
+    assert resultado["ciclo_negativo"] == []
+    assert resultado["custo_ciclo"] is None
+
+
+def test_ordem_do_ciclo_negativo_respeita_arcos_dirigidos():
+    grafo = Grafo()
+    # Três nós, sem arcos reversos: inverter o ciclo deve falhar neste teste.
+    for vi, vj, peso in (
+        ("A", "B", 1), ("B", "C", -4), ("C", "D", 1), ("D", "B", 1),
+    ):
+        grafo.adicionar_aresta(vi, vj, peso)
+
+    resultado = bellman_ford(grafo, "A")
+    ciclo = resultado["ciclo_negativo"]
+
+    assert resultado["tem_ciclo_negativo"] is True
+    assert len(ciclo) == 4
+    assert ciclo[0] == ciclo[-1]
+    assert set(ciclo[:-1]) == {"B", "C", "D"}
+    for vi, vj in zip(ciclo, ciclo[1:]):
+        assert vj in dict(grafo.vizinhos(vi))
+
+
+def test_custo_do_ciclo_formado_antes_da_verificacao_final():
+    grafo = Grafo()
+    # B -> C -> D -> B já fecha o ciclo na primeira passada de relaxamento.
+    # A cauda também permite que o último nó atualizado fique fora do ciclo.
+    for vi, vj, peso in (
+        ("A", "B", 2), ("B", "C", -5), ("C", "D", 1), ("D", "B", 1),
+        ("D", "E", 4), ("E", "F", 1),
+    ):
+        grafo.adicionar_aresta(vi, vj, peso)
+
+    resultado = bellman_ford(grafo, "A")
+    ciclo = resultado["ciclo_negativo"]
+
+    assert resultado["status"] == "CICLO_NEGATIVO"
+    assert resultado["tem_ciclo_negativo"] is True
+    assert len(ciclo) == 4
+    assert ciclo[0] == ciclo[-1]
+    assert set(ciclo[:-1]) == {"B", "C", "D"}
+    custo_dos_arcos = sum(
+        dict(grafo.vizinhos(vi))[vj] for vi, vj in zip(ciclo, ciclo[1:])
+    )
+    assert resultado["custo_ciclo"] == custo_dos_arcos == -3
+
+
+def test_ciclo_de_custo_zero_nao_e_negativo():
+    grafo = Grafo()
+    for vi, vj, peso in (
+        ("A", "B", 2), ("B", "C", -3), ("C", "D", 1), ("D", "B", 2),
+    ):
+        grafo.adicionar_aresta(vi, vj, peso)
+
+    resultado = bellman_ford(grafo, "A")
+
+    assert resultado["distancia"] == {"A": 0, "B": 2, "C": -1, "D": 0}
+    assert resultado["status"] == "OK"
+    assert resultado["tem_ciclo_negativo"] is False
+    assert resultado["ciclo_negativo"] == []
+    assert resultado["custo_ciclo"] is None
