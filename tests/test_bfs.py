@@ -1,5 +1,7 @@
 """BFS (P2) — níveis corretos em grafo pequeno."""
+import random
 
+import networkx as nx
 import pytest
 
 from src.graphs.graph import Grafo
@@ -123,3 +125,57 @@ def test_caminho_longo():
     assert resultado["distancia"]["2500"] == 2500
     assert resultado["pai"]["2500"] == "2499"
     assert resultado["estado"]["2500"] == "ENCERRADO"
+
+# [IA] ChatGPT - casos de teste para validar a BFS.
+
+def test_laco_na_origem_nao_redescobre_inicio():
+    """O laço A->A não deve alterar o pai ou o nível da origem."""
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "A", 1)
+    grafo.adicionar_aresta("A", "B", 1)
+
+    resultado = bfs(grafo, "A")
+
+    assert resultado["ordem"] == ["A", "B"]
+    assert resultado["pai"] == {"A": None, "B": "A"}
+    assert resultado["distancia"] == {"A": 0, "B": 1}
+    assert resultado["nivel"] == {"A": 0, "B": 1}
+    assert resultado["camadas"] == {0: ["A"], 1: ["B"]}
+    assert resultado["arvore"] == [("A", "B")]
+
+
+@pytest.mark.parametrize("semente", range(10))
+def test_bfs_com_networkx_como_oraculo(semente):
+    """Confere distâncias e árvore BFS em grafos dirigidos reproduzíveis."""
+    aleatorio = random.Random(semente)
+    grafo = Grafo()
+    referencia = nx.DiGraph()
+    nos = [str(i) for i in range(9)]
+
+    for no in nos:
+        grafo.adicionar_no(no)
+        referencia.add_node(no)
+
+    for inicio in nos:
+        for fim in nos:
+            if aleatorio.random() < 0.2:
+                peso = aleatorio.choice([-3, 0, 1, 5])
+                grafo.adicionar_aresta(inicio, fim, peso)
+                referencia.add_edge(inicio, fim, weight=peso)
+
+    for origem in ("0", "4", "8"):
+        resultado = bfs(grafo, origem)
+        distancias = nx.single_source_shortest_path_length(referencia, origem)
+        arestas_arvore = list(nx.bfs_edges(referencia, origem))
+
+        esperado_distancia = {
+            no: distancias.get(no, float("inf")) for no in nos
+        }
+        esperado_pai = {no: None for no in nos}
+        for pai, filho in arestas_arvore:
+            esperado_pai[filho] = pai
+
+        assert resultado["distancia"] == esperado_distancia
+        assert resultado["nivel"] == {no: distancias.get(no) for no in nos}
+        assert resultado["pai"] == esperado_pai
+        assert resultado["arvore"] == arestas_arvore

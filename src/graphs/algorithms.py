@@ -55,7 +55,7 @@ def dfs(grafo: Grafo, origem: str | None = None) -> dict:
                 pilha.pop()
                 continue
 
-            vj = vizinhos[posicao][0]
+            vj, _peso = vizinhos[posicao]
             pilha[-1][2] += 1
 
             if estado[vj] == "NAO_VISITADO":
