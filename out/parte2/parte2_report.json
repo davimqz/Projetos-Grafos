@@ -5,8 +5,11 @@
     "nos": 1418,
     "arestas": 130,
     "complexidade": "O(V + E)",
-    "tempo_medio_ms": 1.76,
-    "tempo_por_elemento_us": 1.14
+    "origem": null,
+    "alcancados": 1418,
+    "status": "-",
+    "tempo_medio_ms": 1.11,
+    "tempo_por_custo_teorico_ms": 0.000716
   },
   {
     "algoritmo": "DFS",
@@ -14,8 +17,11 @@
     "nos": 7091,
     "arestas": 6477,
     "complexidade": "O(V + E)",
-    "tempo_medio_ms": 12.73,
-    "tempo_por_elemento_us": 0.94
+    "origem": null,
+    "alcancados": 7091,
+    "status": "-",
+    "tempo_medio_ms": 9.33,
+    "tempo_por_custo_teorico_ms": 0.000688
   },
   {
     "algoritmo": "DFS",
@@ -23,7 +29,82 @@
     "nos": 14182,
     "arestas": 25111,
     "complexidade": "O(V + E)",
-    "tempo_medio_ms": 38.66,
-    "tempo_por_elemento_us": 0.98
+    "origem": null,
+    "alcancados": 14182,
+    "status": "-",
+    "tempo_medio_ms": 26.19,
+    "tempo_por_custo_teorico_ms": 0.000667
+  },
+  {
+    "algoritmo": "BFS",
+    "fracao": 0.1,
+    "nos": 1418,
+    "arestas": 130,
+    "complexidade": "O(V + E)",
+    "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
+    "alcancados": 4,
+    "status": "-",
+    "tempo_medio_ms": 0.39,
+    "tempo_por_custo_teorico_ms": 0.000276
+  },
+  {
+    "algoritmo": "BFS",
+    "fracao": 0.5,
+    "nos": 7091,
+    "arestas": 6477,
+    "complexidade": "O(V + E)",
+    "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+    "alcancados": 537,
+    "status": "-",
+    "tempo_medio_ms": 2.2,
+    "tempo_por_custo_teorico_ms": 0.000285
+  },
+  {
+    "algoritmo": "BFS",
+    "fracao": 1.0,
+    "nos": 14182,
+    "arestas": 25111,
+    "complexidade": "O(V + E)",
+    "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+    "alcancados": 1267,
+    "status": "-",
+    "tempo_medio_ms": 5.5,
+    "tempo_por_custo_teorico_ms": 0.000338
+  },
+  {
+    "algoritmo": "Bellman-Ford",
+    "fracao": 0.1,
+    "nos": 1418,
+    "arestas": 130,
+    "complexidade": "O(V * E)",
+    "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
+    "alcancados": 4,
+    "status": "OK",
+    "tempo_medio_ms": 0.54,
+    "tempo_por_custo_teorico_ms": null
+  },
+  {
+    "algoritmo": "Bellman-Ford",
+    "fracao": 0.5,
+    "nos": 7091,
+    "arestas": 6477,
+    "complexidade": "O(V * E)",
+    "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+    "alcancados": 537,
+    "status": "CICLO_NEGATIVO",
+    "tempo_medio_ms": 5617.59,
+    "tempo_por_custo_teorico_ms": 0.000122
+  },
+  {
+    "algoritmo": "Bellman-Ford",
+    "fracao": 1.0,
+    "nos": 14182,
+    "arestas": 25111,
+    "complexidade": "O(V * E)",
+    "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+    "alcancados": 1267,
+    "status": "CICLO_NEGATIVO",
+    "tempo_medio_ms": 44259.47,
+    "tempo_por_custo_teorico_ms": 0.000124
   }
 ]
