@@ -6,7 +6,6 @@
 
 import random
 
-import networkx as nx
 import pytest
 
 from src.graphs.graph import Grafo
@@ -226,6 +225,7 @@ def test_pesos_fracionarios():
 
 @pytest.mark.parametrize("semente", range(20))
 def test_bellman_ford_com_networkx_como_oraculo(semente):
+    nx = pytest.importorskip("networkx")
     sorteio = random.Random(semente)
     grafo = Grafo()
     referencia = nx.DiGraph()

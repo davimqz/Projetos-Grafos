@@ -219,7 +219,7 @@ def bellman_ford(grafo: Grafo, origem: str) -> dict:
     }
 
 def dijkstra(grafo: Grafo, origem: str) -> dict:
-    """Lança ValueError caso a origem não exista ou haja peso negativo.
+    """Lança ValueError se a origem não existir ou houver peso negativo.
     """
     nos = grafo.nos()
 
