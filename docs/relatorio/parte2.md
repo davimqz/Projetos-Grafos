@@ -204,3 +204,26 @@ Por fim, a DFS identifica ciclos estruturais, mas não confirma se eles possuem 
 Após a implementação, será necessário atualizar os resultados e verificar se as carteiras participam efetivamente de ciclos negativos.
 
 Dessa forma, os resultados atuais representam uma etapa exploratória importante para compreender a estrutura das redes analisadas, mas ainda não permitem concluir que carteiras ilícitas participam mais de ciclos negativos do que carteiras lícitas.
+
+# Parte 2 — Desempenho e escalabilidade
+
+## Como foi medido
+
+Escrever: quais algoritmos, quais tamanhos (10%, 50% e 100%) e a média de 5 execuções.
+
+## Decisões
+
+A escolha da carteira de maior grau de saída como origem no BFS e Bellman-Ford foi arbitrária, escolhido porque com mais graus de saída tem uma maior probabilidade de se conseguir uma maior sequência de nós conectados, mesmo que não tenha sido o caso, a regra diz que a origem pode ser escolhida de forma arbitrária. A escala log foi escolhida porque permite ver melhor a diferença entre os números. A fórmula do custo vem da complexidade de cada algoritmo, com base no código deles.
+
+O gráfico de tempo é um gráfico de linha, escolhido por ser simples.
+
+## Resultados
+
+Comentar o Json e a tabela
+## Comparação com a complexidade teórica
+
+Escrever
+
+## Limitações
+
+Uma limitação é a amostra de 10%. Ela é um sorteio com seed fixa, que pega 1.418 carteiras e só as arestas que têm as duas pontas entre as sorteadas. Escolhemos como origem a carteira com mais arcos de saída, e ela tem só 3, ligados a outras carteiras sorteadas. Essas 3 carteiras não levam a nenhuma carteira nova, por isso, em 10%, o BFS e o Bellman-Ford alcançam só 4 carteiras. A DFS roda sem origem: quando termina uma busca, recomeça em uma carteira ainda não visitada e, por isso, alcança todas as carteiras sorteadas.

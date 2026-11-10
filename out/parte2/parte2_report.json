@@ -8,8 +8,8 @@
     "origem": null,
     "alcancados": 1418,
     "status": "-",
-    "tempo_medio_ms": 1.11,
-    "tempo_por_custo_teorico_ms": 0.000716
+    "tempo_medio_ms": 1.82,
+    "tempo_por_custo_teorico_ms": 0.001176
   },
   {
     "algoritmo": "DFS",
@@ -20,8 +20,8 @@
     "origem": null,
     "alcancados": 7091,
     "status": "-",
-    "tempo_medio_ms": 9.33,
-    "tempo_por_custo_teorico_ms": 0.000688
+    "tempo_medio_ms": 13.9,
+    "tempo_por_custo_teorico_ms": 0.001024
   },
   {
     "algoritmo": "DFS",
@@ -32,8 +32,8 @@
     "origem": null,
     "alcancados": 14182,
     "status": "-",
-    "tempo_medio_ms": 26.19,
-    "tempo_por_custo_teorico_ms": 0.000667
+    "tempo_medio_ms": 36.83,
+    "tempo_por_custo_teorico_ms": 0.000937
   },
   {
     "algoritmo": "BFS",
@@ -44,8 +44,8 @@
     "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
     "alcancados": 4,
     "status": "-",
-    "tempo_medio_ms": 0.39,
-    "tempo_por_custo_teorico_ms": 0.000276
+    "tempo_medio_ms": 0.7,
+    "tempo_por_custo_teorico_ms": 0.000492
   },
   {
     "algoritmo": "BFS",
@@ -56,8 +56,8 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 537,
     "status": "-",
-    "tempo_medio_ms": 2.2,
-    "tempo_por_custo_teorico_ms": 0.000285
+    "tempo_medio_ms": 3.4,
+    "tempo_por_custo_teorico_ms": 0.000441
   },
   {
     "algoritmo": "BFS",
@@ -68,8 +68,8 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 1267,
     "status": "-",
-    "tempo_medio_ms": 5.5,
-    "tempo_por_custo_teorico_ms": 0.000338
+    "tempo_medio_ms": 7.31,
+    "tempo_por_custo_teorico_ms": 0.00045
   },
   {
     "algoritmo": "Bellman-Ford",
@@ -80,7 +80,7 @@
     "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
     "alcancados": 4,
     "status": "OK",
-    "tempo_medio_ms": 0.54,
+    "tempo_medio_ms": 0.8,
     "tempo_por_custo_teorico_ms": null
   },
   {
@@ -92,8 +92,8 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 537,
     "status": "CICLO_NEGATIVO",
-    "tempo_medio_ms": 5617.59,
-    "tempo_por_custo_teorico_ms": 0.000122
+    "tempo_medio_ms": 8756.43,
+    "tempo_por_custo_teorico_ms": 0.000191
   },
   {
     "algoritmo": "Bellman-Ford",
@@ -104,7 +104,7 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 1267,
     "status": "CICLO_NEGATIVO",
-    "tempo_medio_ms": 44259.47,
-    "tempo_por_custo_teorico_ms": 0.000124
+    "tempo_medio_ms": 58574.93,
+    "tempo_por_custo_teorico_ms": 0.000164
   }
 ]

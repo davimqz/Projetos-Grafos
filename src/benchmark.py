@@ -115,7 +115,8 @@ def gerar_grafico(resultados, saida):
     plt.xscale("log")  # a comparação com a teoria de cada algoritmo está na coluna de custo do JSON
     plt.yscale("log")  # o Bellman-Ford fica ordens de grandeza acima dos outros
     plt.minorticks_off()
-    plt.xticks(x, [str(valor) for valor in x])  # só os três tamanhos medidos
+    tamanhos = sorted({r["nos"] + r["arestas"] for r in resultados})
+    plt.xticks(tamanhos, [str(valor) for valor in tamanhos])  # só os tamanhos medidos
     plt.title("Tempo médio x tamanho do grafo")
     plt.xlabel("|V| + |E| (escala log)")
     plt.ylabel("Tempo médio (ms, escala log)")

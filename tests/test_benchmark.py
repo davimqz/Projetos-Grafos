@@ -15,7 +15,6 @@ def test_relatorio_compara_os_algoritmos(tmp_path):
     # só 10% dos nós: o Bellman-Ford leva cerca de 45 s por execução no grafo inteiro
     executar_benchmark(PASTA_PADRAO, tmp_path, fracoes=[0.1])
     relatorio = json.loads((tmp_path / "parte2_report.json").read_text(encoding="utf-8"))
-    assert FRACOES == [0.1, 0.5, 1.0]
     assert [r["algoritmo"] for r in relatorio] == ["DFS", "BFS", "Bellman-Ford"]
     dfs, bfs, bellman_ford = relatorio
     assert dfs["origem"] is None and dfs["alcancados"] == dfs["nos"]
@@ -25,6 +24,10 @@ def test_relatorio_compara_os_algoritmos(tmp_path):
     assert bfs["alcancados"] == bellman_ford["alcancados"]
     assert bellman_ford["status"] == "OK" and bellman_ford["tempo_por_custo_teorico_ms"] is None
     assert (tmp_path / "benchmark_escalabilidade.png").exists()
+
+
+def test_fracoes_do_plano():
+    assert FRACOES == [0.1, 0.5, 1.0]
 
 
 def test_tempo_medio_roda_5_vezes():
