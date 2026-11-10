@@ -10,6 +10,9 @@ A implementar pelo grupo:
 """
 
 from collections import deque
+from heapq import heappop, heappush
+from itertools import count
+
 from src.graphs.graph import Grafo
 
 def dfs(grafo: Grafo, origem: str | None = None) -> dict:
@@ -213,4 +216,52 @@ def bellman_ford(grafo: Grafo, origem: str) -> dict:
         "ciclo_negativo": ciclo_negativo,
         "custo_ciclo": custo_ciclo,
         "status": "CICLO_NEGATIVO" if tem_ciclo_negativo else "OK",
+    }
+
+def dijkstra(grafo: Grafo, origem: str) -> dict:
+    """Lança ValueError se a origem não existir ou houver peso negativo.
+    """
+    nos = grafo.nos()
+
+    if origem not in nos:
+        raise ValueError(f"Nó '{origem}' não existe no grafo.")
+
+    for vi in nos:
+        for vj, peso in grafo.vizinhos(vi):
+            if peso < 0:
+                raise ValueError(
+                    f"Dijkstra não aceita peso negativo na aresta "
+                    f"{vi} -> {vj} (peso {peso})."
+                )
+
+    distancia = {no: float("inf") for no in nos}
+    pai = {no: None for no in nos}
+    ordem = []
+    finalizados = set()
+    distancia[origem] = 0
+
+    contador = count()
+    fila = [(0, next(contador), origem)]
+
+    while fila:
+        custo, _, vi = heappop(fila)
+
+        if vi in finalizados or custo > distancia[vi]:
+            continue
+
+        finalizados.add(vi)
+        ordem.append(vi)
+
+        for vj, peso in grafo.vizinhos(vi):
+            novo_custo = distancia[vi] + peso
+            if novo_custo < distancia[vj]:
+                distancia[vj] = novo_custo
+                pai[vj] = vi
+                heappush(fila, (novo_custo, next(contador), vj))
+
+    return {
+        "distancia": distancia,
+        "pai": pai,
+        "ordem": ordem,
+        "status": "OK",
     }

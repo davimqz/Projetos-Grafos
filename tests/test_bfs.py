@@ -179,3 +179,15 @@ def test_bfs_com_networkx_como_oraculo(semente):
         assert resultado["nivel"] == {no: distancias.get(no) for no in nos}
         assert resultado["pai"] == esperado_pai
         assert resultado["arvore"] == arestas_arvore
+
+        # [IA] Codex - cobertura dos metadados retornados pela BFS.
+        ordem = list(nx.bfs_tree(referencia, origem))
+        assert resultado["ordem"] == ordem
+        assert resultado["camadas"] == {
+            nivel: [no for no in ordem if distancias[no] == nivel]
+            for nivel in sorted(set(distancias.values()))
+        }
+        assert resultado["estado"] == {
+            no: "ENCERRADO" if no in distancias else "NAO_VISITADO"
+            for no in nos
+        }
