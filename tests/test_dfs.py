@@ -196,3 +196,40 @@ def test_dfs_com_networkx_como_oraculo(semente):
     assert completo["tem_ciclo"] == (
         not nx.is_directed_acyclic_graph(referencia)
     )
+
+    # [IA] Codex - invariantes de tempos e classificação de todos os arcos.
+    for resultado in (dfs(grafo, "0"), completo):
+        visitados = set(resultado["ordem"])
+        descoberta = resultado["descoberta"]
+        termino = resultado["termino"]
+        tempos = [tempo for no in visitados for tempo in (descoberta[no], termino[no])]
+        assert sorted(tempos) == list(range(2 * len(visitados)))
+        for no in nos:
+            if no in visitados:
+                assert descoberta[no] < termino[no]
+                assert resultado["estado"][no] == "ENCERRADO"
+            else:
+                assert descoberta[no] is None
+                assert termino[no] is None
+                assert resultado["pai"][no] is None
+                assert resultado["estado"][no] == "NAO_VISITADO"
+
+        classificados = [arco for arcos in resultado["arcos"].values() for arco in arcos]
+        esperados = {(vi, vj) for vi, vj in referencia.edges if vi in visitados}
+        assert set(classificados) == esperados
+        assert len(classificados) == len(esperados)
+        assert resultado["contagem_arcos"] == {
+            tipo: len(arcos) for tipo, arcos in resultado["arcos"].items()
+        }
+        for tipo, arcos in resultado["arcos"].items():
+            for vi, vj in arcos:
+                if tipo == "arvore":
+                    assert resultado["pai"][vj] == vi
+                    assert descoberta[vi] < descoberta[vj] < termino[vj] < termino[vi]
+                elif tipo == "retorno":
+                    assert descoberta[vj] <= descoberta[vi] < termino[vi] <= termino[vj]
+                elif tipo == "avanco":
+                    assert resultado["pai"][vj] != vi
+                    assert descoberta[vi] < descoberta[vj] < termino[vj] < termino[vi]
+                else:
+                    assert termino[vj] < descoberta[vi]
