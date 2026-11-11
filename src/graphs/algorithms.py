@@ -10,6 +10,9 @@ A implementar pelo grupo:
 """
 
 from collections import deque
+from heapq import heappop, heappush
+from itertools import count
+
 from src.graphs.graph import Grafo
 
 def dfs(grafo: Grafo, origem: str | None = None) -> dict:
@@ -136,4 +139,129 @@ def bfs(grafo: Grafo, origem: str) -> dict:
         "camadas": camadas,
         "arvore": arvore,
         "estado": estado,
+    }
+
+def bellman_ford(grafo: Grafo, origem: str) -> dict:
+    nos = grafo.nos()
+
+    if origem not in nos:
+        raise ValueError(f"Nó '{origem}' não existe.")
+
+    distancia = {no: float("inf") for no in nos}
+    pai = {no: None for no in nos}
+    peso_pai = {no: None for no in nos}
+    distancia[origem] = 0
+
+    arestas = [
+        (vi, vj, peso)
+        for vi in nos
+        for vj, peso in grafo.vizinhos(vi)
+    ]
+
+    for _ in range(len(nos) - 1):
+        alterou = False
+
+        for vi, vj, peso in arestas:
+            if distancia[vi] == float("inf"):
+                continue
+
+            novo_custo = distancia[vi] + peso
+            if novo_custo < distancia[vj]:
+                distancia[vj] = novo_custo
+                pai[vj] = vi
+                peso_pai[vj] = peso
+                alterou = True
+
+        if not alterou:
+            break
+
+    ultimo_atualizado = None
+    for vi, vj, peso in arestas:
+        if distancia[vi] == float("inf"):
+            continue
+
+        novo_custo = distancia[vi] + peso
+        if novo_custo < distancia[vj]:
+            distancia[vj] = novo_custo
+            pai[vj] = vi
+            peso_pai[vj] = peso
+            ultimo_atualizado = vj
+
+    ciclo_negativo = []
+    custo_ciclo = None
+
+    if ultimo_atualizado is not None:
+        atual = ultimo_atualizado
+        for _ in range(len(nos)):
+            atual = pai[atual]
+
+        inicio_ciclo = atual
+        ciclo_inverso = [inicio_ciclo]
+        atual = pai[inicio_ciclo]
+
+        while atual != inicio_ciclo:
+            ciclo_inverso.append(atual)
+            atual = pai[atual]
+
+        ciclo_inverso.append(inicio_ciclo)
+        ciclo_negativo = list(reversed(ciclo_inverso))
+        custo_ciclo = sum(peso_pai[vj] for vj in ciclo_negativo[1:])
+
+    tem_ciclo_negativo = bool(ciclo_negativo)
+
+    return {
+        "distancia": distancia,
+        "pai": pai,
+        "tem_ciclo_negativo": tem_ciclo_negativo,
+        "ciclo_negativo": ciclo_negativo,
+        "custo_ciclo": custo_ciclo,
+        "status": "CICLO_NEGATIVO" if tem_ciclo_negativo else "OK",
+    }
+
+def dijkstra(grafo: Grafo, origem: str) -> dict:
+    """Lança ValueError se a origem não existir ou houver peso negativo.
+    """
+    nos = grafo.nos()
+
+    if origem not in nos:
+        raise ValueError(f"Nó '{origem}' não existe no grafo.")
+
+    for vi in nos:
+        for vj, peso in grafo.vizinhos(vi):
+            if peso < 0:
+                raise ValueError(
+                    f"Dijkstra não aceita peso negativo na aresta "
+                    f"{vi} -> {vj} (peso {peso})."
+                )
+
+    distancia = {no: float("inf") for no in nos}
+    pai = {no: None for no in nos}
+    ordem = []
+    finalizados = set()
+    distancia[origem] = 0
+
+    contador = count()
+    fila = [(0, next(contador), origem)]
+
+    while fila:
+        custo, _, vi = heappop(fila)
+
+        if vi in finalizados or custo > distancia[vi]:
+            continue
+
+        finalizados.add(vi)
+        ordem.append(vi)
+
+        for vj, peso in grafo.vizinhos(vi):
+            novo_custo = distancia[vi] + peso
+            if novo_custo < distancia[vj]:
+                distancia[vj] = novo_custo
+                pai[vj] = vi
+                heappush(fila, (novo_custo, next(contador), vj))
+
+    return {
+        "distancia": distancia,
+        "pai": pai,
+        "ordem": ordem,
+        "status": "OK",
     }
