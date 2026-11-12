@@ -4,7 +4,7 @@ No Bellman-Ford, utilizamos como peso o saldo da carteira de destino (B), calcul
 
 No Dijkstra, utilizamos como peso a soma dos valores das transações entre A e B (valor_btc), pois ela já existe no dataset e é não negativa. Dessa forma, o caminho mínimo representa a rota com a menor soma dos valores movimentados.
 
-Na preparação dos dados, removemos os laços (A → A), pois representam troco e poderiam gerar ciclos negativos artificiais. Também agregamos arestas repetidas entre as mesmas carteiras, somando os valores das transações para o Dijkstra, e somamos os atributos de cada carteira entre os diferentes intervalos de tempo (time steps). Para reduzir o tamanho do grafo, aplicamos um recorte em bola de neve, partindo das carteiras ilícitas e expandindo para seus vizinhos. Essa estratégia preserva as conexões, ao contrário da amostragem aleatória. O recorte foi necessário porque o grafo completo possui 2,87 milhões de arestas, acima do limite de aproximadamente 500 mil arestas a partir do qual o enunciado exige amostragem.
+Na preparação dos dados, removemos os laços (A → A), pois representam troco e poderiam gerar ciclos negativos artificiais. Também agregamos arestas repetidas entre as mesmas carteiras, somando os valores das transações para o Dijkstra, e mantivemos uma única linha por carteira, já que o dataset repete em cada intervalo de tempo (time step) os totais da vida inteira da carteira; somar essas linhas contaria o mesmo valor várias vezes. Para reduzir o tamanho do grafo, aplicamos um recorte em bola de neve, partindo das carteiras ilícitas e expandindo para seus vizinhos. Essa estratégia preserva as conexões, ao contrário da amostragem aleatória. O recorte foi necessário porque o grafo completo possui 2,87 milhões de arestas, acima do limite de aproximadamente 500 mil arestas a partir do qual o enunciado exige amostragem.
 
 A metodologia apresenta três limitações principais: as carteiras ilícitas representam 37% do recorte, mas apenas 1,7% do dataset completo, gerando um possível viés; no Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso; e o valor_btc representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
 
@@ -252,16 +252,16 @@ A comparação entre o número de arcos também demonstra que o caminho de menor
 
 | Caso | Origem | Status | Resultado |
 |---|---|---|---|
-| Sem ciclo negativo | `3Fzzji5n…` (lícita) | OK | 45 carteiras alcançadas (incluindo a origem), 29 arcos negativos alcançáveis; distâncias de −4,23 a 169,82; 8 carteiras com distância negativa |
+| Sem ciclo negativo | `3Fzzji5n…` (lícita) | OK | 45 carteiras alcançadas (incluindo a origem), 29 arcos negativos alcançáveis; distâncias de −0,26 a 36,36; 5 carteiras com distância negativa |
 | Com ciclo negativo | `1MFXYK1X…` (desconhecida) | CICLO_NEGATIVO | ciclo de 2 carteiras: `1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo` → `12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P` → `1DEcTtkr…` |
 
 Arcos do ciclo negativo:
 
 | Arco | Peso (saldo do destino) |
 |---|---|
-| `1DEcTtkr…` → `12cgpFdJ…` | −1.082.372,06 |
-| `12cgpFdJ…` → `1DEcTtkr…` | −30.740,64 |
-| **Custo do ciclo** | **−1.113.112,70** |
+| `1DEcTtkr…` → `12cgpFdJ…` | −12.585,72 |
+| `12cgpFdJ…` → `1DEcTtkr…` | −640,43 |
+| **Custo do ciclo** | **−13.226,15** |
 
 Resultados completos: `out/parte2/bellman_ford_<origem>.json`.
 
@@ -271,23 +271,23 @@ A aplicação do algoritmo de Bellman-Ford permitiu investigar a existência de 
 
 **Caso 1: origem lícita (`3Fzzji5n…`)**
 
-Na execução iniciada pela carteira lícita, o algoritmo terminou normalmente, sem identificar ciclos negativos alcançáveis. Foram alcançadas 45 carteiras, com passagem por 29 arcos negativos. Além disso, oito carteiras apresentaram distâncias acumuladas negativas.
+Na execução iniciada pela carteira lícita, o algoritmo terminou normalmente, sem identificar ciclos negativos alcançáveis. Foram alcançadas 45 carteiras, com passagem por 29 arcos negativos. Além disso, cinco carteiras apresentaram distâncias acumuladas negativas.
 
 Esse resultado demonstra que a presença de arcos negativos não implica necessariamente a formação de ciclos de repasse. Uma carteira pode apresentar saldo negativo e estar conectada a outras carteiras com a mesma característica sem que exista um caminho direcionado de retorno que forme um circuito negativo. Nesse caso, os arcos negativos aparecem em trajetórias que não constituem ciclos negativos alcançáveis pela origem analisada.
 
-As oito distâncias negativas também indicam que existem trajetórias cujo custo acumulado, segundo os pesos definidos, permanece abaixo de zero. Isso reforça a distinção entre alcançar carteiras por caminhos de custo negativo e identificar efetivamente uma estrutura cíclica. Portanto, a ausência de ciclos negativos nessa execução não significa ausência de comportamentos de repasse, mas demonstra que os arcos negativos encontrados não formaram um ciclo negativo alcançável a partir daquela origem.
+As cinco distâncias negativas também indicam que existem trajetórias cujo custo acumulado, segundo os pesos definidos, permanece abaixo de zero. Isso reforça a distinção entre alcançar carteiras por caminhos de custo negativo e identificar efetivamente uma estrutura cíclica. Portanto, a ausência de ciclos negativos nessa execução não significa ausência de comportamentos de repasse, mas demonstra que os arcos negativos encontrados não formaram um ciclo negativo alcançável a partir daquela origem.
 
 **Caso 2: origem desconhecida (`1MFXYK1X…`)**
 
 Na execução iniciada pela carteira desconhecida, o Bellman-Ford identificou um ciclo negativo composto por duas carteiras que possuem conexões direcionadas entre si. Os dois arcos apresentam pesos negativos, indicando que ambas possuem saldos negativos segundo a métrica adotada.
 
-O custo acumulado do ciclo foi de aproximadamente −1.113.113 BTC. Entretanto, esse valor é fortemente influenciado por um único arco, com peso de aproximadamente −1.082.372 BTC. A consulta ao arquivo `nos.csv` permitiu identificar a carteira responsável por esse valor: `12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`, classificada como lícita. O endereço apresenta 7.396 transações, aproximadamente 568.470,94 BTC recebidos e 1.650.843 BTC enviados, resultando em saldo de aproximadamente −1.082.372 BTC.
+O custo acumulado do ciclo foi de aproximadamente −13.226 BTC. Entretanto, esse valor é fortemente influenciado por um único arco, com peso de aproximadamente −12.586 BTC. A consulta ao arquivo `nos.csv` permitiu identificar a carteira responsável por esse valor: `12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`, classificada como lícita. O endereço apresenta 86 transações, aproximadamente 6.610,13 BTC recebidos e 19.195,85 BTC enviados, resultando em saldo de aproximadamente −12.586 BTC.
 
 Esse resultado evidencia a presença de um valor extremo (*outlier*) na composição do ciclo. Embora o custo acumulado seja expressivo, sua magnitude não representa necessariamente um comportamento típico das carteiras envolvidas. A concentração de grande parte do valor negativo em uma única carteira exige cautela ao interpretar a intensidade econômica da estrutura identificada.
 
 É importante destacar que a carteira de origem `1MFXYK1X…` não participa diretamente do ciclo negativo: ela apenas possui um caminho que permite alcançá-lo. A mesma estrutura também pode ser alcançada a partir da carteira ilícita `39sfuA8p…`. Dessa forma, duas origens de classificações diferentes conseguem alcançar o mesmo ciclo, embora nenhuma delas seja necessariamente integrante de sua estrutura.
 
-A classificação das carteiras que compõem o ciclo também é relevante para a interpretação dos resultados. Uma delas pertence à classe lícita (`12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`), enquanto a outra é desconhecida (`1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo`), com 2.304 transações e saldo aproximado de −30.740 BTC. Portanto, o ciclo negativo identificado é formado por uma carteira lícita e uma desconhecida, sem participação direta de carteiras classificadas como ilícitas. Embora uma origem ilícita consiga alcançar esse ciclo, alcançar uma estrutura não significa participar dela. Esse resultado, portanto, não sustenta a hipótese de que carteiras ilícitas participem mais de ciclos de repasse; além disso, a quantidade limitada de origens analisadas impede uma conclusão geral sobre essa relação.
+A classificação das carteiras que compõem o ciclo também é relevante para a interpretação dos resultados. Uma delas pertence à classe lícita (`12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`), enquanto a outra é desconhecida (`1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo`), com 48 transações e saldo aproximado de −640 BTC. Portanto, o ciclo negativo identificado é formado por uma carteira lícita e uma desconhecida, sem participação direta de carteiras classificadas como ilícitas. Embora uma origem ilícita consiga alcançar esse ciclo, alcançar uma estrutura não significa participar dela. Esse resultado, portanto, não sustenta a hipótese de que carteiras ilícitas participem mais de ciclos de repasse; além disso, a quantidade limitada de origens analisadas impede uma conclusão geral sobre essa relação.
 
 **Relação com a pergunta de pesquisa**
 
