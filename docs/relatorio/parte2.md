@@ -163,7 +163,7 @@ Consequentemente, as carteiras selecionadas não representam necessariamente uma
 
 A análise realizada com o Bellman-Ford permitiu identificar um ciclo negativo no recorte estudado. Entretanto, os resultados estão limitados à quantidade de origens selecionadas e às estruturas alcançáveis a partir delas. Foram analisadas apenas duas origens, o que não permite estabelecer uma comparação estatisticamente representativa entre carteiras lícitas, ilícitas e desconhecidas.
 
-Além disso, a magnitude do ciclo identificado é fortemente influenciada por um valor extremo associado ao saldo de uma das carteiras. Essa característica exige cautela na interpretação dos custos acumulados, especialmente porque os atributos financeiros utilizados podem apresentar limitações decorrentes da agregação dos dados ao longo dos diferentes períodos analisados.
+Além disso, a magnitude do ciclo identificado é fortemente influenciada por um valor extremo associado ao saldo de uma das carteiras. Essa característica exige cautela na interpretação dos custos acumulados.
 
 A interpretação dos ciclos identificados e sua relação com a pergunta de pesquisa são apresentadas na seção de resultados do Bellman-Ford.
 
@@ -283,7 +283,7 @@ Na execução iniciada pela carteira desconhecida, o Bellman-Ford identificou um
 
 O custo acumulado do ciclo foi de aproximadamente −13.226 BTC. Entretanto, esse valor é fortemente influenciado por um único arco, com peso de aproximadamente −12.586 BTC. A consulta ao arquivo `nos.csv` permitiu identificar a carteira responsável por esse valor: `12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`, classificada como lícita. O endereço apresenta 86 transações, aproximadamente 6.610,13 BTC recebidos e 19.195,85 BTC enviados, resultando em saldo de aproximadamente −12.586 BTC.
 
-Esse resultado evidencia a presença de um valor extremo (*outlier*) na composição do ciclo. Embora o custo acumulado seja expressivo, sua magnitude não representa necessariamente um comportamento típico das carteiras envolvidas. A concentração de grande parte do valor negativo em uma única carteira exige cautela ao interpretar a intensidade econômica da estrutura identificada.
+Esse resultado evidencia a presença de um valor extremo (*outlier*) em relação às demais carteiras do recorte: o saldo de `12cgpFdJ…` é cerca de 7,5 vezes o segundo saldo mais negativo e responde por aproximadamente 95% do custo do ciclo. Por isso, a magnitude do custo acumulado não representa necessariamente um comportamento típico das carteiras envolvidas. A concentração de grande parte do valor negativo em uma única carteira exige cautela ao interpretar a intensidade econômica da estrutura identificada.
 
 É importante destacar que a carteira de origem `1MFXYK1X…` não participa diretamente do ciclo negativo: ela apenas possui um caminho que permite alcançá-lo. A mesma estrutura também pode ser alcançada a partir da carteira ilícita `39sfuA8p…`. Dessa forma, duas origens de classificações diferentes conseguem alcançar o mesmo ciclo, embora nenhuma delas seja necessariamente integrante de sua estrutura.
 
