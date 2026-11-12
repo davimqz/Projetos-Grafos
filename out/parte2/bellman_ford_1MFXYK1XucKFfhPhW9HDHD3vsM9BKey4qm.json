@@ -1,0 +1,27 @@
+{
+  "algoritmo": "BELLMAN_FORD",
+  "peso": "peso",
+  "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+  "total_nos": 14182,
+  "alcancados": 1267,
+  "status": "CICLO_NEGATIVO",
+  "tem_ciclo_negativo": true,
+  "ciclo_negativo": [
+    "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
+    "12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P",
+    "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo"
+  ],
+  "arcos_ciclo": [
+    [
+      "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
+      "12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P",
+      -1082372.0613478809
+    ],
+    [
+      "12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P",
+      "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
+      -30740.63999999994
+    ]
+  ],
+  "custo_ciclo": -1113112.7013478808
+}
