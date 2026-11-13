@@ -49,6 +49,22 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(str(erro))
         print("Resultado gravado em", caminho)
         return 0
+    if args.dataset and args.alg in ("DIJKSTRA", "BELLMAN_FORD"):
+        # casos obrigatórios da Parte 2 (P4a): Dijkstra por par, Bellman-Ford por fonte
+        if not args.source:
+            parser.error(f"--alg {args.alg} exige --source")
+        if args.alg == "DIJKSTRA" and not args.target:
+            parser.error("--alg DIJKSTRA exige --target")
+        from src.casos_parte2 import executar_bellman_ford, executar_dijkstra
+        try:
+            if args.alg == "DIJKSTRA":
+                caminho = executar_dijkstra(args.dataset, args.source, args.target, args.out)
+            else:
+                caminho = executar_bellman_ford(args.dataset, args.source, args.out)
+        except ValueError as erro:
+            parser.error(str(erro))
+        print("Resultado gravado em", caminho)
+        return 0
     raise NotImplementedError("orquestração ainda não implementada (ver src/solve.py)")
 
 

@@ -39,11 +39,11 @@ o peso precisa depender do **arco** (ou do destino de um jeito que não se cance
 | # | Decisão | O que foi feito |
 |---|---|---|
 | 1 | **Grafo** | carteiras (addr → addr): tem ciclos, então o ciclo negativo pode vir dos próprios dados |
-| 2 | **Peso (Bellman-Ford)** | `peso(A → B) = saldo líquido de B = btc_received_total − btc_sent_total` (somado em todos os time steps). Positivo: B acumula BTC. Negativo: B repassa mais do que recebe. Ciclo negativo: grupo de carteiras que ficam repassando dinheiro entre si |
+| 2 | **Peso (Bellman-Ford)** | `peso(A → B) = saldo líquido de B = btc_received_total − btc_sent_total` (totais da vida inteira da carteira). Positivo: B acumula BTC. Negativo: B repassa mais do que recebe. Ciclo negativo: grupo de carteiras que ficam repassando dinheiro entre si |
 | 3 | **Peso (Dijkstra)** | `valor_btc` = soma do `total_BTC` das transações do par A → B. Já vem ≥ 0 dos dados; caminho mínimo = rota que movimenta menos dinheiro |
 | 4 | **Laços** (A → A) | removidos: são troco e virariam ciclos negativos falsos (45.981) |
 | 5 | **Arestas duplicadas** | agregadas em um arco por par: `valor_btc` = soma, `n_txs` = nº de transações (47.346 linhas a menos) |
-| 6 | **Atributos por carteira** | somados em todos os time steps (`*_total`, `total_txs`); máximo para `lifetime_in_blocks` e `num_timesteps_appeared_in` |
+| 6 | **Atributos por carteira** | uma linha por endereço. Corrigido em 12/11: antes eram somados em todos os time steps, mas `wallets_features.csv` repete em cada linha os totais da vida inteira da carteira, então a soma contava o mesmo valor k vezes (k = nº de linhas do endereço). Afetava 8.388 dos 14.182 nós e o peso de 8.206 arcos, sem mudar nenhum sinal; `valor_btc` não era afetado |
 | 7 | **Transações sem valor** | tenta `in_BTC_total − fees`; nas 965, todas as colunas de valor faltam juntas, então ficam marcadas em `valor_faltante`. No recorte atual nenhum arco é afetado |
 | 8 | **Recorte** | bola de neve a partir de 50 carteiras ilícitas sorteadas (seed 42), expandindo por vizinhos de entrada e saída até ≥ 25.000 arestas no subgrafo induzido |
 | 9 | **Pergunta de pesquisa** | *Carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?* (confirmada pelo grupo) |
@@ -84,7 +84,7 @@ python scripts/amostrar_dataset.py   # --arestas 25000 --sementes 50 --seed 42
 | Arestas em `AddrAddr_edgelist.csv` | 2.868.964 | |
 | Laços (carteira → ela mesma) | 45.981 | são **troco** de transação; com peso negativo, cada laço vira sozinho um ciclo negativo. Tratamento precisa ser decidido |
 | Arestas duplicadas | 84.620 | o mesmo par interagiu em mais de uma transação: agregar ou manter? |
-| Linhas em `wallets_features.csv` | 1.268.260 para 822.942 endereços | features são **por (endereço, time step)**: é preciso agregar por endereço |
+| Linhas em `wallets_features.csv` | 1.268.260 para 822.942 endereços | apesar da coluna `Time step`, os totais (`btc_*_total`, `total_txs`, `fees_total`, `lifetime_in_blocks`…) são **iguais em todas as linhas** do endereço (conferido em 12/11): basta uma linha por endereço; somar infla os valores |
 | Origem de cada aresta addr → addr | cada linha é um trio (carteira de entrada, transação, carteira de saída): o join `AddrTx` × `TxAddr` reproduz as 2.868.964 linhas | dá para levar atributos da **transação** para o arco |
 | Valor da transação (`total_BTC` = `out_BTC_total`, `in_BTC_total`, `fees`) | mínimo ≥ 0 em todas; `fees` = `in_BTC_total − out_BTC_total` | **não existe valor negativo**; o valor é da transação inteira, não de cada saída para cada carteira |
 | Transações sem valor (NaN) | 965 | dado faltante para discutir (AVD) |

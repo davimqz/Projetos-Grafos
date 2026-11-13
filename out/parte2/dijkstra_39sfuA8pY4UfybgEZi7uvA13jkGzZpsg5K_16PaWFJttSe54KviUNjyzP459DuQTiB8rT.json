@@ -1,0 +1,31 @@
+{
+  "algoritmo": "DIJKSTRA",
+  "peso": "valor_btc",
+  "origem": "39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K",
+  "destino": "16PaWFJttSe54KviUNjyzP459DuQTiB8rT",
+  "custo": 10.882435390000001,
+  "passos": 3,
+  "caminho": [
+    "39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K",
+    "1MLvzsdbo2N12ANUcGTXkMCQ1GZbLTvkTL",
+    "1FAv42GaDuQixSzEzSbx6aP1Kf4WVWpQUY",
+    "16PaWFJttSe54KviUNjyzP459DuQTiB8rT"
+  ],
+  "arcos": [
+    [
+      "39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K",
+      "1MLvzsdbo2N12ANUcGTXkMCQ1GZbLTvkTL",
+      2.77279994
+    ],
+    [
+      "1MLvzsdbo2N12ANUcGTXkMCQ1GZbLTvkTL",
+      "1FAv42GaDuQixSzEzSbx6aP1Kf4WVWpQUY",
+      2.38407322
+    ],
+    [
+      "1FAv42GaDuQixSzEzSbx6aP1Kf4WVWpQUY",
+      "16PaWFJttSe54KviUNjyzP459DuQTiB8rT",
+      5.72556223
+    ]
+  ]
+}
