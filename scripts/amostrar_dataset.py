@@ -7,7 +7,8 @@ Uso:
 Decisões aplicadas (ver docs/PARTE2_DATASET.md):
 - laços (A -> A, troco) removidos;
 - arestas duplicadas do mesmo par agregadas em um arco (valor_btc = soma, n_txs = contagem);
-- atributos das carteiras somados em todos os time steps;
+- atributos das carteiras: uma linha por endereço (wallets_features repete os totais da vida
+  inteira da carteira em cada time step; somar as linhas contaria o mesmo valor várias vezes);
 - transação sem valor: preenche com in_BTC_total - fees; se ainda faltar, valor_faltante = True;
 - peso (Bellman-Ford) = saldo líquido da carteira de DESTINO = btc_received_total - btc_sent_total;
 - peso do Dijkstra = valor_btc (soma do total_BTC das transações do par, sempre >= 0);
@@ -27,8 +28,9 @@ RAIZ = Path(__file__).resolve().parents[1]
 RAW = RAIZ / "data" / "dataset_parte2" / "raw"
 SAIDA = RAIZ / "data" / "dataset_parte2"
 
-COLS_SOMA = ["btc_received_total", "btc_sent_total", "total_txs", "fees_total"]
-COLS_MAX = ["lifetime_in_blocks", "num_timesteps_appeared_in"]
+# Totais da vida inteira da carteira, repetidos (iguais) em todas as linhas do endereço.
+COLS = ["btc_received_total", "btc_sent_total", "total_txs", "fees_total",
+        "lifetime_in_blocks", "num_timesteps_appeared_in"]
 
 
 def carregar_arestas() -> tuple[pd.DataFrame, dict]:
@@ -56,9 +58,11 @@ def carregar_arestas() -> tuple[pd.DataFrame, dict]:
 
 
 def carregar_carteiras() -> pd.DataFrame:
-    feats = pd.read_csv(RAW / "wallets_features.csv", usecols=["address"] + COLS_SOMA + COLS_MAX)
-    agg = {c: "sum" for c in COLS_SOMA} | {c: "max" for c in COLS_MAX}
-    nos = feats.groupby("address").agg(agg)
+    feats = pd.read_csv(RAW / "wallets_features.csv", usecols=["address"] + COLS)
+    por_end = feats.groupby("address")
+    if (por_end[COLS].nunique() > 1).any().any():
+        raise ValueError("wallets_features: totais diferentes entre linhas do mesmo endereço")
+    nos = por_end[COLS].first()
     nos["saldo_btc"] = nos["btc_received_total"] - nos["btc_sent_total"]
     classes = pd.read_csv(RAW / "wallets_classes.csv").set_index("address")["class"]
     nos["classe"] = classes.map({1: "ilicito", 2: "licito", 3: "desconhecido"})

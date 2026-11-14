@@ -1,19 +1,34 @@
-# Próximos passos (atualizado em 23/10/2026)
+# Próximos passos (atualizado em 12/11/2026)
+
+Entrega em **26/11**. Acompanhamentos: 17, 19 e 24/11. Checklist completo por pacote em `PLANO_DE_TRABALHO.md`.
 
 ## Status
 
 | Frente | Situação |
 |---|---|
-| Estrutura do repositório, mapas, README | ✅ pronto |
-| Dataset da Parte 2 (recorte, pesos, documentação) | ✅ pronto, em `data/dataset_parte2/` |
-| **Algoritmos (`graph.py`, `algorithms.py`)** | ⏳ **vez do Thomaz**: bloqueia a Parte 2 e as análises da Parte 1 |
-| Grafo de estados (`io.py`, `estados.py`) | ⏳ Matheus, em paralelo com o Thomaz |
-| Exploração dos dados (AVD) | ⏳ Vagner, pode começar já |
+| Estrutura do repositório, mapas, README inicial | ✅ pronto |
+| **P2** Grafo e algoritmos (`graph.py`, BFS, DFS, Dijkstra, Bellman-Ford + testes) | ✅ pronto (PRs #2, #3, #6, #8, #10, #12) |
+| **P4a** Dataset da Parte 2 (recorte, pesos, carga) | ✅ pronto; saldo das carteiras corrigido em 12/11 (ver abaixo) |
+| **P4a** Casos obrigatórios (BFS/DFS 3 fontes, Dijkstra 5 pares, Bellman-Ford 2 casos) | ✅ pronto, com resultados e interpretação em `docs/relatorio/parte2.md` (PR #16) |
+| **P4b** Benchmark e escalabilidade | 🟡 DFS, BFS e Bellman-Ford medidos (`parte2_report.json` + gráfico); falta Dijkstra e os gráficos de comportamento/caminhos |
+| **P1** `io.py` + `test_io.py` | ✅ pronto (PR #15) |
+| **P1** `estados.py` (G_pos, G_est, variantes) + `test_estados.py` | ⏳ **não começado**: bloqueia P3 e P5a |
+| **P3** Análises da Parte 1 | ⏳ depende do G_est |
+| **P5a** Figuras e `labirinto_interativo.html` | ⏳ depende do G_est |
+| **P5b** AVD (notebooks) | ⏳ `notebooks/avd/` ainda vazio |
+| **P5c** README final, PDF, declaração de IA | ⏳ no fim |
 
-> ⚠️ **Regra da professora:** `io.py`, `estados.py`, `graph.py` e `algorithms.py` **não podem ser gerados por IA**.
-> IA só para tirar dúvida conceitual ou entender erro, sempre registrando em `docs/REGISTRO_IA.md`.
+> ⚠️ **Regra da professora:** `io.py`, `estados.py`, `graph.py` e `algorithms.py` **não podem ser gerados por IA**,
+> nem análises, notas analíticas, escolha/interpretação de gráficos e a prova do m05. Todo uso de IA vai em `docs/REGISTRO_IA.md`.
 
-## Para todos: preparar o ambiente
+### Correção de 12/11: saldo inflado
+
+`wallets_features.csv` repete em cada time step os totais da vida inteira da carteira. Somar as linhas contava o mesmo valor várias vezes.
+A carga agora usa uma linha por endereço. O recorte manteve os mesmos nós e arcos, mas 8.206 pesos mudaram (nenhum de sinal).
+O Bellman-Ford foi refeito: o ciclo continua, com custo −13.226,15 (antes −1.113.112,70). O Dijkstra e o benchmark não mudam.
+**Quem usar `nos.csv` (AVD) deve partir da versão nova.**
+
+## Ambiente
 
 ```bash
 git clone https://github.com/davimqz/Projetos-Grafos.git
@@ -21,69 +36,45 @@ cd Projetos-Grafos
 python -m venv .venv
 # Windows: .venv\Scripts\activate   |   Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-pytest          # deve rodar (ainda sem testes)
+pytest          # 225 testes passando em 12/11
 ```
 
-O recorte da Parte 2 já está no repositório; **não precisa baixar o dataset** (só se for refazer o recorte).
+O recorte da Parte 2 já está no repositório; **não precisa baixar o dataset** (só para refazer o recorte).
 
 ## Fluxo de trabalho
 
-1. Crie uma branch por tarefa: `git checkout -b feat/p2-bfs`.
-2. Commits no padrão `tipo(escopo): descrição` (ex.: `feat(algorithms): implementa BFS com níveis`, `test(bfs): ...`).
-3. Abra um Pull Request para `main` e marque o **revisor do pacote** (ver `PLANO_DE_TRABALHO.md`).
-4. O revisor aprova e faz o merge. Isso conta como contribuição dos dois.
+1. Uma branch por tarefa.
+2. Commits no padrão `tipo(escopo): descrição`.
+3. PR para `main` marcando o **revisor do pacote** (ver `PLANO_DE_TRABALHO.md`); o revisor aprova e faz o merge.
 
 ---
 
-## Thomaz — P2: Algoritmos (revisor: Davi)
+## Matheus — P1 + P3 (revisor: Thomaz) · **prioridade do grupo**
 
-Os algoritmos são usados nas **duas partes**, então são a prioridade. Faça nesta ordem, um PR por item:
+- [ ] `estados.py`: G_pos e G_est por exploração a partir de S, rótulos `(l,c)|chaves|{bônus}`, nó `ALVO`
+- [ ] variantes: portas como chão/parede, `+` fixo em −4, `--fonte-consumivel`
+- [ ] `test_estados.py` com mapa mínimo contado à mão; conferir o G_est do m02 com o desenho
+- [ ] exportar `out/parte1/arestas_<mapa>.csv` (m01–m08)
+- [ ] depois: análises do P3 (métricas, camadas, graus, comparação de modelagens, m05, armadilhas, mapas do grupo)
 
-**1. `src/graphs/graph.py`: grafo dirigido ponderado (lista de adjacência)**
-- [ ] adicionar nó e arco `(u, v, peso)`, **preservando a ordem de inserção** dos vizinhos (a Parte 1 depende da ordem N, L, S, O)
-- [ ] listar vizinhos de um nó com os pesos
-- [ ] ordem |V|, tamanho |E|, densidade `|E| / (|V|(|V|-1))` (0 se |V| < 2), grau de entrada e de saída
-- [ ] grafo transposto (inverte todos os arcos)
-- [ ] subgrafo induzido por um conjunto de nós
-- [ ] combinar com o Matheus e com o Davi o formato dos nós: rótulo de estado (string) na Parte 1 e endereço da carteira na Parte 2
+## Thomaz — P5a (revisor: Matheus)
 
-**2. `src/graphs/algorithms.py` + testes, um algoritmo por vez**
+- [ ] revisar o PR do `estados.py`
+- [ ] quando houver G_est: percursos m03/m08, camadas e árvore BFS do m02, heatmap do m08
+- [ ] `labirinto_interativo.html`
 
-| Algoritmo | Precisa devolver | Teste (`tests/`) |
-|---|---|---|
-| BFS | distância em passos, pai de cada nó, nível de cada nó | níveis corretos em grafo pequeno |
-| DFS | contagem e lista de arcos de **árvore, retorno, avanço e cruzamento**; se há ciclo | grafo dirigido pequeno com os 4 tipos de arco |
-| Dijkstra (`heapq`) | distância e pai; **erro com mensagem clara** se houver arco negativo | caminho certo com pesos ≥ 0; recusa com peso negativo |
-| Bellman-Ford | distância e pai; se houver ciclo negativo: flag + **lista dos nós do ciclo** e custo | (i) negativo sem ciclo → distâncias certas; (ii) com ciclo → flag e ciclo |
+## Vagner — P4b + P5b (revisor: Davi)
 
-- [ ] nos testes, use `networkx` **só como oráculo** para conferir os resultados (permitido apenas em `tests/`)
-- [ ] `pytest` passando antes de abrir cada PR
-
-**3. Primeiro teste real (avise o Davi do resultado)**
-- [ ] carregar `data/dataset_parte2/arestas.csv` (colunas `origem, destino, peso`) e rodar o Bellman-Ford
-- [ ] o recorte tem ciclo negativo? Se sim, quantos nós tem e qual o custo?
-
-**Depois:** P5a (figuras da Parte 1 e HTML interativo), quando o Matheus tiver o G_est.
-
-## Matheus — P1 + P3: Grafo de estados (revisor: Thomaz)
-
-- [ ] **desenhar à mão o G_est do m02** (a professora recomenda; vai para o PDF)
-- [ ] `io.py`: ler o mapa, ignorar linhas `;`, validar (retangular, 1 S, ≥1 G, símbolos conhecidos) + `tests/test_io.py`
-- [ ] `estados.py`: G_pos e depois G_est por exploração a partir de S, rótulos `(l,c)|chaves|{bônus}`, nó `ALVO`
-- [ ] conferir o G_est do m02 com o desenho à mão; depois m01–m08
-- [ ] `tests/test_estados.py` com um mapa mínimo (≤ 5×7) contado à mão
-- [ ] exportar `out/parte1/arestas_<mapa>.csv`
-
-## Vagner — P5b: AVD (revisor: Davi)
-
-- [ ] explorar `data/dataset_parte2/nos.csv` e `arestas.csv` em `notebooks/avd/`
-- [ ] 4 pilares: estrutural, distribucional, relacional, outliers
-- [ ] faltantes: a classe "desconhecido" (33% do recorte) é ausência de rótulo; discutir o mecanismo, **não apagar**
-- [ ] relação da classe (ilícito/lícito/desconhecido) com **todos** os outros atributos
-- [ ] lembrete: a interpretação dos gráficos e a escolha do tipo de gráfico **não podem ser feitas por IA**
+- [ ] benchmark: incluir o Dijkstra e os gráficos de comportamento/caminhos
+- [ ] AVD em `notebooks/avd/`: 4 pilares, faltantes (classe "desconhecido" não se apaga), classe × todos os atributos
+- [ ] ≥4 exploratórias + ≥2 explanatórias com nota analítica autoral (sem IA na escolha/interpretação dos gráficos)
+- [ ] usar o `nos.csv` corrigido em 12/11
 
 ## Davi — P4a + P5c
 
-- [ ] revisar os PRs do Thomaz
-- [ ] função de carga do recorte (`arestas.csv` → grafo) para a Parte 2
-- [ ] quando os algoritmos estiverem prontos: BFS/DFS de 3 fontes, Dijkstra em 5 pares, Bellman-Ford com e sem ciclo negativo
+- [x] carga do recorte, casos obrigatórios e relatório da Parte 2
+- [x] correção do saldo inflado e atualização dos resultados
+- [ ] merge do PR #16 (revisão do Vagner)
+- [ ] revisar os PRs do Vagner (benchmark e AVD)
+- [ ] README final, PDF (manual + técnica + limitações + conclusões + matriz de contribuição)
+- [ ] `docs/DECLARACAO_IA.pdf` assinada por todos; conferir marcações `# [IA]` e `REGISTRO_IA.md`

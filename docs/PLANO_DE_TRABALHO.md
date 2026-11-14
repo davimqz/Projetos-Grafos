@@ -38,20 +38,22 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 
 ## Parte 1 — tarefas
 
+> Status atualizado em 12/11/2026. Resumo e próximas ações em `PROXIMOS_PASSOS.md`.
+
 ### P1 · Modelagem (Matheus / rev. Thomaz)
-- [ ] `io.py`: ler mapa, ignorar linhas `;`, validar (retangular, 1 S, ≥1 G, símbolos conhecidos)
+- [x] `io.py`: ler mapa, ignorar linhas `;`, validar (retangular, 1 S, ≥1 G, símbolos conhecidos)
 - [ ] `estados.py`: G_pos (paredes + esteiras)
 - [ ] `estados.py`: G_est por exploração a partir de S (chaves, bônus numerados em ordem de leitura)
 - [ ] rótulo `(l,c)|chaves|{bônus}` e nó virtual `ALVO` (custo 0 a partir de G)
 - [ ] variantes: portas-como-chão, portas-como-parede, `+` fixo em −4, `--fonte-consumivel`
 - [ ] exportar `out/parte1/arestas_<mapa>.csv` (inclusive m08)
-- [ ] `test_io.py` e `test_estados.py` (mapa mínimo ≤5×7 contado à mão, esteira→parede, troca de camada)
+- [ ] `test_io.py` ✅ e `test_estados.py` (mapa mínimo ≤5×7 contado à mão, esteira→parede, troca de camada)
 
 ### P2 · Algoritmos (Thomaz / rev. Davi)
-- [ ] `graph.py`: adjacência dirigida (ordem N, L, S, O), graus, densidade, transposto, subgrafo induzido
-- [ ] BFS com níveis/árvore · DFS com classificação de arcos e ciclo
-- [ ] Dijkstra (heapq) com recusa de peso negativo · Bellman-Ford com reconstrução do ciclo
-- [ ] testes dos 4 algoritmos (networkx só como oráculo em `tests/`)
+- [x] `graph.py`: adjacência dirigida (ordem N, L, S, O), graus, densidade, transposto, subgrafo induzido
+- [x] BFS com níveis/árvore · DFS com classificação de arcos e ciclo
+- [x] Dijkstra (heapq) com recusa de peso negativo · Bellman-Ford com reconstrução do ciclo
+- [x] testes dos 4 algoritmos (networkx só como oráculo em `tests/`)
 
 ### P3 · Análises (Matheus / rev. Thomaz)
 - [ ] `metricas_global.json` (G_pos e G_est, teto teórico, ocupação)
@@ -74,17 +76,17 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 ## Parte 2 — tarefas
 
 ### P4a · Dados (Davi / rev. Vagner)
-- [ ] script de download (`scripts/`) e recorte em `data/dataset_parte2/`
-- [ ] estratégia de amostragem documentada (≥ 20 mil arestas) — ver `PARTE2_DATASET.md`
-- [ ] design dos pesos (com negativos vindos dos dados) + significado de caminho mínimo e ciclo negativo
-- [ ] pergunta de pesquisa final
-- [ ] BFS/DFS de ≥3 fontes (ordem, camadas, ciclos) · Dijkstra ≥5 pares (transformação para pesos ≥0)
-- [ ] Bellman-Ford: 1 caso negativo sem ciclo + 1 com ciclo negativo detectado e exibido
+- [x] script de download (`scripts/`) e recorte em `data/dataset_parte2/`
+- [x] estratégia de amostragem documentada (≥ 20 mil arestas) — ver `PARTE2_DATASET.md`
+- [x] design dos pesos (com negativos vindos dos dados) + significado de caminho mínimo e ciclo negativo
+- [x] pergunta de pesquisa final
+- [x] BFS/DFS de ≥3 fontes (ordem, camadas, ciclos) · Dijkstra ≥5 pares (transformação para pesos ≥0)
+- [x] Bellman-Ford: 1 caso negativo sem ciclo + 1 com ciclo negativo detectado e exibido
 
 ### P4b · Experimentos (Vagner / rev. Davi)
-- [ ] tempo médio de ≥5 execuções por algoritmo e tarefa (memória opcional)
-- [ ] escalabilidade 10% / 50% / 100% × complexidade teórica
-- [ ] `out/parte2/parte2_report.json` + gráficos de comparação (tempo, comportamento, caminhos)
+- [ ] tempo médio de ≥5 execuções por algoritmo e tarefa (memória opcional) — feito para DFS, BFS e Bellman-Ford; falta Dijkstra
+- [x] escalabilidade 10% / 50% / 100% × complexidade teórica
+- [ ] `out/parte2/parte2_report.json` ✅ + gráficos de comparação (tempo ✅, comportamento, caminhos)
 
 ### P5b · AVD (Vagner / rev. Davi)
 - [ ] exploração: estrutural, distribucional, relacional, outliers

@@ -14,14 +14,13 @@ from pathlib import Path
 import pandas as pd
 
 PASTA_PADRAO = Path(__file__).resolve().parent.parent / "data" / "dataset_parte2"
-COLUNAS_ARESTAS = ["origem", "destino", "peso"]
 COLUNAS_NOS = ["endereco", "classe"]
 
 
 def _ler_csv(caminho: Path, obrigatorias: list[str]) -> pd.DataFrame:
     if not caminho.exists():
         raise FileNotFoundError(f"arquivo não encontrado: {caminho}")
-    df = pd.read_csv(caminho, dtype={c: str for c in obrigatorias if c != "peso"})
+    df = pd.read_csv(caminho, dtype={c: str for c in obrigatorias if c in ("origem", "destino", "endereco", "classe")})
     faltando = [c for c in obrigatorias if c not in df.columns]
     if faltando:
         raise ValueError(f"{caminho.name}: faltam as colunas {faltando}")
@@ -32,10 +31,16 @@ def _ler_csv(caminho: Path, obrigatorias: list[str]) -> pd.DataFrame:
     return df
 
 
-def ler_arestas(pasta: str | Path = PASTA_PADRAO) -> list[tuple[str, str, float]]:
-    """Devolve as arestas (origem, destino, peso) na ordem em que aparecem no CSV."""
-    df = _ler_csv(Path(pasta) / "arestas.csv", COLUNAS_ARESTAS)
-    return list(zip(df["origem"], df["destino"], df["peso"].astype(float)))
+def ler_arestas(
+    pasta: str | Path = PASTA_PADRAO, coluna_peso: str = "peso"
+) -> list[tuple[str, str, float]]:
+    """Devolve as arestas (origem, destino, peso) na ordem em que aparecem no CSV.
+
+    `coluna_peso` escolhe o peso: "peso" (saldo, Bellman-Ford) ou "valor_btc" (Dijkstra).
+    """
+    # [IA] Claude Code – parâmetro coluna_peso para o Dijkstra usar valor_btc (IO)
+    df = _ler_csv(Path(pasta) / "arestas.csv", ["origem", "destino", coluna_peso])
+    return list(zip(df["origem"], df["destino"], df[coluna_peso].astype(float)))
 
 
 def ler_nos(pasta: str | Path = PASTA_PADRAO) -> dict[str, dict]:
@@ -46,8 +51,8 @@ def ler_nos(pasta: str | Path = PASTA_PADRAO) -> dict[str, dict]:
     return df.set_index("endereco").to_dict(orient="index")
 
 
-def carregar_grafo(grafo, pasta: str | Path = PASTA_PADRAO):
+def carregar_grafo(grafo, pasta: str | Path = PASTA_PADRAO, coluna_peso: str = "peso"):
     """Insere em `grafo` todas as arestas do recorte e devolve o próprio grafo."""
-    for origem, destino, peso in ler_arestas(pasta):
+    for origem, destino, peso in ler_arestas(pasta, coluna_peso):
         grafo.adicionar_aresta(origem, destino, peso)
     return grafo

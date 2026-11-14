@@ -1,0 +1,37 @@
+{
+  "algoritmo": "DIJKSTRA",
+  "peso": "valor_btc",
+  "origem": "3MTTgd2BaPndUYkmGjiacaPLkuWsiPUzM3",
+  "destino": "17tqJV8U98Q7zin186LbR2pYq4fncJuyLw",
+  "custo": 49.95103487,
+  "passos": 4,
+  "caminho": [
+    "3MTTgd2BaPndUYkmGjiacaPLkuWsiPUzM3",
+    "1KNd3pk9M2W2K92UVY7o1XxCypRseQfVam",
+    "3Fp5ejYY8FsJ6Y3kb377VRjJunTeUVYsuq",
+    "3AhpkBp2xR2h1JLnob71aZvyT8TN5tFxjt",
+    "17tqJV8U98Q7zin186LbR2pYq4fncJuyLw"
+  ],
+  "arcos": [
+    [
+      "3MTTgd2BaPndUYkmGjiacaPLkuWsiPUzM3",
+      "1KNd3pk9M2W2K92UVY7o1XxCypRseQfVam",
+      16.96029508
+    ],
+    [
+      "1KNd3pk9M2W2K92UVY7o1XxCypRseQfVam",
+      "3Fp5ejYY8FsJ6Y3kb377VRjJunTeUVYsuq",
+      16.74546359
+    ],
+    [
+      "3Fp5ejYY8FsJ6Y3kb377VRjJunTeUVYsuq",
+      "3AhpkBp2xR2h1JLnob71aZvyT8TN5tFxjt",
+      14.99166683
+    ],
+    [
+      "3AhpkBp2xR2h1JLnob71aZvyT8TN5tFxjt",
+      "17tqJV8U98Q7zin186LbR2pYq4fncJuyLw",
+      1.25360937
+    ]
+  ]
+}
