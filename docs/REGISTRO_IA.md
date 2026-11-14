@@ -1,4 +1,4 @@
-﻿# Registro de uso de IA
+# Registro de uso de IA
 
 Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf`. Os trechos de código ficam marcados com `# [IA] <ferramenta> – <finalidade>`.
 
@@ -31,3 +31,6 @@ Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf
 | 06/11/2026 | Davi | Claude Code | Revisão do texto de resultados de BFS/DFS escrito pelo grupo: conferência dos números com os JSONs, apontamento de erros e lacunas e fornecimento dos valores por camada. Inserção do texto no relatório sem alterar a redação, ajustando só os níveis de título e incluindo um título de seção | `docs/relatorio/parte2.md` | Permitido (revisão de texto) |
 | 06/11/2026 | Thomaz | ChatGPT | Geração dos testes unitários de Dijkstra: caminhos mínimos, pesos zero, laço, nós inacessíveis, origem inválida, recusa de pesos negativos, atualização de prioridade e comparação com NetworkX em 30 grafos aleatórios com sementes fixas | `tests/test_dijkstra.py` | Permitido (testes unitários) |
 | 06/11/2026 | Thomaz | Codex | Revisão de cobertura e geração de testes adicionais dos quatro algoritmos: ordem, camadas e estados da BFS; tempos e classificação de todos os arcos da DFS; empate, ciclo zero e pesos fracionários no Dijkstra; nó único com laço, pesos fracionários e comparação do Bellman-Ford com NetworkX em 20 grafos com todas as 6 origens, validando distâncias, predecessores e testemunhas de ciclo negativo. Execução de 158 testes; benchmark excluído por ausência de matplotlib. Na revisão posterior do PR, 159 testes passaram. Implementações preservadas | `tests/test_bfs.py`, `tests/test_dfs.py`, `tests/test_dijkstra.py`, `tests/test_bellman_ford.py` | Permitido (revisão de código e testes unitários) |
+
+| 13/11/2026 | Thomaz | ChatGPT | Geração dos testes das visualizações com dados artificiais | `tests/test_viz.py` | Permitido (testes unitários) |
+| 14/11/2026 | Thomaz | Codex | Revisão do visualizador e dos testes; correção da validação de mapas sem algoritmos, teste de regressão e ajustes visuais no HTML e nos diagramas existentes | `src/viz.py`, `tests/test_viz.py` | Permitido (revisão de código, testes unitários e apresentação) |
