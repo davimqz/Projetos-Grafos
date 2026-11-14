@@ -1,4 +1,9 @@
-"""
+"""Visualizações e UX.
+
+Parte 1 (P5a): percursos m03 e m08, grafo de estados do m02 em camadas,
+árvore BFS do m02, heatmap de multiplicidade do m08 e labirinto interativo.
+Parte 2 (P5b/AVD): comparação dos algoritmos e visualizações em out/parte2/.
+
 Este módulo NÃO constrói G_pos/G_est, calcula soluções, armadilhas ou
 interpreta resultados. Ele apenas representa informações recebidas.
 """
@@ -11,8 +16,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, Rectangle
 from matplotlib.colors import ListedColormap
@@ -170,7 +173,10 @@ def _desenhar_rede(grupos: dict[str, list[str]], arcos: list[tuple[str, str]],
         if mostrar_nomes:
             try:
                 dados = ler_rotulo(nome)
+                # [IA] Codex – distingue estados da mesma posição por seus bônus.
                 rotulo = f"({dados[0]},{dados[1]})" if dados else nome
+                if dados and dados[3]:
+                    rotulo += " {" + ",".join(map(str, dados[3])) + "}"
             except ValueError:
                 rotulo = str(nome)[:14]
             ax.annotate(rotulo, (x, y), xytext=(0, -13), textcoords="offset points",
@@ -274,6 +280,7 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
         raise ValueError("Forneça pelo menos um mapa")
     for nome, dados in mapas.items():
         _verificar_grade(dados["grade"])
+        # [IA] Codex – correção da validação de mapas sem algoritmos.
         if not isinstance(dados.get("algoritmos"), dict) or not dados["algoritmos"]:
             raise ValueError(f"Mapa {nome} sem dicionário 'algoritmos'")
         for algoritmo, percurso in dados["algoritmos"].items():

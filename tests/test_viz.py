@@ -87,3 +87,21 @@ def test_limite_sem_amostragem(tmp_path):
 def test_html_rejeita_mapa_sem_algoritmos(tmp_path):
     with pytest.raises(ValueError, match="algoritmos"):
         gerar_html_interativo({"demo": {"grade": ["S.G"], "algoritmos": {}}}, tmp_path / "erro.html")
+
+
+# [IA] Codex – verifica a distinção entre estados com bônus diferentes.
+def test_camadas_identifica_bonus_no_rotulo(tmp_path, monkeypatch):
+    from matplotlib.axes import Axes
+
+    rotulos = []
+    anotar = Axes.annotate
+
+    def registrar(ax, texto, *args, **kwargs):
+        rotulos.append(texto)
+        return anotar(ax, texto, *args, **kwargs)
+
+    monkeypatch.setattr(Axes, "annotate", registrar)
+    grafo = GrafoPequeno()
+    grafo._nos = ["(1,1)|a|{}", "(1,1)|a|{0}", "(1,1)|a|{0,2}"]
+    desenhar_camadas(grafo, tmp_path / "bonus.png")
+    assert rotulos == ["(1,1)", "(1,1) {0}", "(1,1) {0,2}"]

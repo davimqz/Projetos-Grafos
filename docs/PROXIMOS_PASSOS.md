@@ -60,8 +60,8 @@ O recorte da Parte 2 já está no repositório; **não precisa baixar o dataset*
 ## Thomaz — P5a (revisor: Matheus)
 
 - [ ] revisar o PR do `estados.py`
-- [ ] quando houver G_est: percursos m03/m08, camadas e árvore BFS do m02, heatmap do m08
-- [ ] `labirinto_interativo.html`
+- [ ] quando houver G_est, integrar as funções de `src/viz.py` em um script que gere em `out/parte1/` os percursos m03/m08, as camadas e a árvore BFS do m02 e o heatmap do m08
+- [ ] no mesmo fluxo, gerar `out/parte1/labirinto_interativo.html` com os percursos e as armadilhas calculados pelo projeto
 
 ## Vagner — P4b + P5b (revisor: Davi)
 
