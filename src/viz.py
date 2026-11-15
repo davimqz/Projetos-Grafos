@@ -291,8 +291,9 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
             raise ValueError(f"Mapa {nome} sem dicionário 'algoritmos'")
         for algoritmo, percurso in dados["algoritmos"].items():
             estados = _posicoes(percurso)
-            if not estados:
-                raise ValueError(f"Percurso vazio em {nome}/{algoritmo}")
+            # [IA] Claude Code – percurso vazio é aceito quando há mensagem de status (RECUSA, SEM_SOLUCAO...).
+            if not estados and algoritmo not in dados.get("mensagens", {}):
+                raise ValueError(f"Percurso vazio em {nome}/{algoritmo} (sem mensagem de status)")
             for l, c, _, _ in estados:
                 if not (0 <= l < len(dados["grade"]) and 0 <= c < len(dados["grade"][0])):
                     raise ValueError(f"Posição fora da grade em {nome}/{algoritmo}")
