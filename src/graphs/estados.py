@@ -13,6 +13,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+from src.graphs.io import encontrar_inicio, enumerar_bonus
+
 from .graph import Grafo
 
 
@@ -54,7 +56,9 @@ class Transicao:
 
 def rotular_posicao(posicao: Posicao) -> str:
     """Devolve o rótulo '(linha,coluna)', sem espaços, de um nó de G_pos."""
-    
+
+    return f"({posicao[0]},{posicao[1]})"
+
 
 def rotular_estado(estado: Estado) -> str:
     """Devolve o rótulo obrigatório, por exemplo '(3,5)|ab|{0,2}'.
@@ -62,8 +66,10 @@ def rotular_estado(estado: Estado) -> str:
     Chaves aparecem em ordem alfabética e identificadores de bônus em ordem
     numérica, sem espaços. Sem chaves, usar '-'; sem bônus, usar '{}'.
     """
-    raise NotImplementedError("Implementar a formatação do rótulo de estado.")
 
+    chaves = "".join(sorted(estado.chaves)) or "-"
+    bonus = "{" + ",".join(str(i) for i in sorted(estado.bonus)) + "}"
+    return f"{rotular_posicao((estado.linha, estado.coluna))}|{chaves}|{bonus}"
 
 def enumerar_consumiveis(
     grade: list[str], *, fonte_consumivel: bool = False
@@ -77,8 +83,16 @@ def enumerar_consumiveis(
     leitura, com identificadores após todos os '+', sem colisões. Com False,
     as fontes não pertencem ao retorno. Não modifica a grade.
     """
-    raise NotImplementedError("Implementar a enumeração dos consumíveis.")
 
+    bonus = enumerar_bonus(grade)
+    if fonte_consumivel:
+        contador = len(bonus)
+        for i, linha in enumerate(grade):
+            for j, char in enumerate(linha):
+                if char == "*":
+                    bonus[(i, j)] = contador
+                    contador += 1
+    return bonus
 
 def movimentos_possiveis(
     grade: list[str], posicao: Posicao
@@ -93,8 +107,37 @@ def movimentos_possiveis(
     pelo chamador. Não aplica coleta nem custos. Em G, não há movimentos
     físicos; a ligação virtual a ALVO pertence à construção de G_est.
     """
-    raise NotImplementedError("Implementar os movimentos geométricos.")
 
+    movimentos = []
+    linhas = len(grade)
+    colunas = len(grade[0]) if linhas > 0 else 0
+    i, j = posicao
+
+    # Norte
+    if i > 0 and grade[i - 1][j] != "#":
+        movimentos.append(("N", (i - 1, j)))
+    # Leste
+    if j < colunas - 1 and grade[i][j + 1] != "#":
+        movimentos.append(("L", (i, j + 1)))
+    # Sul
+    if i < linhas - 1 and grade[i + 1][j] != "#":
+        movimentos.append(("S", (i + 1, j)))
+    # Oeste
+    if j > 0 and grade[i][j - 1] != "#":
+        movimentos.append(("O", (i, j - 1)))
+
+    casa_atual = grade[i][j]
+
+    if casa_atual == "G":
+        return []
+
+    if casa_atual in "^>v<":
+        direcao_esteira = {"^": "N", ">": "L", "v": "S", "<": "O"}[casa_atual]
+        movimentos = [
+            (mov, dest) for mov, dest in movimentos if mov == direcao_esteira
+        ]
+
+    return movimentos
 
 def gerar_transicoes(
     grade: list[str],
@@ -118,7 +161,61 @@ def gerar_transicoes(
     A transição registra o estado após as coletas. Estados em G não têm
     transições físicas. Não inclui a ligação virtual para ALVO.
     """
-    raise NotImplementedError("Implementar as transições e os efeitos das casas.")
+
+    transicoes = []
+    posicao_atual = (estado.linha, estado.coluna)
+    movimentos = movimentos_possiveis(grade, posicao_atual)
+
+    for movimento, destino in movimentos:
+        i, j = destino
+        casa_destino = grade[i][j]
+
+        if casa_destino in "ABCD" and casa_destino.lower() not in estado.chaves:
+            continue
+
+        chaves_novas = set(estado.chaves)
+        bonus_novos = set(estado.bonus)
+
+        if casa_destino in "abcd":
+            chaves_novas.add(casa_destino)
+
+        if destino in consumiveis:
+            bonus_id = consumiveis[destino]
+            bonus_novos.add(bonus_id)
+
+        peso = 1
+        if casa_destino == "~":
+            peso = 5
+        elif casa_destino == ",":
+            peso = 3
+        elif casa_destino == "+":
+            if bonus_id not in estado.bonus:
+                peso = -4 
+            else:
+                peso = 1
+        elif casa_destino == "*":
+            if not fonte_consumivel or bonus_id not in estado.bonus:
+                peso = -2
+            else:
+                peso = 1
+
+        novo_estado = Estado(
+            linha=i,
+            coluna=j,
+            chaves=frozenset(chaves_novas),
+            bonus=frozenset(bonus_novos),
+        )
+
+        transicoes.append(
+            Transicao(
+                destino=novo_estado,
+                movimento=movimento,
+                casa_destino=casa_destino,
+                peso=peso,
+            )
+        )
+
+    return transicoes
 
 
 def construir_grafo_posicoes(
@@ -136,8 +233,42 @@ def construir_grafo_posicoes(
     vale -2 em toda entrada, sem memória de consumo ou coleta de chaves.
     Não espelha arcos automaticamente e não modifica a grade.
     """
-    raise NotImplementedError("Implementar a construção do grafo de posições.")
 
+    if portas not in ("chao", "parede"):
+        raise ValueError(
+            f"Valor inválido para portas: '{portas}'. "
+            "Use 'chao' ou 'parede'."
+        )
+
+    grafo = Grafo()
+
+    for i, linha in enumerate(grade):
+        for j, char in enumerate(linha):
+            if char == "#" or portas == "parede" and char in "ABCD":
+                continue
+            posicao = (i, j)
+            grafo.adicionar_no(rotular_posicao(posicao))
+            movimentos = movimentos_possiveis(grade, posicao)
+            for mov, destino in movimentos:
+                if portas == "parede" and grade[destino[0]][destino[1]] in "ABCD":
+                    continue
+                casa_destino = grade[destino[0]][destino[1]]
+                peso = 1
+                if casa_destino == "~":
+                    peso = 5
+                elif casa_destino == ",":
+                    peso = 3
+                elif casa_destino == "+":
+                    peso = -4
+                elif casa_destino == "*":
+                    peso = -2
+                grafo.adicionar_aresta(
+                    rotular_posicao(posicao),
+                    rotular_posicao(destino),
+                    peso,
+                )
+
+    return grafo
 
 def construir_grafo_estados(
     grade: list[str], *, fonte_consumivel: bool = False
@@ -161,4 +292,48 @@ def construir_grafo_estados(
     A opção fonte_consumivel usa os identificadores adicionais descritos
     em enumerar_consumiveis. Não modifica a grade nem grava arquivos.
     """
-    raise NotImplementedError("Implementar a construção do grafo de estados.")
+
+    grafo = Grafo()
+    estados_por_rotulo: dict[str, Estado] = {}
+
+    consumiveis = enumerar_consumiveis(grade, fonte_consumivel=fonte_consumivel)
+    posicao_inicio = encontrar_inicio(grade)
+    estado_inicial = Estado(
+        linha=posicao_inicio[0],
+        coluna=posicao_inicio[1],
+        chaves=frozenset(),
+        bonus=frozenset(),
+    )
+    rotulo_inicial = rotular_estado(estado_inicial)
+
+    fila_exploracao = [estado_inicial]
+    estados_por_rotulo[rotulo_inicial] = estado_inicial
+    grafo.adicionar_no(rotulo_inicial)
+
+    while fila_exploracao:
+        estado_atual = fila_exploracao.pop(0)
+        rotulo_atual = rotular_estado(estado_atual)
+
+        transicoes = gerar_transicoes(
+            grade, estado_atual, consumiveis, fonte_consumivel=fonte_consumivel
+        )
+
+        for transicao in transicoes:
+            rotulo_destino = rotular_estado(transicao.destino)
+            if rotulo_destino not in estados_por_rotulo:
+                estados_por_rotulo[rotulo_destino] = transicao.destino
+                grafo.adicionar_no(rotulo_destino)
+                fila_exploracao.append(transicao.destino)
+
+            grafo.adicionar_aresta(
+                rotulo_atual,
+                rotulo_destino,
+                transicao.peso,
+            )
+
+    grafo.adicionar_no("ALVO")
+    for rotulo, estado in estados_por_rotulo.items():
+        if grade[estado.linha][estado.coluna] == "G":
+            grafo.adicionar_aresta(rotulo, "ALVO", 0)
+
+    return grafo, estados_por_rotulo
