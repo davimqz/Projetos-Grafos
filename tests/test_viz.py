@@ -63,7 +63,7 @@ def test_heatmap_png(tmp_path):
 def test_html_interativo(tmp_path):
     g = GrafoPequeno()
     dados = {"demo": {"grade":["######", "#S.aG#", "######"],
-                      "algoritmos":{"BFS":[g.a,g.b,g.c]}, "armadilhas":[[1,4]]}}
+                      "algoritmos":{"BFS":[g.a,g.b,g.c]}, "armadilhas":[g.c]}}
     arquivo = gerar_html_interativo(dados,tmp_path/"demo.html")
     conteudo = arquivo.read_text(encoding="utf-8")
     assert "Labirinto interativo" in conteudo

@@ -32,6 +32,17 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.mapa:
+        if args.armadilhas:
+            parser.error("--armadilhas depende da análise de estados-armadilha, ainda não implementada")
+        from src.visualizar_parte1 import gerar_mapa
+        try:
+            status = gerar_mapa(args.mapa, args.out, algoritmo=args.alg or "BFS",
+                                interactive=args.interactive, fonte_consumivel=args.fonte_consumivel)
+        except (ValueError, OSError) as erro:
+            parser.error(str(erro))
+        print(status)
+        return 0
     if args.dataset and args.benchmark:
         # chamada do benchmark da Parte 2 (P4b)
         from src.benchmark import executar_benchmark

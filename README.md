@@ -43,6 +43,18 @@ python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte
 pytest
 ```
 
+Para gerar as figuras P5a e o HTML com os mapas m02, m03 e m08:
+
+```bash
+python -m src.visualizar_parte1 --out ./out/parte1/
+```
+
+Os percursos desse conjunto usam BFS (menor número de passos). O HTML mostra
+que as armadilhas não foram fornecidas até que a análise do grupo esteja pronta.
+Na CLI, `--mapa` gera o percurso do algoritmo escolhido e `--interactive`
+acrescenta o HTML; se o percurso não existir ou o algoritmo não se aplicar,
+o motivo é exibido. `--armadilhas` depende da análise ainda pendente.
+
 ## Estrutura
 
 ```

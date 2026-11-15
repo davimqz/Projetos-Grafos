@@ -269,7 +269,7 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
       "m03": {
         "grade": ["#####", "#S.G#", "#####"],
         "algoritmos": {"BFS": ["(1,1)|-|{}", "(1,2)|-|{}", ...]},
-        "armadilhas": [[linha, coluna], ...]  # opcional, calculadas pelo grupo
+        "armadilhas": ["(linha,coluna)|chaves|{bonus}", ...]  # opcional
       },
       ...
     }
@@ -280,13 +280,18 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
         raise ValueError("Forneça pelo menos um mapa")
     for nome, dados in mapas.items():
         _verificar_grade(dados["grade"])
+        if "armadilhas" in dados:
+            if not isinstance(dados["armadilhas"], list):
+                raise ValueError(f"Armadilhas inválidas em {nome}")
+            for rotulo in dados["armadilhas"]:
+                estado = ler_rotulo(rotulo)
+                if estado is None or not (0 <= estado[0] < len(dados["grade"]) and 0 <= estado[1] < len(dados["grade"][0])):
+                    raise ValueError(f"Estado-armadilha inválido em {nome}: {rotulo!r}")
         # [IA] Codex – correção da validação de mapas sem algoritmos.
         if not isinstance(dados.get("algoritmos"), dict) or not dados["algoritmos"]:
             raise ValueError(f"Mapa {nome} sem dicionário 'algoritmos'")
         for algoritmo, percurso in dados["algoritmos"].items():
             estados = _posicoes(percurso)
-            if not estados:
-                raise ValueError(f"Percurso vazio em {nome}/{algoritmo}")
             for l, c, _, _ in estados:
                 if not (0 <= l < len(dados["grade"]) and 0 <= c < len(dados["grade"][0])):
                     raise ValueError(f"Posição fora da grade em {nome}/{algoritmo}")
@@ -313,7 +318,7 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
 <div><strong>Passo:</strong> <span id="passo"></span></div><div><strong>Posição:</strong> <span id="posicao"></span></div>
 <div><strong>Chaves:</strong> <span id="chaves"></span></div><div><strong>Bônus consumidos:</strong> <span id="bonus"></span></div>
 <div><strong>Camada:</strong> <span id="camada"></span></div>
-<div><strong>Estados no percurso:</strong> <span id="total"></span></div></div></div>
+<div><strong>Estados no percurso:</strong> <span id="total"></span></div><div><strong>Resultado:</strong> <span id="status"></span></div><div><strong>Armadilhas:</strong> <span id="infoArmadilhas"></span></div></div></div>
 <div class="panel toolbar"><button id="anterior">Anterior</button><button class="primary" id="reproduzir">Reproduzir</button><button id="proximo">Próximo</button><input id="steps" aria-label="Selecionar passo do percurso" type="range" min="0" max="0" value="0"><span id="indice"></span></div>
 <script>
 const MAPAS = __DATA__;
@@ -325,12 +330,12 @@ function percurso(){return dados().algoritmos[$('algoritmo').value].map(parseEst
 function parar(){if(relogio!==null){clearInterval(relogio);relogio=null;} $('reproduzir').textContent='Reproduzir';}
 function reiniciar(){parar();passoAtual=0;atualizar();}
 function trocarMapa(){const m=dados();$('algoritmo').replaceChildren();Object.keys(m.algoritmos).forEach(nome=>{$('algoritmo').add(new Option(nome,nome));});reiniciar();}
-function atualizar(){const m=dados(), p=percurso();passoAtual=Math.min(Math.max(passoAtual,0),p.length-1);const atual=p[passoAtual], vistos=new Set(p.slice(0,passoAtual+1).map(s=>s.l+','+s.c));
-const armadilhas = new Set((m.armadilhas||[]).map(s=>s[0]+','+s[1]));const grid=$('grade');grid.replaceChildren();grid.style.gridTemplateColumns='repeat('+m.grade[0].length+',var(--cell))';
-m.grade.forEach((linha,l)=>Array.from(linha).forEach((ch,c)=>{const cell=document.createElement('div');cell.className='cell '+(ch==='#'?'wall':'floor');const key=l+','+c;if(vistos.has(key)&&ch!=='#')cell.classList.add('visited');if($('mostrarArmadilhas').checked&&armadilhas.has(key))cell.classList.add('trap');if(atual.l===l&&atual.c===c)cell.classList.add('current');if(ch==='S')cell.classList.add('start');if(ch==='G')cell.classList.add('goal');cell.textContent=ch==='.'||ch==='#'?'':ch;cell.title='('+l+','+c+') '+ch;grid.appendChild(cell);}));
-$('passo').textContent=(passoAtual+1)+' / '+p.length;$('posicao').textContent='('+atual.l+','+atual.c+')';$('chaves').textContent=atual.chaves||'nenhuma';$('bonus').textContent=atual.bonus||'nenhum';$('camada').textContent=atual.chaves||'sem chaves';$('total').textContent=p.length;
-$('steps').max=String(p.length-1);$('steps').value=String(passoAtual);$('indice').textContent=String(passoAtual);$('anterior').disabled=passoAtual===0;$('proximo').disabled=passoAtual===p.length-1;
-if(passoAtual===p.length-1)parar();}
+function atualizar(){const m=dados(), p=percurso();passoAtual=Math.min(Math.max(passoAtual,0),Math.max(0,p.length-1));const atual=p[passoAtual], vistos=new Set(p.slice(0,passoAtual+1).map(s=>s.l+','+s.c));
+const armadilhas = new Set((m.armadilhas||[]).filter(s=>typeof s==='string').map(parseEstado).filter(s=>s && atual && s.chaves===atual.chaves && s.bonus===atual.bonus).map(s=>s.l+','+s.c));const grid=$('grade');grid.replaceChildren();grid.style.gridTemplateColumns='repeat('+m.grade[0].length+',var(--cell))';
+m.grade.forEach((linha,l)=>Array.from(linha).forEach((ch,c)=>{const cell=document.createElement('div');cell.className='cell '+(ch==='#'?'wall':'floor');const key=l+','+c;if(vistos.has(key)&&ch!=='#')cell.classList.add('visited');if($('mostrarArmadilhas').checked&&armadilhas.has(key))cell.classList.add('trap');if(atual && atual.l===l&&atual.c===c)cell.classList.add('current');if(ch==='S')cell.classList.add('start');if(ch==='G')cell.classList.add('goal');cell.textContent=ch==='.'||ch==='#'?'':ch;cell.title='('+l+','+c+') '+ch;grid.appendChild(cell);}));
+$('passo').textContent=(p.length?passoAtual+1:0)+' / '+p.length;$('posicao').textContent=atual?'('+atual.l+','+atual.c+')':'?';$('chaves').textContent=atual?(atual.chaves||'nenhuma'):'?';$('bonus').textContent=atual?(atual.bonus||'nenhum'):'?';$('camada').textContent=atual?(atual.chaves||'sem chaves'):'?';$('total').textContent=p.length;$('status').textContent=(m.status||{})[$('algoritmo').value]||(p.length?'Percurso encontrado.':'Sem percurso.');$('infoArmadilhas').textContent=Array.isArray(m.armadilhas)?'Dispon?veis para o estado atual':'N?o fornecidas';
+$('steps').max=String(Math.max(0,p.length-1));$('steps').disabled=!p.length;$('reproduzir').disabled=!p.length;$('steps').value=String(passoAtual);$('indice').textContent=String(passoAtual);$('anterior').disabled=passoAtual===0;$('proximo').disabled=!p.length||passoAtual===p.length-1;
+if(!p.length||passoAtual===p.length-1)parar();}
 $('mapa').addEventListener('change',trocarMapa);$('algoritmo').addEventListener('change',reiniciar);$('mostrarArmadilhas').addEventListener('change',atualizar);
 $('anterior').addEventListener('click',()=>{parar();passoAtual--;atualizar();});$('proximo').addEventListener('click',()=>{parar();passoAtual++;atualizar();});
 $('steps').addEventListener('input',e=>{parar();passoAtual=+e.target.value;atualizar();});$('velocidade').addEventListener('change',()=>{if(relogio!==null){parar();iniciar();}});
