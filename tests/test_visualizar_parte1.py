@@ -29,7 +29,7 @@ def test_mapa_sem_saida_gera_html_com_status(tmp_path):
     status = gerar_mapa(MAPAS / "m07_impossivel.txt", tmp_path, interactive=True)
     assert "não alcançável" in status
     html = (tmp_path / "labirinto_m07_impossivel.html").read_text(encoding="utf-8")
-    assert status in html and '"BFS": []' in html
+    assert status in html and '"DIJKSTRA": []' in html
     assert not list(tmp_path.glob("*.png"))
 
 
@@ -54,6 +54,14 @@ def test_cli_recebe_estados_armadilha(tmp_path, capsys):
 def test_rejeita_armadilha_ausente_do_grafo(tmp_path):
     with pytest.raises(ValueError, match="estados existentes"):
         gerar_mapa(MAPAS / "m02_uma_chave.txt", tmp_path, armadilhas_estados=["(99,99)|-|{}"])
+
+
+def test_percurso_m03_usa_mesmo_arquivo_do_lote(tmp_path):
+    gerar_mapa(MAPAS / "m03_tres_chaves.txt", tmp_path)
+    assert (tmp_path / "percurso_m03.png").exists()
+    assert not (tmp_path / "percurso_m03_tres_chaves.png").exists()
+    dados, _, _, resultados = preparar_mapa(MAPAS / "m03_tres_chaves.txt", ("DIJKSTRA",))
+    assert dados["custos"]["DIJKSTRA"][-1] == resultados["DIJKSTRA"]["distancia"]["ALVO"]
 
 
 def test_cli_interativo_preserva_html_conjunto_e_outros_mapas(tmp_path):

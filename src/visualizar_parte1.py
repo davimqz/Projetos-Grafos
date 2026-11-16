@@ -49,7 +49,7 @@ def preparar_mapa(arquivo, algoritmos=("BFS",), *, fonte_consumivel=False):
             "estados": list(estados), "custos": custos}, grafo, estados, resultados
 
 
-def gerar_mapa(arquivo, saida, *, algoritmo="BFS", interactive=False, fonte_consumivel=False,
+def gerar_mapa(arquivo, saida, *, algoritmo="DIJKSTRA", interactive=False, fonte_consumivel=False,
                armadilhas_estados=None):
     saida = Path(saida)
     dados, grafo, estados, resultados = preparar_mapa(arquivo, (algoritmo,), fonte_consumivel=fonte_consumivel)
@@ -61,7 +61,8 @@ def gerar_mapa(arquivo, saida, *, algoritmo="BFS", interactive=False, fonte_cons
         dados["armadilhas_estados"] = armadilhas_estados
     caminho = dados["algoritmos"][algoritmo]
     if caminho:
-        desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{Path(arquivo).stem}.png",
+        nome_mapa = {"m03_tres_chaves": "m03", "m08_grande": "m08"}.get(Path(arquivo).stem, Path(arquivo).stem)
+        desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{nome_mapa}.png",
                           titulo=f"{Path(arquivo).stem} — {algoritmo}")
     if interactive:
         gerar_html_interativo({Path(arquivo).stem: dados}, saida / f"labirinto_{Path(arquivo).stem}.html")
@@ -77,9 +78,12 @@ def gerar_figuras(arquivos, saida):
             arquivos[nome], ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD")
         )
         mapas[nome] = dados
-        if nome in ("m03", "m08") and dados["algoritmos"]["BFS"]:
-            desenhar_percurso(dados["grade"], dados["algoritmos"]["BFS"], saida / f"percurso_{nome}.png",
-                              titulo=f"{nome} — BFS (menor número de passos)")
+        if nome in ("m03", "m08"):
+            caminho = dados["algoritmos"]["DIJKSTRA"]
+            if not caminho:
+                raise ValueError(f"{nome}: {dados['status']['DIJKSTRA']}")
+            desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{nome}.png",
+                              titulo=f"{nome} — Dijkstra (menor custo)")
         if nome == "m02":
             desenhar_camadas(grafo, saida / "camadas_m02.png")
             desenhar_arvore_bfs(resultados["BFS"], saida / "arvore_bfs_m02.png")
