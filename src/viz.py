@@ -274,6 +274,12 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
       ...
     }
 
+    Campos opcionais lidos pelo HTML (calculados pelo grupo):
+      "custos": {"BFS": [0, 1, ...]}            custo acumulado por estado (sem ALVO)
+      "mensagens": {"Dijkstra": "RECUSA: ..."}  aviso de status do algoritmo
+      "estados": ["(1,1)|-|{}", ...]            estados de G_est, para a troca de camadas
+      "armadilhas_estados": ["(2,3)|a|{}", ...] estados-armadilha, realçados por camada
+
     Os percursos e armadilhas devem ter sido calculados externamente.
     """
     if not mapas:
@@ -285,57 +291,79 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
             raise ValueError(f"Mapa {nome} sem dicionário 'algoritmos'")
         for algoritmo, percurso in dados["algoritmos"].items():
             estados = _posicoes(percurso)
-            if not estados:
-                raise ValueError(f"Percurso vazio em {nome}/{algoritmo}")
+            # [IA] Claude Code – percurso vazio é aceito quando há mensagem de status (RECUSA, SEM_SOLUCAO...).
+            if not estados and algoritmo not in dados.get("mensagens", {}):
+                raise ValueError(f"Percurso vazio em {nome}/{algoritmo} (sem mensagem de status)")
             for l, c, _, _ in estados:
                 if not (0 <= l < len(dados["grade"]) and 0 <= c < len(dados["grade"][0])):
                     raise ValueError(f"Posição fora da grade em {nome}/{algoritmo}")
     # Evita que nomes importados dos dados possam encerrar a tag <script>.
     dados_json = json.dumps(mapas, ensure_ascii=False).replace("<", "\\u003c").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
     # [IA] Codex – revisão visual e acessibilidade do visualizador.
+    # [IA] Claude Code – custo acumulado, troca de camadas, armadilhas por estado, mensagens e teclado.
     html = r'''<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Labirinto interativo — Grafos</title>
 <style>
  :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#203b3b;background:#f4f3ed;--ink:#203b3b;--green:#126c5b;--line:#dce3d9}
 *{box-sizing:border-box}body{max-width:1180px;margin:0 auto;padding:40px 28px 60px}header{margin-bottom:28px;border-bottom:1px solid #cbd7cb;padding-bottom:24px}header:before{content:"PROJETO DE GRAFOS  /  EXPLORADOR";display:block;color:#69877a;font-size:11px;font-weight:800;letter-spacing:.16em;margin-bottom:12px}h1{font-family:Georgia,serif;font-size:clamp(30px,4vw,46px);font-weight:normal;letter-spacing:-.035em;margin:0 0 8px}p{color:#62766e;margin:0;line-height:1.5}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin:14px 0;box-shadow:0 6px 24px #24473508}
-.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:end}.group{display:flex;flex-direction:column;gap:7px;min-width:145px}label{font-size:12px;color:#587066;font-weight:700}select,input,button{font:inherit}select{padding:10px 34px 10px 12px;border:1px solid #cad8cc;border-radius:7px;background:#fff;color:var(--ink)}button{padding:10px 17px;border:1px solid #cad8cc;border-radius:7px;background:#fff;color:var(--ink);cursor:pointer;font-weight:650}button:hover:not(:disabled){border-color:var(--green)}button.primary{background:var(--green);color:white;border-color:var(--green)}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid #e6ad52;outline-offset:3px}input{accent-color:var(--green)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:24px;align-items:center}.map-wrap{overflow:auto;padding:20px;background:#edf2eb;border-radius:9px;min-width:0}
-#grade{display:grid;gap:2px;width:max-content;margin:auto;--cell:34px}.cell{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:12px;font-weight:750;position:relative}.wall{background:#294940}.floor{background:#fff}.visited{background:#b9ded1}.trap{outline:2px solid #c76b4b;outline-offset:-3px}.current{background:#d89c42!important;color:#172f2b!important;border-radius:50%;outline:3px solid #fff;outline-offset:-4px;z-index:1}.start{color:#087960}.goal{color:#a64d37}
-.readout{font-size:13px}.readout:before{content:"ESTADO ATUAL";display:block;color:#82988a;font-size:10px;font-weight:800;letter-spacing:.14em;margin-bottom:8px}.readout div{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #edf1ec}.readout strong{color:#60786b;font-weight:500}.readout span{font-weight:700;text-align:right}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}#steps{flex:1;min-width:130px}#indice{font-size:12px;color:#60786b;min-width:20px}.legend{display:flex;flex-wrap:wrap;gap:16px;color:#60786b;font-size:12px;margin:12px 0 0}.legend span:before{content:"";display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:2px;background:#b9ded1}.legend span:nth-child(2):before{background:#d89c42;border-radius:50%}.legend span:nth-child(3):before{background:transparent;border:2px solid #c76b4b}
+.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:end}.group{display:flex;flex-direction:column;gap:7px;min-width:145px}label{font-size:12px;color:#587066;font-weight:700}select,input,button{font:inherit}select{padding:10px 34px 10px 12px;border:1px solid #cad8cc;border-radius:7px;background:#fff;color:var(--ink)}button{padding:10px 17px;border:1px solid #cad8cc;border-radius:7px;background:#fff;color:var(--ink);cursor:pointer;font-weight:650}button:hover:not(:disabled){border-color:var(--green)}button.primary{background:var(--green);color:white;border-color:var(--green)}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:3px solid #e6ad52;outline-offset:3px}input{accent-color:var(--green)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;align-items:center}.map-wrap{overflow:auto;padding:20px;background:#edf2eb;border-radius:9px;min-width:0}
+#grade{display:grid;gap:2px;width:max-content;margin:auto;--cell:34px}.cell{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:12px;font-weight:750;position:relative}.wall{background:#294940}.floor{background:#fff}.visited{background:#b9ded1}.outside{background:#e4e7e1;color:#9aa69f}.trap{outline:2px solid #c76b4b;outline-offset:-3px}.current{background:#d89c42!important;color:#172f2b!important;border-radius:50%;outline:3px solid #fff;outline-offset:-4px;z-index:1}.start{color:#087960}.goal{color:#a64d37}
+.readout{font-size:13px}.readout:before{content:"ESTADO ATUAL";display:block;color:#82988a;font-size:10px;font-weight:800;letter-spacing:.14em;margin-bottom:8px}.readout div{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #edf1ec}.readout strong{color:#60786b;font-weight:500}.readout span{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}#custo{color:var(--green);font-size:15px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}#steps{flex:1;min-width:130px}#indice{font-size:12px;color:#60786b;min-width:20px}.legend{display:flex;flex-wrap:wrap;gap:16px;color:#60786b;font-size:12px;margin:12px 0 0}.legend span:before{content:"";display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:2px;background:#b9ded1}.legend span:nth-child(2):before{background:#d89c42;border-radius:50%}.legend span:nth-child(3):before{background:transparent;border:2px solid #c76b4b}.legend span:nth-child(4):before{background:#e4e7e1}
+#aviso{display:none;margin-top:12px;padding:12px 14px;border-radius:8px;background:#fbefe6;color:#7c3d22;font-size:13px;font-weight:600}.dica{font-size:12px;color:#82988a;margin-top:10px}
 @media(max-width:740px){body{padding:24px 16px 40px}.layout{grid-template-columns:1fr}#grade{--cell:28px}.panel{padding:16px}.map-wrap{padding:14px}.group{flex:1 1 130px}}
 </style></head><body>
 <header><h1>Labirinto interativo</h1><p>Visualização de percursos calculados pelo projeto. Não executa algoritmos no navegador.</p></header>
 <div class="panel controls"><div class="group"><label for="mapa">Mapa</label><select id="mapa"></select></div>
 <div class="group"><label for="algoritmo">Algoritmo</label><select id="algoritmo"></select></div>
+<div class="group"><label for="camadaSel">Camada exibida</label><select id="camadaSel"></select></div>
 <div class="group"><label for="velocidade">Velocidade</label><select id="velocidade"><option value="1000">Lenta</option><option selected value="550">Normal</option><option value="200">Rápida</option></select></div>
 <label><input type="checkbox" id="mostrarArmadilhas" checked> Mostrar armadilhas</label></div>
-<div class="panel layout"><div><div class="map-wrap"><div id="grade" aria-label="Mapa do labirinto"></div></div><div class="legend"><span>Percorrido</span><span>Posição atual</span><span>Armadilha</span></div></div><div class="readout">
+<div class="panel layout"><div><div class="map-wrap"><div id="grade" aria-label="Mapa do labirinto"></div></div><div class="legend"><span>Percorrido</span><span>Posição atual</span><span>Armadilha</span><span>Sem estado nesta camada</span></div><div id="aviso" role="status"></div></div><div class="readout">
 <div><strong>Passo:</strong> <span id="passo"></span></div><div><strong>Posição:</strong> <span id="posicao"></span></div>
 <div><strong>Chaves:</strong> <span id="chaves"></span></div><div><strong>Bônus consumidos:</strong> <span id="bonus"></span></div>
-<div><strong>Camada:</strong> <span id="camada"></span></div>
+<div><strong>Custo acumulado:</strong> <span id="custo"></span></div>
+<div><strong>Camada do estado:</strong> <span id="camada"></span></div>
+<div><strong>Camada exibida:</strong> <span id="exibida"></span></div>
 <div><strong>Estados no percurso:</strong> <span id="total"></span></div></div></div>
 <div class="panel toolbar"><button id="anterior">Anterior</button><button class="primary" id="reproduzir">Reproduzir</button><button id="proximo">Próximo</button><input id="steps" aria-label="Selecionar passo do percurso" type="range" min="0" max="0" value="0"><span id="indice"></span></div>
+<p class="dica">Teclado: ← e → avançam um passo; espaço reproduz ou pausa.</p>
 <script>
 const MAPAS = __DATA__;
 const $ = id => document.getElementById(id);
 let passoAtual=0, relogio=null;
 function parseEstado(texto){if(texto==='ALVO')return null;const m=/^\((\d+)\s*,\s*(\d+)\)\|([a-d]*|-)\|\{([0-9,]*)\}$/.exec(texto);if(!m)throw Error('Estado inválido: '+texto);return {l:+m[1],c:+m[2],chaves:m[3]==='-'?'':m[3],bonus:m[4]};}
+function nomeCamada(ch){return ch===''?'sem chaves':'chaves '+ch;}
 function dados(){return MAPAS[$('mapa').value];}
-function percurso(){return dados().algoritmos[$('algoritmo').value].map(parseEstado).filter(x=>x!==null);}
+function percurso(){return (dados().algoritmos[$('algoritmo').value]||[]).map(parseEstado).filter(x=>x!==null);}
+function custos(){return (dados().custos||{})[$('algoritmo').value]||null;}
+function estadosMapa(){const m=dados();const lista=(m.estados&&m.estados.length?m.estados:Object.values(m.algoritmos).flat());return lista.map(parseEstado).filter(x=>x!==null);}
+function camadas(){const s=new Set(estadosMapa().map(e=>e.chaves));return Array.from(s).sort((a,b)=>a.length-b.length||a.localeCompare(b));}
 function parar(){if(relogio!==null){clearInterval(relogio);relogio=null;} $('reproduzir').textContent='Reproduzir';}
 function reiniciar(){parar();passoAtual=0;atualizar();}
-function trocarMapa(){const m=dados();$('algoritmo').replaceChildren();Object.keys(m.algoritmos).forEach(nome=>{$('algoritmo').add(new Option(nome,nome));});reiniciar();}
-function atualizar(){const m=dados(), p=percurso();passoAtual=Math.min(Math.max(passoAtual,0),p.length-1);const atual=p[passoAtual], vistos=new Set(p.slice(0,passoAtual+1).map(s=>s.l+','+s.c));
-const armadilhas = new Set((m.armadilhas||[]).map(s=>s[0]+','+s[1]));const grid=$('grade');grid.replaceChildren();grid.style.gridTemplateColumns='repeat('+m.grade[0].length+',var(--cell))';
-m.grade.forEach((linha,l)=>Array.from(linha).forEach((ch,c)=>{const cell=document.createElement('div');cell.className='cell '+(ch==='#'?'wall':'floor');const key=l+','+c;if(vistos.has(key)&&ch!=='#')cell.classList.add('visited');if($('mostrarArmadilhas').checked&&armadilhas.has(key))cell.classList.add('trap');if(atual.l===l&&atual.c===c)cell.classList.add('current');if(ch==='S')cell.classList.add('start');if(ch==='G')cell.classList.add('goal');cell.textContent=ch==='.'||ch==='#'?'':ch;cell.title='('+l+','+c+') '+ch;grid.appendChild(cell);}));
-$('passo').textContent=(passoAtual+1)+' / '+p.length;$('posicao').textContent='('+atual.l+','+atual.c+')';$('chaves').textContent=atual.chaves||'nenhuma';$('bonus').textContent=atual.bonus||'nenhum';$('camada').textContent=atual.chaves||'sem chaves';$('total').textContent=p.length;
-$('steps').max=String(p.length-1);$('steps').value=String(passoAtual);$('indice').textContent=String(passoAtual);$('anterior').disabled=passoAtual===0;$('proximo').disabled=passoAtual===p.length-1;
-if(passoAtual===p.length-1)parar();}
-$('mapa').addEventListener('change',trocarMapa);$('algoritmo').addEventListener('change',reiniciar);$('mostrarArmadilhas').addEventListener('change',atualizar);
+function trocarMapa(){const m=dados();$('algoritmo').replaceChildren();Object.keys(m.algoritmos).forEach(nome=>{$('algoritmo').add(new Option(nome,nome));});
+$('camadaSel').replaceChildren();$('camadaSel').add(new Option('Seguir o percurso','__auto'));camadas().forEach(ch=>$('camadaSel').add(new Option(nomeCamada(ch),ch)));reiniciar();}
+function atualizar(){const m=dados(), p=percurso(), aviso=$('aviso'), msg=(m.mensagens||{})[$('algoritmo').value];
+const grid=$('grade');grid.replaceChildren();grid.style.gridTemplateColumns='repeat('+m.grade[0].length+',var(--cell))';
+if(!p.length){parar();aviso.style.display='block';aviso.textContent=msg||'Sem percurso para este algoritmo.';}else if(msg){aviso.style.display='block';aviso.textContent=msg;}else{aviso.style.display='none';}
+passoAtual=Math.min(Math.max(passoAtual,0),Math.max(p.length-1,0));const atual=p[passoAtual]||null;
+const sel=$('camadaSel').value, exibida=sel==='__auto'?(atual?atual.chaves:''):sel;
+const temEstados=!!(m.estados&&m.estados.length), naCamada=new Set(estadosMapa().filter(e=>e.chaves===exibida).map(e=>e.l+','+e.c));
+const vistos=new Set(p.slice(0,passoAtual+1).filter(s=>s.chaves===exibida||sel==='__auto').map(s=>s.l+','+s.c));
+const armadilhas=new Set((m.armadilhas||[]).map(s=>s[0]+','+s[1]));((m.armadilhas_estados||[]).map(parseEstado).filter(e=>e&&e.chaves===exibida)).forEach(e=>armadilhas.add(e.l+','+e.c));
+m.grade.forEach((linha,l)=>Array.from(linha).forEach((ch,c)=>{const cell=document.createElement('div');const key=l+','+c;cell.className='cell '+(ch==='#'?'wall':'floor');
+if(ch!=='#'&&temEstados&&!naCamada.has(key))cell.classList.add('outside');if(vistos.has(key)&&ch!=='#')cell.classList.add('visited');if($('mostrarArmadilhas').checked&&armadilhas.has(key))cell.classList.add('trap');
+if(atual&&atual.l===l&&atual.c===c&&(sel==='__auto'||atual.chaves===exibida))cell.classList.add('current');if(ch==='S')cell.classList.add('start');if(ch==='G')cell.classList.add('goal');cell.textContent=ch==='.'||ch==='#'?'':ch;cell.title='('+l+','+c+') '+ch;grid.appendChild(cell);}));
+const cs=custos();$('passo').textContent=p.length?(passoAtual+1)+' / '+p.length:'—';$('posicao').textContent=atual?'('+atual.l+','+atual.c+')':'—';$('chaves').textContent=atual?(atual.chaves||'nenhuma'):'—';$('bonus').textContent=atual?(atual.bonus||'nenhum'):'—';
+$('custo').textContent=cs&&p.length?String(+cs[passoAtual].toFixed(2)):'—';$('camada').textContent=atual?nomeCamada(atual.chaves):'—';$('exibida').textContent=nomeCamada(exibida);$('total').textContent=p.length;
+$('steps').max=String(Math.max(p.length-1,0));$('steps').value=String(passoAtual);$('indice').textContent=String(passoAtual);$('anterior').disabled=passoAtual===0||!p.length;$('proximo').disabled=passoAtual>=p.length-1;$('reproduzir').disabled=p.length<2;
+if(p.length&&passoAtual===p.length-1)parar();}
+$('mapa').addEventListener('change',trocarMapa);$('algoritmo').addEventListener('change',reiniciar);$('camadaSel').addEventListener('change',atualizar);$('mostrarArmadilhas').addEventListener('change',atualizar);
 $('anterior').addEventListener('click',()=>{parar();passoAtual--;atualizar();});$('proximo').addEventListener('click',()=>{parar();passoAtual++;atualizar();});
 $('steps').addEventListener('input',e=>{parar();passoAtual=+e.target.value;atualizar();});$('velocidade').addEventListener('change',()=>{if(relogio!==null){parar();iniciar();}});
-function iniciar(){if(passoAtual===percurso().length-1)passoAtual=0;relogio=setInterval(()=>{if(passoAtual<percurso().length-1){passoAtual++;atualizar();}else parar();},+$('velocidade').value);$('reproduzir').textContent='Pausar';atualizar();}
+function iniciar(){if(percurso().length<2)return;if(passoAtual===percurso().length-1)passoAtual=0;relogio=setInterval(()=>{if(passoAtual<percurso().length-1){passoAtual++;atualizar();}else parar();},+$('velocidade').value);$('reproduzir').textContent='Pausar';atualizar();}
 $('reproduzir').addEventListener('click',()=>{if(relogio!==null)parar();else iniciar();});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT')return;if(e.key==='ArrowRight'){parar();passoAtual++;atualizar();}else if(e.key==='ArrowLeft'){parar();passoAtual--;atualizar();}else if(e.key===' '){e.preventDefault();$('reproduzir').click();}});
 Object.keys(MAPAS).forEach(nome=>$('mapa').add(new Option(nome,nome)));trocarMapa();
 </script></body></html>'''
     html = html.replace("__DATA__", dados_json)
