@@ -3,7 +3,7 @@
 Exemplos (do enunciado):
     python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
     python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
-    python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --out ./out/parte1/
+    python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --out ./out/parte1/
     python -m src.cli --dataset ./data/dataset_parte2/ --alg DIJKSTRA --source A --target Z --out ./out/parte2/
     python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte2/
 """
@@ -36,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.mapa:
         from src.visualizar_parte1 import gerar_mapa
         try:
+            # P3: integrar aqui o cálculo de armadilhas à orquestração de --mapa.
             armadilhas = None
             if args.arquivo_armadilhas:
                 import json

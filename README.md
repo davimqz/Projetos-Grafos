@@ -52,12 +52,15 @@ python -m src.visualizar_parte1 --out ./out/parte1/
 Os percursos desse conjunto usam BFS (menor número de passos). O HTML mostra
 que as armadilhas não foram fornecidas até que a análise do grupo esteja pronta.
 Na CLI, `--mapa` gera o percurso do algoritmo escolhido e `--interactive`
-acrescenta o HTML; se o percurso não existir ou o algoritmo não se aplicar,
+gera `labirinto_<nome-do-mapa>.html`, preservando o HTML conjunto
+`labirinto_interativo.html`; se o percurso não existir ou o algoritmo não se aplicar,
 o motivo é exibido. Para mostrar armadilhas, `--arquivo-armadilhas` recebe um
 JSON com uma lista de rótulos de estados calculados pelo grupo, por exemplo
 `["(1,1)|-|{}"]`; o exemplo ilustra o formato e não declara que o estado é uma
 armadilha. Com `--armadilhas`, a CLI também lista os estados no terminal. Os
-resultados reais da análise ainda precisam ser produzidos pelo grupo.
+resultados reais da análise ainda precisam ser produzidos pelo grupo. Quando o P3
+estiver pronto, seu cálculo deverá ser integrado ao fluxo `--mapa` da CLI para
+que `--armadilhas` não dependa de um arquivo previamente gerado.
 
 ## Estrutura
 

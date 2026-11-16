@@ -64,7 +64,7 @@ def gerar_mapa(arquivo, saida, *, algoritmo="BFS", interactive=False, fonte_cons
         desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{Path(arquivo).stem}.png",
                           titulo=f"{Path(arquivo).stem} — {algoritmo}")
     if interactive:
-        gerar_html_interativo({Path(arquivo).stem: dados}, saida / "labirinto_interativo.html")
+        gerar_html_interativo({Path(arquivo).stem: dados}, saida / f"labirinto_{Path(arquivo).stem}.html")
     return dados["status"][algoritmo]
 
 
