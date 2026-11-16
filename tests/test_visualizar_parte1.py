@@ -15,6 +15,12 @@ def test_percurso_real_usa_arestas_do_grafo():
                for origem, destino in zip(percurso, percurso[1:]))
     assert dados["grade"][estados[percurso[-1]].linha][estados[percurso[-1]].coluna] == "G"
     assert resultados["BFS"]["pai"]["ALVO"] == percurso[-1]
+    assert set(dados["estados"]) == set(estados)
+    custos = dados["custos"]["BFS"]
+    assert custos[0] == 0 and len(custos) == len(percurso)
+    for i, (u, v) in enumerate(zip(percurso, percurso[1:])):
+        peso = next(peso for destino, peso in grafo.vizinhos(u) if destino == v)
+        assert custos[i + 1] == custos[i] + peso
 
 
 def test_mapa_sem_saida_gera_html_com_status(tmp_path):

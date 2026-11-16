@@ -34,7 +34,19 @@ def preparar_mapa(arquivo, algoritmos=("BFS",), *, fonte_consumivel=False):
             status[nome] = "Percurso encontrado."
         except ValueError:
             percursos[nome], status[nome] = [], "Saída não alcançável."
-    return {"grade": grade, "algoritmos": percursos, "status": status}, grafo, estados, resultados
+    # [IA] Codex – prepara os dados de apresentação a partir dos arcos existentes.
+    custos = {}
+    for nome, caminho in percursos.items():
+        if not caminho:
+            continue
+        acumulados = [0]
+        for u, v in zip(caminho, caminho[1:]):
+            peso = next(peso for destino, peso in grafo.vizinhos(u) if destino == v)
+            acumulados.append(acumulados[-1] + peso)
+        custos[nome] = acumulados
+    return {"grade": grade, "algoritmos": percursos, "status": status,
+            "mensagens": {nome: texto for nome, texto in status.items() if not percursos[nome]},
+            "estados": list(estados), "custos": custos}, grafo, estados, resultados
 
 
 def gerar_mapa(arquivo, saida, *, algoritmo="BFS", interactive=False, fonte_consumivel=False):
