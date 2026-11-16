@@ -38,16 +38,16 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 
 ## Parte 1 — tarefas
 
-> Status atualizado em 12/11/2026. Resumo e próximas ações em `PROXIMOS_PASSOS.md`.
+> Status atualizado em 16/11/2026. Resumo e próximas ações em `PROXIMOS_PASSOS.md`.
 
 ### P1 · Modelagem (Matheus / rev. Thomaz)
 - [x] `io.py`: ler mapa, ignorar linhas `;`, validar (retangular, 1 S, ≥1 G, símbolos conhecidos)
-- [ ] `estados.py`: G_pos (paredes + esteiras)
-- [ ] `estados.py`: G_est por exploração a partir de S (chaves, bônus numerados em ordem de leitura)
-- [ ] rótulo `(l,c)|chaves|{bônus}` e nó virtual `ALVO` (custo 0 a partir de G)
-- [ ] variantes: portas-como-chão, portas-como-parede, `+` fixo em −4, `--fonte-consumivel`
-- [ ] exportar `out/parte1/arestas_<mapa>.csv` (inclusive m08)
-- [ ] `test_io.py` ✅ e `test_estados.py` (mapa mínimo ≤5×7 contado à mão, esteira→parede, troca de camada)
+- [x] `estados.py`: G_pos (paredes + esteiras)
+- [x] `estados.py`: G_est por exploração a partir de S (chaves, bônus numerados em ordem de leitura)
+- [x] rótulo `(l,c)|chaves|{bônus}` e nó virtual `ALVO` (custo 0 a partir de G)
+- [x] variantes: portas-como-chão, portas-como-parede, `+` fixo em −4, `--fonte-consumivel`
+- [ ] exportar `out/parte1/arestas_<mapa>.csv` (inclusive m08), via `src/solve.py`
+- [x] `test_io.py` e `test_estados.py` (mapa mínimo ≤5×7 contado à mão, esteira→parede, troca de camada)
 
 ### P2 · Algoritmos (Thomaz / rev. Davi)
 - [x] `graph.py`: adjacência dirigida (ordem N, L, S, O), graus, densidade, transposto, subgrafo induzido
@@ -67,10 +67,10 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [ ] textos do PDF: m01 (BFS × Dijkstra), m06 (exploit e correção), m07 (sem solução), grafo não dirigido estaria errado
 
 ### P5a · Visualização Parte 1 (Thomaz / rev. Matheus)
-- [ ] `percurso_m03.png`, `percurso_m08.png` (cor muda a cada chave)
-- [ ] G_est do m02 em camadas (destacar arcos entre camadas) · árvore BFS do m02 com níveis
-- [ ] heatmap de multiplicidade do m08
-- [ ] `labirinto_interativo.html`: mapa + algoritmo, passo a passo, estado atual, armadilhas, camadas, controle de velocidade
+- [ ] `percurso_m03.png`, `percurso_m08.png` (cor muda a cada chave) — PR #19
+- [ ] G_est do m02 em camadas (destacar arcos entre camadas) · árvore BFS do m02 com níveis — PR #19
+- [ ] heatmap de multiplicidade do m08 — PR #19
+- [ ] `labirinto_interativo.html` (template na main, PR #20; dados reais no PR #19; falta ligar às armadilhas do P3): mapa + algoritmo, passo a passo, estado atual, armadilhas, camadas, controle de velocidade
 - [ ] (bônus) editor de mapas, comparação lado a lado, painel de métricas
 
 ## Parte 2 — tarefas

@@ -1,4 +1,4 @@
-# Próximos passos (atualizado em 12/11/2026)
+# Próximos passos (atualizado em 16/11/2026)
 
 Entrega em **26/11**. Acompanhamentos: 17, 19 e 24/11. Checklist completo por pacote em `PLANO_DE_TRABALHO.md`.
 
@@ -8,14 +8,12 @@ Entrega em **26/11**. Acompanhamentos: 17, 19 e 24/11. Checklist completo por pa
 |---|---|
 | Estrutura do repositório, mapas, README inicial | ✅ pronto |
 | **P2** Grafo e algoritmos (`graph.py`, BFS, DFS, Dijkstra, Bellman-Ford + testes) | ✅ pronto (PRs #2, #3, #6, #8, #10, #12) |
-| **P4a** Dataset da Parte 2 (recorte, pesos, carga) | ✅ pronto; saldo das carteiras corrigido em 12/11 (ver abaixo) |
-| **P4a** Casos obrigatórios (BFS/DFS 3 fontes, Dijkstra 5 pares, Bellman-Ford 2 casos) | ✅ pronto, com resultados e interpretação em `docs/relatorio/parte2.md` (PR #16) |
-| **P4b** Benchmark e escalabilidade | 🟡 DFS, BFS e Bellman-Ford medidos (`parte2_report.json` + gráfico); falta Dijkstra e os gráficos de comportamento/caminhos |
-| **P1** `io.py` + `test_io.py` | ✅ pronto (PR #15) |
-| **P1** `estados.py` (G_pos, G_est, variantes) + `test_estados.py` | ⏳ **não começado**: bloqueia P3 e P5a |
-| **P3** Análises da Parte 1 | ⏳ depende do G_est |
-| **P5a** Figuras e `labirinto_interativo.html` | ⏳ depende do G_est |
-| **P5b** AVD (notebooks) | ⏳ `notebooks/avd/` ainda vazio |
+| **P4a** Dataset e casos obrigatórios da Parte 2 | ✅ pronto, com resultados e interpretação em `docs/relatorio/parte2.md` (PR #16) |
+| **P1** `io.py`, `estados.py` (G_pos, G_est, variantes) + testes | ✅ pronto (PRs #15 e #18) |
+| **P5a** Figuras da Parte 1 e `labirinto_interativo.html` | 🟡 template do HTML na main (PR #20); figuras e integração com o G_est no PR #19, em revisão |
+| **P3** Análises da Parte 1 | ⏳ **não começado**: falta `src/solve.py` (métricas, camadas, graus, `arestas_<mapa>.csv`, armadilhas, m05, mapas do grupo) |
+| **P4b** Benchmark e escalabilidade | 🟡 DFS, BFS e Bellman-Ford medidos; falta Dijkstra e os gráficos de comportamento/caminhos |
+| **P5b** AVD (notebooks) | ⏳ `notebooks/avd/` ainda vazio; **acompanhamento de AVD em 17/11** |
 | **P5c** README final, PDF, declaração de IA | ⏳ no fim |
 
 > ⚠️ **Regra da professora:** `io.py`, `estados.py`, `graph.py` e `algorithms.py` **não podem ser gerados por IA**,
@@ -36,7 +34,7 @@ cd Projetos-Grafos
 python -m venv .venv
 # Windows: .venv\Scripts\activate   |   Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-pytest          # 225 testes passando em 12/11
+pytest          # 311 testes passando em 16/11
 ```
 
 O recorte da Parte 2 já está no repositório; **não precisa baixar o dataset** (só para refazer o recorte).
@@ -51,30 +49,34 @@ O recorte da Parte 2 já está no repositório; **não precisa baixar o dataset*
 
 ## Matheus — P1 + P3 (revisor: Thomaz) · **prioridade do grupo**
 
-- [ ] `estados.py`: G_pos e G_est por exploração a partir de S, rótulos `(l,c)|chaves|{bônus}`, nó `ALVO`
-- [ ] variantes: portas como chão/parede, `+` fixo em −4, `--fonte-consumivel`
-- [ ] `test_estados.py` com mapa mínimo contado à mão; conferir o G_est do m02 com o desenho
-- [ ] exportar `out/parte1/arestas_<mapa>.csv` (m01–m08)
-- [ ] depois: análises do P3 (métricas, camadas, graus, comparação de modelagens, m05, armadilhas, mapas do grupo)
+- [x] `estados.py`: G_pos, G_est, rótulos, nó `ALVO` e variantes (portas chão/parede, `+` fixo, fonte consumível)
+- [x] `test_estados.py`
+- [ ] revisar o PR #19 (figuras e HTML do Thomaz)
+- [ ] `src/solve.py`: exportar `out/parte1/arestas_<mapa>.csv` (m01–m08)
+- [ ] análises do P3: `metricas_global.json`, `camadas.json`, graus, `comparacao_modelagem.csv`, m05 (BF no G_pos × G_est + prova), `solucoes.csv`
+- [ ] armadilhas do m04 e do m07 (busca a partir de ALVO no transposto); o HTML e a CLI já recebem a lista de estados
+- [ ] 2 mapas em `data/mapas_grupo/` + gabarito
 
-## Thomaz — P5a (revisor: Matheus)
+## Thomaz — P2 + P5a (revisor: Matheus)
 
-- [ ] revisar o PR do `estados.py`
-- [ ] quando houver G_est, integrar as funções de `src/viz.py` em um script que gere em `out/parte1/` os percursos m03/m08, as camadas e a árvore BFS do m02 e o heatmap do m08
-- [ ] no mesmo fluxo, gerar `out/parte1/labirinto_interativo.html` com os percursos e as armadilhas calculados pelo projeto
+- [x] revisar o PR do `estados.py`
+- [ ] PR #19: percursos m03/m08, camadas e árvore BFS do m02, heatmap do m08 e HTML com os dados reais (em revisão)
+- [ ] ajustes pedidos na revisão do PR #19
+- [ ] quando o P3 gerar as armadilhas, ligar o HTML a elas
 
 ## Vagner — P4b + P5b (revisor: Davi)
 
-- [ ] benchmark: incluir o Dijkstra e os gráficos de comportamento/caminhos
-- [ ] AVD em `notebooks/avd/`: 4 pilares, faltantes (classe "desconhecido" não se apaga), classe × todos os atributos
+- [x] template do `labirinto_interativo.html` (PR #20)
+- [ ] **AVD em `notebooks/avd/` (acompanhamento em 17/11)**: 4 pilares, faltantes (classe "desconhecido" não se apaga), classe × todos os atributos
 - [ ] ≥4 exploratórias + ≥2 explanatórias com nota analítica autoral (sem IA na escolha/interpretação dos gráficos)
 - [ ] usar o `nos.csv` corrigido em 12/11
+- [ ] benchmark: incluir o Dijkstra e os gráficos de comportamento/caminhos
 
 ## Davi — P4a + P5c
 
-- [x] carga do recorte, casos obrigatórios e relatório da Parte 2
+- [x] carga do recorte, casos obrigatórios e relatório da Parte 2 (PR #16)
 - [x] correção do saldo inflado e atualização dos resultados
-- [ ] merge do PR #16 (revisão do Vagner)
+- [ ] revisar o PR #19
 - [ ] revisar os PRs do Vagner (benchmark e AVD)
 - [ ] README final, PDF (manual + técnica + limitações + conclusões + matriz de contribuição)
 - [ ] `docs/DECLARACAO_IA.pdf` assinada por todos; conferir marcações `# [IA]` e `REGISTRO_IA.md`
