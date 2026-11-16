@@ -49,9 +49,16 @@ def preparar_mapa(arquivo, algoritmos=("BFS",), *, fonte_consumivel=False):
             "estados": list(estados), "custos": custos}, grafo, estados, resultados
 
 
-def gerar_mapa(arquivo, saida, *, algoritmo="BFS", interactive=False, fonte_consumivel=False):
+def gerar_mapa(arquivo, saida, *, algoritmo="BFS", interactive=False, fonte_consumivel=False,
+               armadilhas_estados=None):
     saida = Path(saida)
     dados, grafo, estados, resultados = preparar_mapa(arquivo, (algoritmo,), fonte_consumivel=fonte_consumivel)
+    if armadilhas_estados is not None:
+        if not isinstance(armadilhas_estados, list) or any(
+            not isinstance(rotulo, str) or rotulo not in estados for rotulo in armadilhas_estados
+        ):
+            raise ValueError("Armadilhas devem ser uma lista de estados existentes no grafo deste mapa")
+        dados["armadilhas_estados"] = armadilhas_estados
     caminho = dados["algoritmos"][algoritmo]
     if caminho:
         desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{Path(arquivo).stem}.png",

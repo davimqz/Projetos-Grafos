@@ -32,7 +32,7 @@ python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg DIJKSTRA --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m05_bonus.txt --alg BELLMAN_FORD --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
-python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --out ./out/parte1/
+python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --interactive --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./out/parte1/
 
 # PARTE 2
@@ -53,7 +53,11 @@ Os percursos desse conjunto usam BFS (menor número de passos). O HTML mostra
 que as armadilhas não foram fornecidas até que a análise do grupo esteja pronta.
 Na CLI, `--mapa` gera o percurso do algoritmo escolhido e `--interactive`
 acrescenta o HTML; se o percurso não existir ou o algoritmo não se aplicar,
-o motivo é exibido. `--armadilhas` depende da análise ainda pendente.
+o motivo é exibido. Para mostrar armadilhas, `--arquivo-armadilhas` recebe um
+JSON com uma lista de rótulos de estados calculados pelo grupo, por exemplo
+`["(1,1)|-|{}"]`; o exemplo ilustra o formato e não declara que o estado é uma
+armadilha. Com `--armadilhas`, a CLI também lista os estados no terminal. Os
+resultados reais da análise ainda precisam ser produzidos pelo grupo.
 
 ## Estrutura
 

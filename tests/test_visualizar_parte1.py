@@ -1,6 +1,8 @@
 """Integração das visualizações com os mapas e algoritmos reais."""
 # [IA] Codex – testes de integração da apresentação com dados do projeto.
 from pathlib import Path
+import json
+import pytest
 
 from src.visualizar_parte1 import preparar_mapa, gerar_mapa
 
@@ -35,3 +37,20 @@ def test_dijkstra_com_peso_negativo_tem_status():
     dados, _, _, _ = preparar_mapa(MAPAS / "m05_bonus.txt", ("DIJKSTRA",))
     assert not dados["algoritmos"]["DIJKSTRA"]
     assert "peso negativo" in dados["status"]["DIJKSTRA"]
+
+
+# [IA] Codex – verifica a passagem dos estados fornecidos ao HTML pela CLI.
+def test_cli_recebe_estados_armadilha(tmp_path, capsys):
+    from src.cli import main
+    arquivo = tmp_path / "armadilhas.json"
+    estado = "(1,1)|-|{}"
+    arquivo.write_text(json.dumps([estado]), encoding="utf-8")
+    assert main(["--mapa", str(MAPAS / "m02_uma_chave.txt"), "--out", str(tmp_path),
+                 "--interactive", "--armadilhas", "--arquivo-armadilhas", str(arquivo)]) == 0
+    assert estado in capsys.readouterr().out
+    assert '"armadilhas_estados": ["(1,1)|-|{}"]' in (tmp_path / "labirinto_interativo.html").read_text(encoding="utf-8")
+
+
+def test_rejeita_armadilha_ausente_do_grafo(tmp_path):
+    with pytest.raises(ValueError, match="estados existentes"):
+        gerar_mapa(MAPAS / "m02_uma_chave.txt", tmp_path, armadilhas_estados=["(99,99)|-|{}"])

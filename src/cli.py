@@ -22,6 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", required=True, help="pasta de saída")
     p.add_argument("--fonte-consumivel", action="store_true", help="'*' vale -2 só na primeira vez")
     p.add_argument("--armadilhas", action="store_true", help="lista estados-armadilha")
+    p.add_argument("--arquivo-armadilhas", help="JSON com lista de rótulos de estados-armadilha calculados pelo grupo")
     p.add_argument("--interactive", action="store_true", help="gera o labirinto interativo")
     p.add_argument("--source", help="nó de origem (Parte 2)")
     p.add_argument("--target", help="nó de destino (Parte 2)")
@@ -33,12 +34,22 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.mapa:
-        if args.armadilhas:
-            parser.error("--armadilhas depende da análise de estados-armadilha, ainda não implementada")
         from src.visualizar_parte1 import gerar_mapa
         try:
+            armadilhas = None
+            if args.arquivo_armadilhas:
+                import json
+                from pathlib import Path
+                armadilhas = json.loads(Path(args.arquivo_armadilhas).read_text(encoding="utf-8"))
+            if args.armadilhas and armadilhas is None:
+                parser.error("--armadilhas exige --arquivo-armadilhas com os estados calculados pelo grupo")
             status = gerar_mapa(args.mapa, args.out, algoritmo=args.alg or "BFS",
-                                interactive=args.interactive, fonte_consumivel=args.fonte_consumivel)
+                                interactive=args.interactive, fonte_consumivel=args.fonte_consumivel,
+                                armadilhas_estados=armadilhas)
+            if args.armadilhas:
+                print("Estados-armadilha:")
+                for estado in armadilhas:
+                    print(estado)
         except (ValueError, OSError) as erro:
             parser.error(str(erro))
         print(status)
