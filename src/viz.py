@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch, Rectangle
+from matplotlib.patches import FancyArrowPatch
 from matplotlib.colors import ListedColormap
 
 
@@ -121,8 +121,9 @@ def desenhar_percurso(grade: list[str], percurso: list[str], arquivo: str | Path
         l2, c2, _, _ = estados[indice + 1]
         ax.plot([c1, c2], [l1, l2], color=cores[chaves], linewidth=3.4,
                 alpha=.87, zorder=7, solid_capstyle="round")
-    for l, c, chaves, _ in estados:
-        ax.scatter(c, l, s=18, color=[cores[chaves]], zorder=8)
+    # [IA] Codex – agrupa marcadores para evitar um objeto gráfico por estado.
+    ax.scatter([c for _, c, _, _ in estados], [l for l, _, _, _ in estados],
+               s=18, color=[cores[chaves] for _, _, chaves, _ in estados], zorder=8)
     ax.scatter(estados[0][1], estados[0][0], s=110, marker="o",
                facecolors="white", edgecolors="#125E6A", linewidths=2, zorder=9)
     ax.scatter(estados[-1][1], estados[-1][0], s=110, marker="s",
@@ -130,6 +131,10 @@ def desenhar_percurso(grade: list[str], percurso: list[str], arquivo: str | Path
     from matplotlib.lines import Line2D
     itens = [Line2D([0], [0], color=cores[chaves], lw=3,
                     label=f"Chaves: {chaves or 'nenhuma'}") for chaves in conjuntos]
+    itens.extend([Line2D([0], [0], marker="o", color="none", markerfacecolor="white",
+                         markeredgecolor="#125E6A", markersize=8, label="Início"),
+                  Line2D([0], [0], marker="s", color="none", markerfacecolor="white",
+                         markeredgecolor="#9B4D5F", markersize=8, label="Fim do percurso")])
     ax.legend(handles=itens, loc="upper center", bbox_to_anchor=(.5, -.02),
               ncol=min(4, len(itens)), frameon=False, fontsize=9)
     ax.set_title(titulo, fontsize=13, color="#233143", pad=14)
@@ -165,9 +170,10 @@ def _desenhar_rede(grupos: dict[str, list[str]], arcos: list[tuple[str, str]],
         mudou = grupos_no[u] != grupos_no[v]
         cor = "#c27d43" if destacar_transicao and mudou else "#9aafa5"
         ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>",
-                                     mutation_scale=8, lw=1.3 if mudou else .75,
+                                     mutation_scale=11, lw=1.5 if mudou else .85,
                                      color=cor, alpha=.8, zorder=1,
-                                     connectionstyle="arc3,rad=.08"))
+                                     shrinkA=8, shrinkB=11,
+                                     connectionstyle="arc3,rad=.13"))
     for nome, (x, y) in layout.items():
         ax.scatter(x, y, s=170 if mostrar_nomes else 45, color="#2b7866", edgecolors="white", linewidths=1, zorder=3)
         if mostrar_nomes:
@@ -194,6 +200,11 @@ def _desenhar_rede(grupos: dict[str, list[str]], arcos: list[tuple[str, str]],
     ax.set_aspect("auto")
     ax.axis("off")
     ax.set_title(titulo, fontsize=13, color="#233143", pad=16)
+    if destacar_transicao:
+        from matplotlib.lines import Line2D
+        ax.legend(handles=[Line2D([0], [0], color="#9aafa5", label="Mesma camada"),
+                           Line2D([0], [0], color="#c27d43", label="Mudança de camada")],
+                  loc="lower center", bbox_to_anchor=(.5, -.08), ncol=2, frameon=False)
     return _salvar(fig, arquivo)
 
 
@@ -252,8 +263,10 @@ def desenhar_heatmap(grade: list[str], grafo: Any, arquivo: str | Path) -> Path:
     for l in range(n_linhas):
         for c in range(n_colunas):
             if grade[l][c] != "#":
-                ax.text(c, l, str(quantidades[l][c]), ha="center", va="center",
-                        fontsize=8, color="#223448")
+                valor = quantidades[l][c]
+                cor = "white" if imagem.norm(valor) > .55 else "#223448"
+                ax.text(c, l, str(valor), ha="center", va="center",
+                        fontsize=8, color=cor)
     ax.set_xticks(range(n_colunas)); ax.set_yticks(range(n_linhas))
     ax.set_xlabel("Coluna"); ax.set_ylabel("Linha")
     ax.set_title("Multiplicidade de estados por posição", fontsize=13, pad=14)
@@ -269,7 +282,7 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
       "m03": {
         "grade": ["#####", "#S.G#", "#####"],
         "algoritmos": {"BFS": ["(1,1)|-|{}", "(1,2)|-|{}", ...]},
-        "armadilhas": [[linha, coluna], ...]  # opcional, calculadas pelo grupo
+        "armadilhas": ["(linha,coluna)|chaves|{bonus}", ...]  # opcional
       },
       ...
     }
@@ -286,14 +299,26 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
         raise ValueError("Forneça pelo menos um mapa")
     for nome, dados in mapas.items():
         _verificar_grade(dados["grade"])
+        if "armadilhas" in dados:
+            if not isinstance(dados["armadilhas"], list):
+                raise ValueError(f"Armadilhas inválidas em {nome}")
+            for rotulo in dados["armadilhas"]:
+                if isinstance(rotulo, (list, tuple)) and len(rotulo) == 2:
+                    continue
+                estado = ler_rotulo(rotulo)
+                if estado is None or not (0 <= estado[0] < len(dados["grade"]) and 0 <= estado[1] < len(dados["grade"][0])):
+                    raise ValueError(f"Estado-armadilha inválido em {nome}: {rotulo!r}")
         # [IA] Codex – correção da validação de mapas sem algoritmos.
         if not isinstance(dados.get("algoritmos"), dict) or not dados["algoritmos"]:
             raise ValueError(f"Mapa {nome} sem dicionário 'algoritmos'")
         for algoritmo, percurso in dados["algoritmos"].items():
             estados = _posicoes(percurso)
             # [IA] Claude Code – percurso vazio é aceito quando há mensagem de status (RECUSA, SEM_SOLUCAO...).
-            if not estados and algoritmo not in dados.get("mensagens", {}):
+            if not estados and not (dados.get("mensagens", {}).get(algoritmo) or dados.get("status", {}).get(algoritmo)):
                 raise ValueError(f"Percurso vazio em {nome}/{algoritmo} (sem mensagem de status)")
+            custos = dados.get("custos", {}).get(algoritmo)
+            if custos is not None and (len(custos) != len(estados) or any(not isinstance(c, (int, float)) for c in custos)):
+                raise ValueError(f"Custos incompatíveis com o percurso em {nome}/{algoritmo}")
             for l, c, _, _ in estados:
                 if not (0 <= l < len(dados["grade"]) and 0 <= c < len(dados["grade"][0])):
                     raise ValueError(f"Posição fora da grade em {nome}/{algoritmo}")
@@ -312,22 +337,26 @@ def gerar_html_interativo(mapas: dict[str, dict], arquivo: str | Path) -> Path:
 .readout{font-size:13px}.readout:before{content:"ESTADO ATUAL";display:block;color:#82988a;font-size:10px;font-weight:800;letter-spacing:.14em;margin-bottom:8px}.readout div{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #edf1ec}.readout strong{color:#60786b;font-weight:500}.readout span{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}#custo{color:var(--green);font-size:15px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}#steps{flex:1;min-width:130px}#indice{font-size:12px;color:#60786b;min-width:20px}.legend{display:flex;flex-wrap:wrap;gap:16px;color:#60786b;font-size:12px;margin:12px 0 0}.legend span:before{content:"";display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:2px;background:#b9ded1}.legend span:nth-child(2):before{background:#d89c42;border-radius:50%}.legend span:nth-child(3):before{background:transparent;border:2px solid #c76b4b}.legend span:nth-child(4):before{background:#e4e7e1}
 #aviso{display:none;margin-top:12px;padding:12px 14px;border-radius:8px;background:#fbefe6;color:#7c3d22;font-size:13px;font-weight:600}.dica{font-size:12px;color:#82988a;margin-top:10px}
 @media(max-width:740px){body{padding:24px 16px 40px}.layout{grid-template-columns:1fr}#grade{--cell:28px}.panel{padding:16px}.map-wrap{padding:14px}.group{flex:1 1 130px}}
+/* [IA] Codex – apresentação inspirada em uma planta de navegação. */
+:root{--ink:#142e43;--muted:#526b7a;--accent:#145e88;--line:#cbd9e0;color:var(--ink);background:#eaf0f2;font-family:"Trebuchet MS",system-ui,sans-serif}
+body{max-width:1380px;padding:36px 32px 56px}header{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;border-bottom:2px solid var(--ink);margin-bottom:18px;padding-bottom:18px}header:before{content:"TEORIA DOS GRAFOS  /  PARTE 1";grid-column:1/-1;color:var(--accent);font:700 11px/1.2 Consolas,monospace;letter-spacing:.15em;margin:0}h1{font-family:"Trebuchet MS",sans-serif;font-weight:800;letter-spacing:-.04em;font-size:clamp(29px,3.5vw,44px);margin:0}header p{max-width:365px;color:var(--muted);font-size:13px;text-align:right}.panel{border-color:var(--line);border-radius:6px;box-shadow:0 4px 20px #24475a0b;margin:12px 0;padding:20px}.controls{gap:16px;align-items:end}.group{min-width:155px;flex:1 1 155px}.controls label,.group label{color:#39576a;font-size:12px}select{width:100%;border-color:#b9cbd4;color:var(--ink);border-radius:4px}button{border-color:#b9cbd4;border-radius:4px;color:var(--ink)}button:hover:not(:disabled){border-color:var(--accent)}button.primary{background:var(--accent);border-color:var(--accent)}input{accent-color:var(--accent)}:focus-visible{outline:3px solid #db8d1a;outline-offset:3px}
+.layout{grid-template-columns:minmax(0,1fr) 250px;gap:22px;align-items:start}.map-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 10px}.map-title h2{font-size:15px;margin:0}.map-title small{color:var(--muted);font-size:12px}.map-wrap{background-color:#dce8ed;background-image:linear-gradient(#b8ccd83d 1px,transparent 1px),linear-gradient(90deg,#b8ccd83d 1px,transparent 1px);background-size:20px 20px;border:1px solid #ccdde5;border-radius:4px;padding:24px}.cell{border-radius:2px;font-family:Consolas,monospace}.wall{background:#244052}.floor{background:#fbfdfe}.visited{background:#9cdbd5}.trap{outline:2px solid #bd5434}.current{background:#f2b746!important;color:#172d3c!important}.start{color:#087060}.goal{color:#a64339}.cell.key{box-shadow:inset 0 0 0 2px #3e8a81;color:#205e55}.cell.door{box-shadow:inset 0 0 0 2px #8864a8;color:#60407f}.readout{background:#f3f7f8;border:1px solid #dae7eb;border-radius:4px;padding:16px;font-size:13px}.readout:before{color:var(--accent);font:700 11px Consolas,monospace;letter-spacing:.12em}.readout div{border-color:#dce8ec}.readout strong{color:#536d7b}.readout span{overflow-wrap:anywhere}.legend{color:#4a6371;gap:16px}.legend span:before{background:#9cdbd5}.legend span:nth-child(2):before{background:#f2b746}.legend span:nth-child(3):before{border-color:#bd5434}.legend span:nth-child(4):before{display:inline-block;background:#e4e7e1}.legend span:nth-child(5):before{display:none}.toolbar{gap:10px}.toolbar .progress{flex:1;display:flex;align-items:center;gap:12px;min-width:180px}.toolbar #steps{width:100%}#indice{font-family:Consolas,monospace;color:var(--muted)}
+.cell.outside{background:#d5dcdd;color:#73838a}.legend span:nth-child(4):before{display:inline-block;background:#d5dcdd}.legend span:nth-child(5):before{display:none}
+@media(max-width:740px){body{padding:22px 14px 40px}header{grid-template-columns:1fr}header p{text-align:left}.layout{grid-template-columns:minmax(0,1fr)}.layout>div{min-width:0}.panel{padding:16px}.map-wrap{padding:14px}#grade{--cell:28px}.toolbar .progress{flex-basis:100%}.group{min-width:0;flex:1 1 130px}.map-title{flex-wrap:wrap}}
 </style></head><body>
-<header><h1>Labirinto interativo</h1><p>Visualização de percursos calculados pelo projeto. Não executa algoritmos no navegador.</p></header>
+<header><h1>Labirinto interativo</h1><p>Explore o percurso e acompanhe como as chaves e os bônus mudam a cada passo.</p></header>
 <div class="panel controls"><div class="group"><label for="mapa">Mapa</label><select id="mapa"></select></div>
 <div class="group"><label for="algoritmo">Algoritmo</label><select id="algoritmo"></select></div>
 <div class="group"><label for="camadaSel">Camada exibida</label><select id="camadaSel"></select></div>
 <div class="group"><label for="velocidade">Velocidade</label><select id="velocidade"><option value="1000">Lenta</option><option selected value="550">Normal</option><option value="200">Rápida</option></select></div>
 <label><input type="checkbox" id="mostrarArmadilhas" checked> Mostrar armadilhas</label></div>
-<div class="panel layout"><div><div class="map-wrap"><div id="grade" aria-label="Mapa do labirinto"></div></div><div class="legend"><span>Percorrido</span><span>Posição atual</span><span>Armadilha</span><span>Sem estado nesta camada</span></div><div id="aviso" role="status"></div></div><div class="readout">
+<div class="panel layout"><div><div class="map-title"><h2>Mapa e percurso</h2><small>Role para ver o mapa inteiro</small></div><div class="map-wrap" tabindex="0" aria-label="Mapa do labirinto; use a rolagem para navegar"><div id="grade" aria-label="Mapa do labirinto"></div></div><div class="legend"><span>Percorrido</span><span>Posição atual</span><span>Armadilha</span><span>Chave: minúscula · porta: maiúscula</span></div></div><div class="readout" aria-label="Estado atual">
 <div><strong>Passo:</strong> <span id="passo"></span></div><div><strong>Posição:</strong> <span id="posicao"></span></div>
 <div><strong>Chaves:</strong> <span id="chaves"></span></div><div><strong>Bônus consumidos:</strong> <span id="bonus"></span></div>
-<div><strong>Custo acumulado:</strong> <span id="custo"></span></div>
-<div><strong>Camada do estado:</strong> <span id="camada"></span></div>
-<div><strong>Camada exibida:</strong> <span id="exibida"></span></div>
-<div><strong>Estados no percurso:</strong> <span id="total"></span></div></div></div>
-<div class="panel toolbar"><button id="anterior">Anterior</button><button class="primary" id="reproduzir">Reproduzir</button><button id="proximo">Próximo</button><input id="steps" aria-label="Selecionar passo do percurso" type="range" min="0" max="0" value="0"><span id="indice"></span></div>
-<p class="dica">Teclado: ← e → avançam um passo; espaço reproduz ou pausa.</p>
+<div><strong>Custo acumulado:</strong> <span id="custo"></span></div><div><strong>Camada do estado:</strong> <span id="camada"></span></div><div><strong>Camada exibida:</strong> <span id="exibida"></span></div>
+<div><strong>Estados no percurso:</strong> <span id="total"></span></div><div><strong>Resultado:</strong> <span id="status"></span></div><div><strong>Armadilhas:</strong> <span id="infoArmadilhas"></span></div></div></div>
+<div id="aviso" role="status"></div>
+<div class="panel toolbar" aria-label="Controles do percurso"><button id="anterior">Anterior</button><button class="primary" id="reproduzir">Reproduzir</button><button id="proximo">Próximo</button><div class="progress"><input id="steps" aria-label="Selecionar passo do percurso" type="range" min="0" max="0" value="0"><span id="indice"></span></div></div>
 <script>
 const MAPAS = __DATA__;
 const $ = id => document.getElementById(id);
@@ -343,18 +372,18 @@ function parar(){if(relogio!==null){clearInterval(relogio);relogio=null;} $('rep
 function reiniciar(){parar();passoAtual=0;atualizar();}
 function trocarMapa(){const m=dados();$('algoritmo').replaceChildren();Object.keys(m.algoritmos).forEach(nome=>{$('algoritmo').add(new Option(nome,nome));});
 $('camadaSel').replaceChildren();$('camadaSel').add(new Option('Seguir o percurso','__auto'));camadas().forEach(ch=>$('camadaSel').add(new Option(nomeCamada(ch),ch)));reiniciar();}
-function atualizar(){const m=dados(), p=percurso(), aviso=$('aviso'), msg=(m.mensagens||{})[$('algoritmo').value];
+function atualizar(){const m=dados(), p=percurso(), aviso=$('aviso'), msg=(m.mensagens||{})[$('algoritmo').value]||(m.status||{})[$('algoritmo').value];
 const grid=$('grade');grid.replaceChildren();grid.style.gridTemplateColumns='repeat('+m.grade[0].length+',var(--cell))';
 if(!p.length){parar();aviso.style.display='block';aviso.textContent=msg||'Sem percurso para este algoritmo.';}else if(msg){aviso.style.display='block';aviso.textContent=msg;}else{aviso.style.display='none';}
 passoAtual=Math.min(Math.max(passoAtual,0),Math.max(p.length-1,0));const atual=p[passoAtual]||null;
 const sel=$('camadaSel').value, exibida=sel==='__auto'?(atual?atual.chaves:''):sel;
 const temEstados=!!(m.estados&&m.estados.length), naCamada=new Set(estadosMapa().filter(e=>e.chaves===exibida).map(e=>e.l+','+e.c));
 const vistos=new Set(p.slice(0,passoAtual+1).filter(s=>s.chaves===exibida||sel==='__auto').map(s=>s.l+','+s.c));
-const armadilhas=new Set((m.armadilhas||[]).map(s=>s[0]+','+s[1]));((m.armadilhas_estados||[]).map(parseEstado).filter(e=>e&&e.chaves===exibida)).forEach(e=>armadilhas.add(e.l+','+e.c));
+const armadilhas=new Set((m.armadilhas||[]).filter(Array.isArray).map(s=>s[0]+','+s[1]));(m.armadilhas||[]).filter(s=>typeof s==='string').map(parseEstado).filter(e=>e&&e.chaves===exibida).forEach(e=>armadilhas.add(e.l+','+e.c));((m.armadilhas_estados||[]).map(parseEstado).filter(e=>e&&e.chaves===exibida)).forEach(e=>armadilhas.add(e.l+','+e.c));
 m.grade.forEach((linha,l)=>Array.from(linha).forEach((ch,c)=>{const cell=document.createElement('div');const key=l+','+c;cell.className='cell '+(ch==='#'?'wall':'floor');
 if(ch!=='#'&&temEstados&&!naCamada.has(key))cell.classList.add('outside');if(vistos.has(key)&&ch!=='#')cell.classList.add('visited');if($('mostrarArmadilhas').checked&&armadilhas.has(key))cell.classList.add('trap');
-if(atual&&atual.l===l&&atual.c===c&&(sel==='__auto'||atual.chaves===exibida))cell.classList.add('current');if(ch==='S')cell.classList.add('start');if(ch==='G')cell.classList.add('goal');cell.textContent=ch==='.'||ch==='#'?'':ch;cell.title='('+l+','+c+') '+ch;grid.appendChild(cell);}));
-const cs=custos();$('passo').textContent=p.length?(passoAtual+1)+' / '+p.length:'—';$('posicao').textContent=atual?'('+atual.l+','+atual.c+')':'—';$('chaves').textContent=atual?(atual.chaves||'nenhuma'):'—';$('bonus').textContent=atual?(atual.bonus||'nenhum'):'—';
+if(atual&&atual.l===l&&atual.c===c&&(sel==='__auto'||atual.chaves===exibida))cell.classList.add('current');if(ch==='S')cell.classList.add('start');if(ch==='G')cell.classList.add('goal');if(/[a-d]/.test(ch))cell.classList.add('key');if(/[A-D]/.test(ch))cell.classList.add('door');cell.textContent=ch==='.'||ch==='#'?'':ch;cell.title='('+l+','+c+') '+ch;grid.appendChild(cell);}));
+$('status').textContent=msg||(m.status||{})[$('algoritmo').value]||(p.length?'Percurso encontrado.':'Sem percurso.');$('infoArmadilhas').textContent=(Array.isArray(m.armadilhas_estados)||Array.isArray(m.armadilhas))?'Dispon\u00edveis para a camada':'N\u00e3o fornecidas';const cs=custos();$('passo').textContent=p.length?(passoAtual+1)+' / '+p.length:'—';$('posicao').textContent=atual?'('+atual.l+','+atual.c+')':'—';$('chaves').textContent=atual?(atual.chaves||'nenhuma'):'—';$('bonus').textContent=atual?(atual.bonus||'nenhum'):'—';
 $('custo').textContent=cs&&p.length?String(+cs[passoAtual].toFixed(2)):'—';$('camada').textContent=atual?nomeCamada(atual.chaves):'—';$('exibida').textContent=nomeCamada(exibida);$('total').textContent=p.length;
 $('steps').max=String(Math.max(p.length-1,0));$('steps').value=String(passoAtual);$('indice').textContent=String(passoAtual);$('anterior').disabled=passoAtual===0||!p.length;$('proximo').disabled=passoAtual>=p.length-1;$('reproduzir').disabled=p.length<2;
 if(p.length&&passoAtual===p.length-1)parar();}
