@@ -44,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
                 armadilhas = json.loads(Path(args.arquivo_armadilhas).read_text(encoding="utf-8"))
             if args.armadilhas and armadilhas is None:
                 parser.error("--armadilhas exige --arquivo-armadilhas com os estados calculados pelo grupo")
-            status = gerar_mapa(args.mapa, args.out, algoritmo=args.alg or "BFS",
+            status = gerar_mapa(args.mapa, args.out, algoritmo=args.alg or "DIJKSTRA",
                                 interactive=args.interactive, fonte_consumivel=args.fonte_consumivel,
                                 armadilhas_estados=armadilhas)
             if args.armadilhas:

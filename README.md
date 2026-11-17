@@ -49,9 +49,10 @@ Para gerar as figuras P5a e o HTML com os mapas m02, m03 e m08:
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
 
-Os percursos desse conjunto usam BFS (menor número de passos). O HTML mostra
+Os percursos m03 e m08 desse conjunto usam Dijkstra (menor custo). A árvore
+do m02 usa BFS. O HTML mostra
 que as armadilhas não foram fornecidas até que a análise do grupo esteja pronta.
-Na CLI, `--mapa` gera o percurso do algoritmo escolhido e `--interactive`
+Na CLI, `--mapa` gera o percurso do algoritmo escolhido (Dijkstra por padrão) e `--interactive`
 gera `labirinto_<nome-do-mapa>.html`, preservando o HTML conjunto
 `labirinto_interativo.html`; se o percurso não existir ou o algoritmo não se aplicar,
 o motivo é exibido. Para mostrar armadilhas, `--arquivo-armadilhas` recebe um
