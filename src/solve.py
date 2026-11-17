@@ -13,12 +13,16 @@ físicas. A Parte 2 continua nos seus módulos específicos.
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
+import csv
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypedDict
 
-from src.graphs.estados import Estado
+from numpy import char
+
+from src.graphs.estados import Estado, construir_grafo_estados, construir_grafo_posicoes, rotular_estado
 from src.graphs.graph import Grafo
+from src.graphs.io import encontrar_inicio, ler_mapa
 
 
 AlgoritmoCaminho = Literal["BFS", "DIJKSTRA", "BELLMAN_FORD"]
@@ -83,7 +87,25 @@ def carregar_mapa(
     a S sem chaves ou bônus consumidos. Não grava saídas.
     Erros de leitura e validação são propagados ao chamador.
     """
-    raise NotImplementedError
+
+    caminho = Path(caminho)
+
+    grade = ler_mapa(caminho)
+    grafo, estados = construir_grafo_estados(grade, fonte_consumivel=fonte_consumivel)
+
+    cords_inicio = encontrar_inicio(grade)
+    origem = rotular_estado(Estado(cords_inicio[0], cords_inicio[1], frozenset(), frozenset()))
+
+
+    return DadosMapa(
+        nome = caminho.stem if nome is None else nome,
+        grade = grade,
+        grafo_posicoes=construir_grafo_posicoes(grade),
+        grafo_estados=grafo,
+        estados=estados,
+        origem=origem,
+        fonte_consumivel=fonte_consumivel
+    )
 
 
 def exportar_arestas(dados: DadosMapa, caminho: str | Path) -> None:
@@ -98,8 +120,53 @@ def exportar_arestas(dados: DadosMapa, caminho: str | Path) -> None:
     Usa CSV com escape correto dos rótulos que contêm vírgulas.
     Não constrói novas transições nem altera as regras do mapa.
     """
-    raise NotImplementedError
 
+    with open(caminho, "w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
+
+        escritor.writerow([
+            "origem",
+            "destino",
+            "movimento",
+            "casa_destino",
+            "peso",
+        ])
+
+        data = dados.grafo_estados.arestas()
+
+        for i in data:
+            origem = i[0]
+            destino = i[1]
+            peso= i[2]
+
+            if destino == "ALVO":
+                escritor.writerow([origem, destino, "", "", peso])
+                continue
+
+            estado_origem = dados.estados[origem]
+            estado_destino = dados.estados[destino]
+            
+            diffx = estado_origem.linha - estado_destino.linha
+            diffy = estado_origem.coluna - estado_destino.coluna
+
+            if diffx == 1 and diffy == 0:
+                movimento = "N"
+            elif diffx == -1 and diffy == 0:
+                movimento = "S"
+            elif diffx == 0 and diffy == 1:
+                movimento = "O"
+            else:
+                movimento = "L"
+
+            
+
+            escritor.writerow([
+                origem,
+                destino,
+                movimento,
+                dados.grade[estado_destino.linha][estado_destino.coluna],
+                peso
+            ])
 
 def calcular_metricas_globais(dados: DadosMapa) -> dict[str, object]:
     """Devolve as métricas de um mapa para metricas_global.json.
@@ -110,7 +177,41 @@ def calcular_metricas_globais(dados: DadosMapa) -> dict[str, object]:
     na variante fonte_consumivel, inclui também as fontes consumíveis.
     Reutiliza as consultas de Grafo e não grava arquivos.
     """
-    raise NotImplementedError
+
+    casas_livres_list = {".", "S", "G", ",", "~", "a", "b", "c", "d", "A", "B", "C", "D", ">", "<", "^", "v", "+", "*"}
+
+    ordem_pos = dados.grafo_posicoes.ordem()
+    tamanho_pos = dados.grafo_posicoes.tamanho()
+    densidade_pos = dados.grafo_posicoes.densidade()
+
+    grafo_fisico = dados.grafo_estados.subgrafo_induzido(dados.estados)
+
+    ordem_est = grafo_fisico.ordem()
+    tamanho_est = grafo_fisico.tamanho()
+    densidade_est = grafo_fisico.densidade()
+
+    casas_livres = sum(linha.count(char) for linha in dados.grade for char in casas_livres_list)
+    chaves_distintas = len({char for linha in dados.grade for char in linha if char in "abcd"})
+    bonus_consumiveis = sum(linha.count("+") for linha in dados.grade)
+    fontes_consumiveis = sum(linha.count("*") for linha in dados.grade)
+    
+    teto_teorico = casas_livres * (2 ** chaves_distintas) * (2 ** bonus_consumiveis)
+    if dados.fonte_consumivel:
+        teto_teorico *= (2 ** fontes_consumiveis)
+
+    taxa_ocupacao = ordem_est / teto_teorico if teto_teorico > 0 else 0
+
+    return {
+        "ordem_pos": ordem_pos,
+        "tamanho_pos": tamanho_pos,
+        "densidade_pos": densidade_pos,
+        "ordem_est": ordem_est,
+        "tamanho_est": tamanho_est,
+        "densidade_est": densidade_est,
+        "teto_teorico": teto_teorico,
+        "taxa_ocupacao": taxa_ocupacao
+    }
+
 
 
 def calcular_camadas(dados: DadosMapa) -> dict[str, object]:
