@@ -1,7 +1,19 @@
 // [IA] Claude Code – labirinto interativo: escolha de mapa/algoritmo e animação passo a passo
+// [IA] Codex – organização dos controles, navegação pelo percurso e apresentação
 import { useEffect, useState } from 'react'
 import { ALGORITMOS, MAPAS, NOME_ALG, fmtInt, lerRotulo } from '../util.js'
 import { Grade, LegendaCasas } from './Grade.jsx'
+
+const NOMES_MAPAS = {
+  m01_terreno: 'M01 · Terreno',
+  m02_uma_chave: 'M02 · Uma chave',
+  m03_tres_chaves: 'M03 · Três chaves',
+  m04_esteiras: 'M04 · Esteiras',
+  m05_bonus: 'M05 · Bônus',
+  m06_fonte: 'M06 · Fonte',
+  m07_impossivel: 'M07 · Impossível',
+  m08_grande: 'M08 · Grande',
+}
 
 export function Labirinto() {
   const nomes = Object.keys(MAPAS)
@@ -35,14 +47,15 @@ export function Labirinto() {
   return (
     <section className="panel">
       <header>
-        <h2>Labirinto interativo</h2>
+        <span className="section-label">PARTE 1</span><h2>Labirinto interativo</h2>
         <p className="note">Escolha o mapa e o algoritmo e acompanhe o percurso passo a passo. A cor do caminho muda a cada chave coletada.</p>
       </header>
       <div className="lab">
         <div className="side">
+          <div className="selecao">
           <label className="field">Mapa
             <select id="sel-mapa" value={mapa} onChange={(ev) => setMapa(ev.target.value)}>
-              {nomes.map((n) => <option key={n} value={n}>{n}</option>)}
+              {nomes.map((n) => <option key={n} value={n}>{NOMES_MAPAS[n] || n}</option>)}
             </select>
           </label>
           <label className="field">Algoritmo
@@ -51,16 +64,22 @@ export function Labirinto() {
             </select>
           </label>
           <p className={temCaminho ? 'status' : 'status alerta'}>{M.status[alg]}</p>
+          </div>
+          <div className="reproducao">
+          <h3>Acompanhar percurso</h3>
           <div className="btns">
-            <button className="btn" disabled={!temCaminho} aria-label="Passo anterior"
-              onClick={() => { setTocando(false); setPasso((p) => Math.max(0, p - 1)) }}>◀</button>
+            <button className="btn" disabled={!temCaminho || passo === 0}
+              onClick={() => { setTocando(false); setPasso((p) => Math.max(0, p - 1)) }}>Anterior</button>
             <button className="btn primary" disabled={!temCaminho}
               onClick={() => { if (passo >= fim) setPasso(0); setTocando(!tocando) }}>{rotuloBotao}</button>
-            <button className="btn" disabled={!temCaminho} aria-label="Próximo passo"
-              onClick={() => { setTocando(false); setPasso((p) => Math.min(fim, p + 1)) }}>▶</button>
+            <button className="btn" disabled={!temCaminho || passo === fim}
+              onClick={() => { setTocando(false); setPasso((p) => Math.min(fim, p + 1)) }}>Próximo</button>
           </div>
+          <label className="field">Posição no percurso: {temCaminho ? `${passo} de ${fim}` : 'indisponível'}
+            <input className="controle-faixa" type="range" min="0" max={Math.max(0, fim)} value={Math.min(passo, Math.max(0, fim))} disabled={!temCaminho} style={{ '--progresso': `${fim > 0 ? (passo / fim) * 100 : 0}%` }} onChange={(ev) => { setTocando(false); setPasso(Number(ev.target.value)) }} />
+          </label>
           <label className="field">Velocidade: {vel} passos/s
-            <input id="vel" type="range" min="1" max="20" value={vel} onChange={(ev) => setVel(Number(ev.target.value))} />
+            <input className="controle-faixa" id="vel" type="range" min="1" max="20" value={vel} style={{ '--progresso': `${((vel - 1) / 19) * 100}%` }} onChange={(ev) => setVel(Number(ev.target.value))} />
           </label>
           {e && (
             <dl className="state">
@@ -72,9 +91,11 @@ export function Labirinto() {
             </dl>
           )}
           <p className="note">{fmtInt(M.n_estados)} estados e {fmtInt(M.n_arcos)} arcos no grafo de estados.</p>
+          </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
-          <Grade grade={M.grade} caminho={caminho} passo={temCaminho ? passo : null} />
+        <div className="mapa-area" style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
+          <Grade grade={M.grade} caminho={caminho} passo={temCaminho ? passo : null} duracao={tocando && passo > 0 ? 1000 / vel : 0} />
+          <div className="path-legend"><span><i className="current-marker" /> posição atual</span><span><i className="path-marker" /> caminho percorrido</span></div>
           <LegendaCasas />
         </div>
       </div>

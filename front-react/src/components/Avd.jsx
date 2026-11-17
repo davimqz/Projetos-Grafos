@@ -1,4 +1,5 @@
 // [IA] Claude Code – os 4 gráficos exploratórios da AVD (tipos escolhidos pelo Vagner no notebook)
+// [IA] Codex – contraste, legendas e tabelas responsivas dos dados existentes
 import { DADOS_AVD as A, NOME_CLASSE, ORDEM, corClasse, fmt, fmtInt } from '../util.js'
 
 function Barras({ dados, rotulo, yLabel, fmtV, fmtEixo }) {
@@ -8,7 +9,8 @@ function Barras({ dados, rotulo, yLabel, fmtV, fmtEixo }) {
   const max = Math.max(...dados.map((d) => d.v)) * 1.2 || 1
   const bw = (W - m.l - m.r) / dados.length
   return (
-    <div className="scroll">
+    <>
+    <div className="chart-visual">
       <svg className="fit" width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={rotulo}>
         {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
           const y = H - m.b - t * (H - m.t - m.b)
@@ -33,12 +35,15 @@ function Barras({ dados, rotulo, yLabel, fmtV, fmtEixo }) {
         <text x="14" y={H / 2} transform={`rotate(-90 14 ${H / 2})`} textAnchor="middle" fontSize="11" className="muted">{yLabel}</text>
       </svg>
     </div>
+    <table className="chart-table"><caption>{rotulo}</caption><thead><tr><th>Classe</th><th>{yLabel}</th></tr></thead><tbody>{dados.map((d) => <tr key={d.k}><th scope="row">{NOME_CLASSE[d.k]}</th><td>{fmtV(d.v)}</td></tr>)}</tbody></table>
+    </>
   )
 }
 
 function LegendaClasses() {
   return (
-    <div className="legend">
+    <div className="legend chart-legend" aria-label="Classes das carteiras">
+      <strong>Classe</strong>
       {ORDEM.map((c) => <span key={c}><i style={{ background: corClasse(c) }}></i>{NOME_CLASSE[c]}</span>)}
     </div>
   )
@@ -46,6 +51,14 @@ function LegendaClasses() {
 
 const SINAIS = ['negativo', 'zero', 'positivo']
 const COR_SINAL = { negativo: 'var(--neg)', zero: 'var(--zero)', positivo: 'var(--pos)' }
+
+function corMatriz(valor) {
+  const t = Math.max(0, Math.min(1, valor))
+  const rgb = [225, 235, 250].map((claro, i) => Math.round(claro + ([35, 85, 180][i] - claro) * t))
+  const luminancia = rgb.map((c) => c / 255).map((c) => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+  const brilho = 0.2126 * luminancia[0] + 0.7152 * luminancia[1] + 0.0722 * luminancia[2]
+  return { fundo: `rgb(${rgb.join(',')})`, texto: brilho > 0.179 ? '#000000' : '#ffffff' }
+}
 
 export function Avd() {
   const total = ORDEM.reduce((s, c) => s + A.contagem[c], 0)
@@ -67,14 +80,15 @@ export function Avd() {
 
       <section className="panel">
         <header><h2>3. Para qual classe vão as arestas de cada classe</h2><p className="note">Cada linha soma 100%: proporção das arestas que saem da classe de origem.</p></header>
-        <div className="scroll">
+        <div className="chart-visual">
           <svg className="fit" width="520" height="300" viewBox="0 0 520 300" role="img" aria-label="Origem por destino">
             {ORDEM.map((o, i) => ORDEM.map((d, j) => {
               const v = A.origem_destino[o][d]
+              const cor = corMatriz(v)
               return (
                 <g key={o + d}>
-                  <rect x={130 + j * 122} y={34 + i * 78} width="118" height="74" fill={`rgba(23,107,87,${0.1 + 0.85 * v})`} rx="6" />
-                  <text x={189 + j * 122} y={76 + i * 78} textAnchor="middle" fontSize="15" fontWeight="600" style={{ fill: v > 0.5 ? '#ffffff' : 'var(--ink)' }}>{fmt(100 * v)}%</text>
+                  <rect x={130 + j * 122} y={34 + i * 78} width="118" height="74" fill={cor.fundo} rx="6" />
+                  <text x={189 + j * 122} y={76 + i * 78} textAnchor="middle" fontSize="15" fontWeight="600" style={{ fill: cor.texto }}>{fmt(100 * v)}%</text>
                 </g>
               )
             }))}
@@ -84,11 +98,13 @@ export function Avd() {
             <text x="14" y="150" transform="rotate(-90 14 150)" textAnchor="middle" fontSize="11" className="muted">Classe da origem</text>
           </svg>
         </div>
+        <div className="matriz-escala" aria-label="Escala de cores: zero a cem por cento"><strong>Proporção de arestas</strong><span>0%</span><i aria-hidden="true"/><span>100%</span></div>
+        <table className="chart-table"><caption>Percentual das arestas por origem e destino</caption><thead><tr><th>Origem / destino</th>{ORDEM.map((d) => <th key={d}>{NOME_CLASSE[d]}</th>)}</tr></thead><tbody>{ORDEM.map((o) => <tr key={o}><th scope="row">{NOME_CLASSE[o]}</th>{ORDEM.map((d) => <td key={d}>{fmt(100 * A.origem_destino[o][d])}%</td>)}</tr>)}</tbody></table>
       </section>
 
       <section className="panel">
         <header><h2>4. Sinal do peso das arestas, pela classe do destino</h2><p className="note">Número de arestas com peso negativo, zero ou positivo que chegam em cada classe.</p></header>
-        <div className="scroll">
+        <div className="chart-visual">
           <svg className="fit" width="520" height="290" viewBox="0 0 520 290" role="img" aria-label="Sinal do peso">
             {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
               const y = 248 - t * 220
@@ -114,7 +130,9 @@ export function Avd() {
             <text x="14" y="140" transform="rotate(-90 14 140)" textAnchor="middle" fontSize="11" className="muted">Número de arestas</text>
           </svg>
         </div>
-        <div className="legend">
+        <table className="chart-table"><caption>Número de arestas por classe de destino e sinal</caption><thead><tr><th>Destino</th>{SINAIS.map((s) => <th key={s}>{s}</th>)}</tr></thead><tbody>{ORDEM.map((c) => <tr key={c}><th scope="row">{NOME_CLASSE[c]}</th>{SINAIS.map((s) => <td key={s}>{fmtInt(A.sinal_peso[c][s])}</td>)}</tr>)}</tbody></table>
+        <div className="legend chart-legend" aria-label="Sinal do peso das arestas">
+          <strong>Sinal do peso</strong>
           {SINAIS.map((s) => <span key={s}><i style={{ background: COR_SINAL[s] }}></i>peso {s}</span>)}
         </div>
       </section>

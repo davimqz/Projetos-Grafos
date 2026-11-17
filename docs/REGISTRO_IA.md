@@ -1,4 +1,4 @@
-﻿# Registro de uso de IA
+# Registro de uso de IA
 
 Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf`. Os trechos de código ficam marcados com `# [IA] <ferramenta> – <finalidade>`.
 
@@ -67,3 +67,5 @@ Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf
 | 16/11/2026 | Thomaz | Codex | Ajuste da integração para apresentar percursos de menor custo calculados pelo Dijkstra do grupo e padronização dos nomes das figuras; testes de integração | `src/visualizar_parte1.py`, `src/cli.py`, `tests/test_visualizar_parte1.py`, `README.md` | Permitido (integração e testes) |
 | 17/11/2026 | Vagner | Claude Code | Front-end em React (fora dos requisitos do enunciado) com o labirinto interativo, as figuras da Parte 1 e os 4 gráficos exploratórios da AVD, e script que exporta para JSON os resultados já calculados pelo código do grupo (`preparar_mapa`, grafo de estados, `bfs`/`dfs`/`dijkstra`/`bellman_ford`). Tipos de gráfico iguais aos escolhidos pelo Vagner no notebook; nenhum algoritmo novo e nenhuma interpretação | `front/index.html`, `front/dados.js`, `scripts/exportar_front.py` | Permitido (sintaxe de visualização/IO) |
 | 17/11/2026 | Vagner | Claude Code | Projeto React tradicional (Vite) em `front-react/` com os mesmos componentes do front-end (labirinto interativo, figuras da Parte 1 e 4 exploratórios da AVD), e `scripts/exportar_front.py` passando a gerar também `front-react/src/dados.json`. Só desenho, interação e configuração do projeto; nenhum algoritmo novo e nenhuma interpretação | `front-react/`, `scripts/exportar_front.py` | Permitido (sintaxe de visualização/IO) |
+| 17/11/2026 | Thomaz | Codex | Melhorias visuais e de interação no front React, incluindo navegação, controles, animação, legendas e responsividade. Dados e algoritmos do grupo preservados | `front-react/` | Permitido (visualização e interface) |
+| 17/11/2026 | Thomaz | Codex | Ajuste visual dos controles de posição e velocidade do percurso e das barras de rolagem das visualizações; build do front | `front-react/src/components/Labirinto.jsx`, `front-react/src/styles.css` | Permitido (interface e apresentação) |
