@@ -18,8 +18,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypedDict
 
-from numpy import char
-
 from src.graphs.estados import Estado, construir_grafo_estados, construir_grafo_posicoes, rotular_estado
 from src.graphs.graph import Grafo
 from src.graphs.io import encontrar_inicio, ler_mapa
@@ -223,7 +221,41 @@ def calcular_camadas(dados: DadosMapa) -> dict[str, object]:
     Também registra a quantidade de arcos entre camadas e as posições
     e símbolos das casas que os geram. Não inclui interpretações textuais.
     """
-    raise NotImplementedError
+
+    nos_por_camada: dict[str, list[str]] = {}
+    for rotulo, estado in dados.estados.items():
+        camada = "".join(sorted(estado.chaves)) or "-"
+        nos_por_camada.setdefault(camada, []).append(rotulo)
+
+    camadas = []
+    for camada, nos in sorted(nos_por_camada.items(), key=lambda x: (0 if x[0] == "-" else len(x[0]), x[0])):
+        subgrafo = dados.grafo_estados.subgrafo_induzido(nos)
+        camadas.append({
+            "camada": camada,
+            "ordem": subgrafo.ordem(),
+            "tamanho": subgrafo.tamanho(),
+            "densidade": subgrafo.densidade(),
+        })
+
+    arcos_entre_camadas = 0
+    casas_geradoras_dict: dict[tuple[int, int], str] = {}
+
+    for origem, destino, _ in dados.grafo_estados.arestas():
+        if destino != "ALVO" and dados.estados[origem].chaves != dados.estados[destino].chaves:
+            arcos_entre_camadas += 1
+            est_dest = dados.estados[destino]
+            casas_geradoras_dict[(est_dest.linha, est_dest.coluna)] = dados.grade[est_dest.linha][est_dest.coluna]
+
+    casas_geradoras = [
+        {"linha": linha, "coluna": coluna, "simbolo": simbolo}
+        for (linha, coluna), simbolo in sorted(casas_geradoras_dict.items())
+    ]
+
+    return {
+        "camadas": camadas,
+        "arcos_entre_camadas": arcos_entre_camadas,
+        "casas_geradoras": casas_geradoras,
+    }
 
 
 def calcular_graus(dados: DadosMapa) -> list[GrauEstado]:
@@ -232,8 +264,23 @@ def calcular_graus(dados: DadosMapa) -> list[GrauEstado]:
     Os graus não contam arcos para ALVO. Mantém a ordem dos estados
     recebidos para permitir uma exportação reproduzível.
     """
-    raise NotImplementedError
 
+    graus: list[GrauEstado] = []
+
+    for rotulo in dados.estados:
+        grau_entrada = dados.grafo_estados.grau_entrada(rotulo)
+        grau_saida = dados.grafo_estados.grau_saida(rotulo)
+
+        if any(destino == "ALVO" for destino, _peso in dados.grafo_estados.vizinhos(rotulo)):
+            grau_saida -= 1
+
+        graus.append({
+            "estado": rotulo,
+            "grau_entrada": grau_entrada,
+            "grau_saida": grau_saida,
+        })
+
+    return graus
 
 def analisar_graus(dados: DadosMapa) -> dict[str, object]:
     """Devolve rankings, multiplicidades por casa e estados de beco.
@@ -244,7 +291,45 @@ def analisar_graus(dados: DadosMapa) -> dict[str, object]:
     Becos são estados sem saída física que não estão em G.
     As explicações desses resultados ficam a cargo do grupo no PDF.
     """
-    raise NotImplementedError
+
+    grafo_fisico = dados.grafo_estados.subgrafo_induzido(dados.estados)
+
+    graus_entrada = {rotulo: grafo_fisico.grau_entrada(rotulo) for rotulo in dados.estados}
+    graus_saida = {rotulo: grafo_fisico.grau_saida(rotulo) for rotulo in dados.estados}
+
+
+    estado_maior_entrada = max(sorted(graus_entrada), key=graus_entrada.get, default=None)
+    estado_maior_saida = max(graus_saida, key=graus_saida.get, default=None)
+
+    multiplicidades: dict[tuple[int, int], int] = {}
+    for estado in dados.estados.values():
+        pos = (estado.linha, estado.coluna)
+        multiplicidades[pos] = multiplicidades.get(pos, 0) + 1
+
+    multiplicidade_maxima = max(multiplicidades.values(), default=0)
+    casas_max = [
+        {"linha": linha, "coluna": coluna, "simbolo": dados.grade[linha][coluna]}
+        for (linha, coluna), qtd in sorted(multiplicidades.items())
+        if qtd == multiplicidade_maxima
+    ]
+
+    becos = [
+        rotulo
+        for rotulo, estado in dados.estados.items()
+        if graus_saida[rotulo] == 0 and dados.grade[estado.linha][estado.coluna] != "G"
+    ]
+
+    return {
+        "estado_maior_grau_entrada": estado_maior_entrada,
+        "maior_grau_entrada": graus_entrada.get(estado_maior_entrada, 0),
+        "estado_maior_grau_saida": estado_maior_saida,
+        "maior_grau_saida": graus_saida.get(estado_maior_saida, 0),
+        "multiplicidade_maxima": multiplicidade_maxima,
+        "casas_multiplicidade_maxima": casas_max,
+        "quantidade_casas_multiplicidade_maxima": len(casas_max),
+        "becos": becos,
+        "quantidade_becos": len(becos),
+    }
 
 
 def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
