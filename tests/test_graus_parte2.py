@@ -35,3 +35,36 @@ def test_resumo_maior_grau_de_saida_e_por_classe():
     assert r["saida"]["maiores"][0] == {"endereco": "a", "classe": "ilicito", "grau": 2}
     assert r["entrada"]["total"]["com_grau_zero"] == 1
     assert r["saida"]["por_classe"]["licito"]["carteiras"] == 2
+
+
+def test_faixas_log_cobrem_o_grau_maximo():
+    from scripts.graus_parte2 import faixas_log
+
+    assert faixas_log(1) == [1, 2]
+    assert faixas_log(5) == [1, 2, 4, 8]
+    assert faixas_log(2719)[-1] > 2719
+
+
+def test_tabela_grau_zero_por_classe():
+    from scripts.graus_parte2 import tabela_grau_zero
+
+    zeros = tabela_grau_zero(calcular_graus(ARESTAS, NOS)).set_index("classe")
+    assert zeros.loc["Desconhecida", "zero_entrada"] == 1 and zeros.loc["Desconhecida", "prop_zero_saida"] == 1.0
+    assert zeros.loc["Lícita", "zero_entrada"] == 0 and zeros.loc["Lícita", "carteiras"] == 2
+
+
+def test_ccdf_proporcao_com_grau_maior_ou_igual():
+    from scripts.graus_parte2 import ccdf
+
+    x, y = ccdf(pd.Series([0, 1, 1, 3]))
+    assert x == [1, 3]
+    assert y == [0.75, 0.25]
+
+
+def test_figuras_sao_geradas(tmp_path):
+    from scripts.graus_parte2 import figura_ccdf, figura_histograma
+
+    graus = calcular_graus(ARESTAS, NOS)
+    figura_histograma(graus, tmp_path / "h.png")
+    figura_ccdf(graus, tmp_path / "c.png")
+    assert (tmp_path / "h.png").stat().st_size > 0 and (tmp_path / "c.png").stat().st_size > 0
