@@ -247,7 +247,27 @@ arco por par.
 
 Na preparação dos dados, removemos os laços (A → A), pois representam troco e poderiam gerar ciclos negativos artificiais. Também agregamos arestas repetidas entre as mesmas carteiras, somando os valores das transações para o Dijkstra, e mantivemos uma única linha por carteira, já que o dataset repete em cada intervalo de tempo (time step) os totais da vida inteira da carteira; somar essas linhas contaria o mesmo valor várias vezes. Para reduzir o tamanho do grafo, aplicamos um recorte em bola de neve, partindo das carteiras ilícitas e expandindo para seus vizinhos. Essa estratégia preserva as conexões, ao contrário da amostragem aleatória. O recorte foi necessário porque o grafo completo possui 2,87 milhões de arestas, acima do limite de aproximadamente 500 mil arestas a partir do qual o enunciado exige amostragem.
 
-> **[A ESCREVER — Davi]** Distribuição dos graus de entrada e de saída (exigida pelo enunciado).
+#### Caracterização estrutural e distribuição dos graus
+
+O grafo analisado é direcionado e composto por 14.182 vértices (carteiras) e 25.111 arcos (pares de carteiras que transacionaram entre si). A análise da distribuição dos graus de entrada e saída revela uma concentração de conexões em valores baixos, acompanhada pela presença de algumas carteiras com número expressivamente elevado de conexões. Considerando o conjunto completo, ambos os tipos de grau apresentam média de 1,77. Entretanto, as medianas diferem: o grau de entrada possui mediana igual a zero, enquanto o grau de saída apresenta mediana igual a um. Essa diferença também é observada na quantidade de carteiras sem conexões: 8.021 (56,6%) têm grau de entrada zero, enquanto 2.089 (14,7%) têm grau de saída zero.
+
+A distribuição também apresenta diferenças entre as classes. No grau de entrada, as carteiras ilícitas possuem mediana igual a um, enquanto as lícitas e desconhecidas apresentam mediana igual a zero. Além disso, 37,3% das carteiras ilícitas não possuem conexões de entrada, proporção consideravelmente inferior à observada nas classes desconhecida (67,4%) e lícita (68,1%). No grau de saída, as três classes apresentam mediana igual a um, mas a proporção de carteiras sem conexões de saída varia: 8,2% entre as ilícitas, 10,9% entre as desconhecidas e 27,0% entre as lícitas.
+
+Outro aspecto relevante é a presença de carteiras com graus muito superiores aos valores predominantes na rede. No grau de entrada, o maior valor identificado pertence a uma carteira desconhecida, com 2.719 conexões, seguida por uma carteira ilícita, com 1.996. Entre as lícitas, o maior grau de entrada é 162. Para o grau de saída, os maiores valores também pertencem às classes desconhecida e ilícita, com 1.002 e 398 conexões, respectivamente, enquanto a carteira lícita de maior grau de saída apresenta 71 conexões. Esses valores evidenciam a existência de vértices com elevada concentração de conexões, que se destacam em relação à distribuição predominante.
+
+As Figuras 5.1 e 5.2 apresentam, respectivamente, a distribuição dos graus por meio de histogramas e da distribuição acumulada complementar (CCDF), considerando as três classes de carteiras. A utilização de escalas logarítmicas permite visualizar diferentes ordens de magnitude, enquanto a CCDF complementa os histogramas ao demonstrar a proporção de carteiras que alcança ou supera determinado valor de grau. Em conjunto, as representações permitem observar tanto a concentração de conexões em graus menores quanto o comportamento das distribuições nas faixas de graus mais elevados.
+
+![Histograma dos graus de entrada e de saída por classe](../../out/parte2/graus_histograma.png)
+
+*Figura 5.1 — Distribuição dos graus de entrada e de saída por classe, em escala log-log com faixas de base 2. O eixo vertical é a proporção das carteiras da classe; as carteiras com grau zero estão na tabela abaixo dos gráficos.*
+
+![CCDF dos graus de entrada e de saída por classe](../../out/parte2/graus_ccdf.png)
+
+*Figura 5.2 — Distribuição acumulada complementar (CCDF) dos graus por classe: proporção das carteiras da classe com grau maior ou igual a k, em escala log-log.*
+
+Por fim, a caracterização evidencia diferenças estruturais entre as classes, especialmente na quantidade de carteiras sem conexões e na presença de vértices com graus elevados. Essas características são relevantes para contextualizar as análises posteriores de caminhos e ciclos na rede, sem implicar, por si só, qualquer relação direta entre o número de conexões e a participação em ciclos negativos.
+
+Os números vêm de `out/parte2/graus_resumo.json` e `out/parte2/graus_zero.csv`, gerados por `python -m scripts.graus_parte2`.
 
 ### 5.2 Pesos, caminho mínimo e ciclo negativo
 
