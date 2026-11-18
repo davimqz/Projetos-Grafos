@@ -123,6 +123,9 @@ python -m src.cli --dataset ./data/dataset_parte2/ --alg BELLMAN_FORD --source 1
 
 # benchmark (média de 5 execuções) e escalabilidade em 10%, 50% e 100%
 python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte2/
+
+# graus de entrada e saída por carteira, histograma e CCDF por classe
+python -m scripts.graus_parte2
 ```
 
 Para refazer o recorte do zero (baixa os CSVs brutos do Google Drive para `data/dataset_parte2/raw/`):
@@ -141,6 +144,8 @@ python scripts/amostrar_dataset.py --arestas 25000 --sementes 50 --seed 42
 | `bellman_ford_<carteira>.json` | 1 caso com peso negativo sem ciclo e 1 com ciclo negativo detectado |
 | `parte2_report.json` | tempos médios e escalabilidade por algoritmo |
 | `benchmark_escalabilidade.png` | tempo × tamanho do grafo |
+| `graus_histograma.png`, `graus_ccdf.png` | distribuição dos graus de entrada e saída por classe |
+| `graus_parte2.csv`, `graus_resumo.json`, `graus_zero.csv` | graus por carteira, estatísticas por classe e carteiras com grau zero |
 
 ## AVD
 
