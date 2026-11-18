@@ -67,7 +67,8 @@ def resumo(graus: pd.DataFrame, n_arestas: int, top: int = 5) -> dict:
     return saida
 
 
-# Figuras: tipo, escalas e elementos definidos pelo Davi (histograma log-log com faixas logarítmicas e proporção
+# Figuras: tipo, escalas e elementos definidos pelo Davi (histograma log-log com faixas logarítmicas, barras das
+# classes lado a lado em cada faixa e proporção
 # dentro da classe; CCDF log-log; um painel por direção; tabela dos graus zero abaixo do histograma).
 # Cores e ordem das classes iguais às do notebook da AVD.
 ORDEM = ["ilicito", "desconhecido", "licito"]
@@ -112,16 +113,26 @@ def figura_histograma(graus: pd.DataFrame, caminho: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    import numpy as np
+
     limites = faixas_log(int(graus[list(DIRECOES.values())].max().max()))
+    inicio = np.array(limites[:-1], dtype=float)
+    n = len(ORDEM)
     fig, eixos = plt.subplots(1, 2, figsize=(13, 6.5), sharey=True)
     for eixo, (direcao, coluna) in zip(eixos, DIRECOES.items()):
-        for classe in ORDEM:
+        for i, classe in enumerate(ORDEM):
             serie = graus.loc[graus["classe"] == classe, coluna]
-            positivos = serie[serie > 0]
+            contagem, _ = np.histogram(serie[serie > 0], bins=limites)
             # proporção em relação à classe inteira (inclui as carteiras de grau zero, que vão para a tabela)
-            eixo.hist(positivos, bins=limites, weights=[1 / len(serie)] * len(positivos),
-                      color=CORES[classe], alpha=0.45, edgecolor=CORES[classe], linewidth=1.2,
-                      label=NOMES[classe])
+            proporcao = contagem / len(serie)
+            # barras lado a lado: cada faixa [a, 2a) é dividida em n partes iguais na escala log
+            esquerda = inicio * 2 ** (i / n)
+            largura = inicio * 2 ** ((i + 1) / n) - esquerda
+            mostrar = proporcao > 0
+            eixo.bar(esquerda[mostrar], proporcao[mostrar], width=largura[mostrar], align="edge",
+                     color=CORES[classe], edgecolor="white", linewidth=0.5, label=NOMES[classe])
+        for limite in limites:
+            eixo.axvline(limite, color="#cccccc", linewidth=0.6, zorder=0)
         eixo.set_xscale("log", base=2)
         eixo.set_yscale("log")
         eixo.set_title(TITULOS[direcao])
