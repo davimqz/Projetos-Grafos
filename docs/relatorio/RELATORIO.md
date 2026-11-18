@@ -32,8 +32,23 @@ Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/202
 
 ## 1. Introdução
 
-> **[A ESCREVER — Davi]** Um ou dois parágrafos: o que o projeto faz nas duas partes, o que é o grafo de estados e qual é
-> a pergunta de pesquisa da Parte 2.
+Este projeto tem como objetivo implementar, do zero e sem o uso de bibliotecas especializadas em algoritmos de grafos,
+as estratégias de busca em largura (BFS), busca em profundidade (DFS), Dijkstra e Bellman-Ford, aplicando-as a dois
+problemas distintos. A primeira parte aborda a resolução de labirintos com mecânicas adicionais, como chaves, portas,
+esteiras, bônus e fontes de energia. Nesse contexto, cada posição do mapa pode representar diferentes estados,
+dependendo das chaves coletadas e dos bônus já consumidos durante o percurso. Foram utilizados oito mapas
+disponibilizados pelo enunciado, incluindo o maior deles, de dimensões 31 × 71, além de dois mapas desenvolvidos pelo
+grupo. A segunda parte utiliza o conjunto de dados Elliptic++, que representa uma rede de transações Bitcoin composta
+originalmente por 822.942 carteiras e aproximadamente 2,87 milhões de arcos, da qual foi extraído um recorte com
+14.182 carteiras e 25.111 arcos para análise.
+
+A partir desse segundo problema, busca-se investigar a seguinte questão: **carteiras ilícitas participam mais de
+ciclos de repasse (ciclos negativos) do que as lícitas?** Para isso, aplicam-se os algoritmos implementados ao recorte,
+usando o saldo da carteira de destino como peso dos arcos, o que permite valores negativos, e a análise exploratória e
+explanatória dos dados complementa a investigação. O relatório está organizado em seções que apresentam o manual de
+utilização, os detalhes da implementação, os resultados da aplicação dos algoritmos nas duas partes do projeto, a
+análise e visualização dos dados (AVD), os testes realizados, as limitações identificadas, as conclusões obtidas, a
+matriz de contribuição dos integrantes do grupo e, por fim, o uso de IA.
 
 ---
 
