@@ -66,3 +66,58 @@ def calcular_metricas_globais(dados: DadosMapa) -> dict[str, object]:
 def _densidade(ordem: int, tamanho: int) -> float:
     """Calcula a mesma densidade dirigida sem copiar um subgrafo."""
     return tamanho / (ordem * (ordem - 1)) if ordem > 1 else 0.0
+
+
+def calcular_camadas(dados: DadosMapa) -> dict[str, object]:
+    """Devolve os dados de um mapa para camadas.json.
+
+    Uma camada corresponde a um conjunto de chaves, incluindo todos os
+    conjuntos de bônus que aparecem com essas chaves. Registra ordem,
+    tamanho e densidade de cada subgrafo induzido, sem ALVO.
+    Também registra a quantidade de arcos entre camadas e as posições
+    e símbolos das casas que os geram. Não inclui interpretações textuais.
+    """
+
+    nos_por_camada: dict[str, list[str]] = {}
+    for rotulo, estado in dados.estados.items():
+        camada = "".join(sorted(estado.chaves)) or "-"
+        nos_por_camada.setdefault(camada, []).append(rotulo)
+
+    tamanhos = dict.fromkeys(nos_por_camada, 0)
+    camada_por_no = {no: camada for camada, nos in nos_por_camada.items() for no in nos}
+    arcos_entre_camadas = 0
+    casas_geradoras_dict: dict[tuple[int, int], str] = {}
+
+    for origem, camada in camada_por_no.items():
+        for destino, _ in dados.grafo_estados.vizinhos(origem):
+            if destino not in camada_por_no:
+                continue
+            if camada == camada_por_no[destino]:
+                tamanhos[camada] += 1
+            else:
+                arcos_entre_camadas += 1
+                est_dest = dados.estados[destino]
+                casas_geradoras_dict[(est_dest.linha, est_dest.coluna)] = dados.grade[est_dest.linha][est_dest.coluna]
+
+    camadas = [
+        {
+            "camada": camada,
+            "ordem": len(nos),
+            "tamanho": tamanhos[camada],
+            "densidade": _densidade(len(nos), tamanhos[camada]),
+        }
+        for camada, nos in sorted(
+            nos_por_camada.items(), key=lambda item: (0 if item[0] == "-" else len(item[0]), item[0])
+        )
+    ]
+
+    casas_geradoras = [
+        {"linha": linha, "coluna": coluna, "simbolo": simbolo}
+        for (linha, coluna), simbolo in sorted(casas_geradoras_dict.items())
+    ]
+
+    return {
+        "camadas": camadas,
+        "arcos_entre_camadas": arcos_entre_camadas,
+        "casas_geradoras": casas_geradoras,
+    }
