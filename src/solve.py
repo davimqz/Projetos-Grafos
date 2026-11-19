@@ -43,6 +43,8 @@ from src.parte1.analises import calcular_camadas
 
 from src.parte1.analises import calcular_graus, analisar_graus, _analisar_graus
 
+from src.parte1.analises import classificar_arcos, encontrar_armadilhas
+
 # [IA] Codex - otimização das análises e da integração, preservando a lógica do integrante; algoritmos e construção dos grafos permanecem em src.graphs.
 
 def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
@@ -114,54 +116,6 @@ def _resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: di
         status=status,
         caminho=caminho
     )
-
-def classificar_arcos(dados: DadosMapa) -> dict[str, object]:
-    """Prepara a linha de um mapa para dfs_classificacao.csv.
-
-    Usa a DFS existente a partir da origem, preservando a ordem N, L, S, O.
-    A linha contém mapa, arvore, retorno, avanco e cruzamento.
-    Também disponibiliza a indicação de ciclo para o relatório, separada
-    das colunas obrigatórias. A busca inclui ALVO e seus arcos alcançáveis.
-    """
-
-    grafo = dados.grafo_estados
-    inicio = dados.origem
-
-    resultado = dfs(grafo, inicio)
-
-    return {
-        "mapa": dados.nome,
-        "arvore": resultado["contagem_arcos"]["arvore"],
-        "retorno": resultado["contagem_arcos"]["retorno"],
-        "avanco": resultado["contagem_arcos"]["avanco"],
-        "cruzamento": resultado["contagem_arcos"]["cruzamento"],
-        "tem_ciclo": resultado["tem_ciclo"],
-        }
-
-
-
-
-
-def encontrar_armadilhas(dados: DadosMapa) -> list[str]:
-    """Devolve os rótulos físicos alcançáveis sem caminho até ALVO.
-
-    Reutiliza o transposto e uma busca já implementada pelo grupo.
-    ALVO não pertence ao retorno. A lista mantém a ordem dos estados
-    recebidos e serve tanto ao CSV obrigatório quanto à visualização.
-    Não grava arquivos nem modifica o grafo original.
-    """
-
-    grafo = dados.grafo_estados.transposto()
-    alcancaveis = set(bfs(grafo, "ALVO")["ordem"])
-
-    out = []
-
-    for rotulo in dados.estados:
-        if rotulo not in alcancaveis:
-            out.append(rotulo) 
-
-    return out
-
 
 def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
     """Prepara as três linhas de um mapa para comparacao_modelagem.csv.
