@@ -507,15 +507,43 @@ Por fim, o valor extremo identificado influencia significativamente a magnitude 
 
 Fonte: `out/parte2/parte2_report.json`, `out/parte2/benchmark_escalabilidade.png`.
 
-| Algoritmo | 10% | 50% | 100% | Complexidade |
-|---|---|---|---|---|
-| BFS | | | | O(V + E) |
-| DFS | | | | O(V + E) |
-| Dijkstra | | | | O((V + E) log V) |
-| Bellman-Ford | | | | O(V · E) |
+Cada tempo é a média aritmética de cinco execuções com `timeit`. O carregamento do grafo e a
+amostragem ficaram fora da medição. As frações de 10%, 50% e 100% são relativas aos vértices
+do recorte. Cada subgrafo induzido mantém os arcos cujas duas extremidades foram selecionadas,
+resultando em 1.418 vértices e 130 arcos, 7.091 vértices e 6.477 arcos, e 14.182 vértices e
+25.111 arcos, respectivamente.
 
-> **[A ESCREVER — Vagner]** Como foi medido, tempos médios (≥ 5 execuções), comparação do crescimento com a
-> complexidade teórica e os gráficos de comportamento e de caminhos. Falta incluir o Dijkstra no benchmark.
+| Algoritmo | 10% (ms) | 50% (ms) | 100% (ms) | Complexidade |
+|---|---:|---:|---:|---|
+| BFS | 0,60 | 3,75 | 6,95 | O(V + E) |
+| DFS | 1,60 | 10,87 | 31,35 | O(V + E) |
+| Dijkstra | 0,59 | 4,10 | 8,26 | O((V + E) log V) |
+| Bellman-Ford | 0,66 | 7.139,71 | 88.121,32 | O(V · E) |
+
+![Tempo médio por tamanho do grafo para BFS, DFS, Dijkstra e Bellman-Ford](../../out/parte2/benchmark_escalabilidade.png)
+
+A DFS percorreu todos os vértices de cada amostra. BFS, Dijkstra e Bellman-Ford partiram da mesma
+carteira em cada amostra e registraram 4, 537 e 1.267 vértices alcançados, respectivamente.
+O Dijkstra usou `valor_btc` como peso e validou os pesos de todos os arcos da amostra.
+O Bellman-Ford usou o saldo da carteira de destino como peso. Seu status foi `OK` com parada
+antecipada em 10% e `CICLO_NEGATIVO` em 50% e 100%.
+
+![Carteiras alcançadas pelos quatro algoritmos nas três amostras](../../out/parte2/benchmark_comportamento.png)
+
+O gráfico de comportamento mostra as contagens registradas no benchmark. O eixo vertical usa escala logarítmica.
+
+![Cinco caminhos do Dijkstra com setas, pesos por arco e custo total](../../out/parte2/benchmark_caminhos_dijkstra.png)
+
+O diagrama mostra os cinco pares da seção 5.4. Cada seta indica a direção do arco e traz o peso
+`valor_btc`. O custo total de cada caminho foi calculado com os pesos antes do arredondamento.
+
+![Caminhos do BFS e do Dijkstra para o mesmo par de carteiras ilícitas](../../out/parte2/benchmark_caminhos_bfs_dijkstra.png)
+
+Para o par `39sfuA8p…` → `17uQbqBG…`, o caminho retornado pelo BFS tem 3 arcos e o do
+Dijkstra tem 5. Para exibir os custos na mesma escala, a figura soma `valor_btc` nos arcos
+dos dois caminhos. O total do BFS foi calculado depois da busca.
+
+> **[A ESCREVER — Vagner]** Comparar o crescimento observado com a complexidade teórica.
 
 #### Decisões
 

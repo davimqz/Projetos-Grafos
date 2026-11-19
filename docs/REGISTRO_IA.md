@@ -1,4 +1,4 @@
-# Registro de uso de IA
+﻿# Registro de uso de IA
 
 Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf`. Os trechos de código ficam marcados com `# [IA] <ferramenta> – <finalidade>`.
 
@@ -88,3 +88,7 @@ Exigido pelo enunciado: todo uso de IA é declarado aqui e na `DECLARACAO_IA.pdf
 | 18/11/2026 | Thomaz | Codex | Ajustes no front e no HTML interativo existentes para aproximar seus visuais e controles; criação da integração de geração do HTML pelo front e testes | `front-react/`, `scripts/gerar_html_front.py`, `src/viz.py`, `src/assets/`, `tests/test_gerar_html_front.py`, `out/parte1/labirinto_interativo.html` | Permitido (interface, apresentação e testes) |
 | 18/11/2026 | Thomaz | Codex | Redação e correção da seção de uso de IA no relatório, com base no registro do projeto | `docs/relatorio/RELATORIO.md` | Permitido (documentação) |
 | 19/11/2026 | Matheus | Codex | Correção da normalização de Bellman-Ford após comentário no PR #32: ciclos em armadilhas não descartam soluções finitas até ALVO; reutilização das buscas e do subgrafo existentes, com testes de regressão e exportação | `src/parte1/buscas.py`, `tests/parte1/test_buscas.py`, `tests/parte1/test_execucao.py` | Permitido (integração e testes) |
+| 19/11/2026 | Vagner | Codex | Inclusão do Dijkstra do grupo no benchmark P4b com pesos `valor_btc`, estimativa de custo da validação global e da busca a partir da origem, e ajuste do teste existente. Nenhuma alteração no algoritmo nem interpretação dos resultados, nem testes rodados | `src/benchmark.py`, `tests/test_benchmark.py` | Permitido (medição/IO e testes) |
+| 19/11/2026 | Vagner | Codex | Preenchimento da tabela da seção 5.6 com os tempos do JSON, descrição factual do procedimento de medição e inserção do gráfico de escalabilidade existente. A interpretação dos resultados fica com Vagner | `docs/relatorio/RELATORIO.md` | Permitido (organização/documentação) |
+| 19/11/2026 | Vagner | Codex | Geração e inserção das figuras escolhidas por Vagner para a seção 5.6. Gráfico de barras das carteiras alcançadas por algoritmo e amostra e diagrama dos cinco caminhos do Dijkstra com pesos por arco. Dados copiados dos JSON já gerados pelo grupo | `out/parte2/benchmark_comportamento.png`, `out/parte2/benchmark_caminhos_dijkstra.png`, `docs/relatorio/RELATORIO.md` | Permitido (sintaxe de visualização) |
+| 19/11/2026 | Vagner | Codex | Diagrama de comparação dos caminhos do BFS e do Dijkstra para o mesmo par. Caminhos obtidos dos JSON existentes e pesos consultados no CSV de arestas | `out/parte2/benchmark_caminhos_bfs_dijkstra.png`, `docs/relatorio/RELATORIO.md` | Permitido (sintaxe de visualização e IO) |
