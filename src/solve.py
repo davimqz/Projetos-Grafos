@@ -41,79 +41,9 @@ from src.parte1.analises import calcular_metricas_globais, _densidade
 
 from src.parte1.analises import calcular_camadas
 
+from src.parte1.analises import calcular_graus, analisar_graus, _analisar_graus
+
 # [IA] Codex - otimização das análises e da integração, preservando a lógica do integrante; algoritmos e construção dos grafos permanecem em src.graphs.
-
-def calcular_graus(dados: DadosMapa) -> list[GrauEstado]:
-    """Devolve as linhas de graus_<mapa>.csv para os estados físicos.
-
-    Os graus não contam arcos para ALVO. Mantém a ordem dos estados
-    recebidos para permitir uma exportação reproduzível.
-    """
-
-    # Uma única passagem pelos arcos substitui uma varredura por estado.
-    graus: dict[str, GrauEstado] = {
-        rotulo: {"estado": rotulo, "grau_entrada": 0, "grau_saida": 0}
-        for rotulo in dados.estados
-    }
-    for origem, grau in graus.items():
-        for destino, _ in dados.grafo_estados.vizinhos(origem):
-            if destino in graus:
-                grau["grau_saida"] += 1
-                graus[destino]["grau_entrada"] += 1
-    return list(graus.values())
-
-def analisar_graus(dados: DadosMapa) -> dict[str, object]:
-    """Devolve rankings, multiplicidades por casa e estados de beco.
-
-    Registra os estados de maior grau de entrada e saída, com desempate
-    pela ordem de leitura do rótulo, e os respectivos graus físicos.
-    Inclui a multiplicidade máxima, as casas que a atingem e sua quantidade.
-    Becos são estados sem saída física que não estão em G.
-    As explicações desses resultados ficam a cargo do grupo no PDF.
-    """
-
-    return _analisar_graus(dados, calcular_graus(dados))
-
-
-def _analisar_graus(dados: DadosMapa, graus: list[GrauEstado]) -> dict[str, object]:
-    """Reutiliza os graus já calculados durante a orquestração."""
-    graus_entrada = {grau["estado"]: grau["grau_entrada"] for grau in graus}
-    graus_saida = {grau["estado"]: grau["grau_saida"] for grau in graus}
-
-    # Menor rótulo no empate, sem ordenar todos os estados.
-    estado_maior_entrada = min(graus_entrada, key=lambda no: (-graus_entrada[no], no), default=None)
-    estado_maior_saida = min(graus_saida, key=lambda no: (-graus_saida[no], no), default=None)
-
-    multiplicidades: dict[tuple[int, int], int] = {}
-    for estado in dados.estados.values():
-        pos = (estado.linha, estado.coluna)
-        multiplicidades[pos] = multiplicidades.get(pos, 0) + 1
-
-    multiplicidade_maxima = max(multiplicidades.values(), default=0)
-    casas_max = [
-        {"linha": linha, "coluna": coluna, "simbolo": dados.grade[linha][coluna]}
-        for (linha, coluna), qtd in sorted(multiplicidades.items())
-        if qtd == multiplicidade_maxima
-    ]
-
-    becos = [
-        rotulo
-        for rotulo, estado in dados.estados.items()
-        if graus_saida[rotulo] == 0 and dados.grade[estado.linha][estado.coluna] != "G"
-    ]
-
-    return {
-        "estado_maior_grau_entrada": estado_maior_entrada,
-        "maior_grau_entrada": graus_entrada.get(estado_maior_entrada, 0),
-        "estado_maior_grau_saida": estado_maior_saida,
-        "maior_grau_saida": graus_saida.get(estado_maior_saida, 0),
-        "multiplicidade_maxima": multiplicidade_maxima,
-        "casas_multiplicidade_maxima": casas_max,
-        "quantidade_casas_multiplicidade_maxima": len(casas_max),
-        "becos": becos,
-        "quantidade_becos": len(becos),
-    }
-
 
 def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
     """Normaliza o resultado de um algoritmo existente até ALVO.
