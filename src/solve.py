@@ -21,6 +21,8 @@ from typing import Literal, TypedDict
 from src.graphs.estados import Estado, construir_grafo_estados, construir_grafo_posicoes, rotular_estado
 from src.graphs.graph import Grafo
 from src.graphs.io import encontrar_inicio, ler_mapa
+from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford
+from src.viz import reconstruir_percurso
 
 
 AlgoritmoCaminho = Literal["BFS", "DIJKSTRA", "BELLMAN_FORD"]
@@ -344,8 +346,77 @@ def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
     Bellman-Ford o detectar e SEM_SOLUCAO para ALVO inalcançável.
     Não implementa novamente os algoritmos e não grava arquivos.
     """
-    raise NotImplementedError
 
+    grafo = dados.grafo_estados
+    inicio = dados.origem
+
+    if inicio not in grafo.nos():
+        raise ValueError(f"Origem '{inicio}' não existe no grafo.")
+
+    if algoritmo == "BFS":
+        try:
+            resultado = bfs(grafo, inicio)
+            caminho = reconstruir_percurso(resultado, dados.origem, "ALVO")
+
+            custo = 0.0
+            for origem, destino in zip(caminho, caminho[1:]):
+                for vizinho, peso in dados.grafo_estados.vizinhos(origem):
+                    if vizinho == destino:
+                        custo += peso
+                        break
+            
+            if resultado["distancia"]["ALVO"] == float("inf"):
+                status = "SEM_SOLUCAO"
+            else:
+                status = "OK"
+                
+        except ValueError:
+                status= "SEM_SOLUCAO"
+
+    elif algoritmo == "DIJKSTRA":
+        try:
+            resultado = dijkstra(grafo, inicio)
+            caminho = reconstruir_percurso(resultado, dados.origem, "ALVO")
+            custo = resultado["distancia"]["ALVO"]
+            status = resultado["status"]
+
+        except ValueError as e:
+            if "negativo" in str(e):
+                status = "RECUSA"
+            else:
+                status = "SEM_SOLUCAO"
+                
+
+    elif algoritmo == "BELLMAN_FORD":
+        try:
+            resultado = bellman_ford(grafo, inicio)
+
+            if not resultado["tem_ciclo_negativo"]:
+                caminho = reconstruir_percurso(resultado, dados.origem, "ALVO")
+                custo = resultado["distancia"]["ALVO"]
+
+            status = resultado["status"]
+
+        except ValueError:
+            status= "SEM_SOLUCAO"
+    else:
+        raise ValueError(f"Algoritmo desconhecido: {algoritmo}")
+    
+    if status != "OK":
+         passos = None
+         custo = None
+         caminho = []
+    else:
+        passos = len(caminho) - 2
+
+    return Solucao(
+        mapa=dados.nome,
+        algoritmo=algoritmo,
+        passos=passos,
+        custo=custo,
+        status=status,
+        caminho=caminho
+    )
 
 def classificar_arcos(dados: DadosMapa) -> dict[str, object]:
     """Prepara a linha de um mapa para dfs_classificacao.csv.
@@ -355,7 +426,23 @@ def classificar_arcos(dados: DadosMapa) -> dict[str, object]:
     Também disponibiliza a indicação de ciclo para o relatório, separada
     das colunas obrigatórias. A busca inclui ALVO e seus arcos alcançáveis.
     """
-    raise NotImplementedError
+
+    grafo = dados.grafo_estados
+    inicio = dados.origem
+
+    resultado = dfs(grafo, inicio)
+
+    return {
+        "mapa": dados.nome,
+        "arvore": resultado["contagem_arcos"]["arvore"],
+        "retorno": resultado["contagem_arcos"]["retorno"],
+        "avanco": resultado["contagem_arcos"]["avanco"],
+        "cruzamento": resultado["contagem_arcos"]["cruzamento"],
+        "tem_ciclo": resultado["tem_ciclo"],
+        }
+
+
+
 
 
 def encontrar_armadilhas(dados: DadosMapa) -> list[str]:
