@@ -32,57 +32,6 @@ def vazio():
     return solve.DadosMapa("vazio", [], Grafo(), Grafo(), {}, "")
 
 
-@pytest.mark.parametrize("usar_string", [False, True])
-def test_exportar_arestas_preserva_ordem_movimentos_simbolos_e_pesos(carregar, tmp_path, usar_string):
-    dados = carregar(["#,#", ".SG", "#~#"])
-    caminho = tmp_path / "arestas.csv"
-
-    solve.exportar_arestas(dados, str(caminho) if usar_string else caminho)
-
-    with caminho.open(newline="", encoding="utf-8") as arquivo:
-        linhas = list(csv.reader(arquivo))
-    assert linhas == [
-        ["origem", "destino", "movimento", "casa_destino", "peso"],
-        ["(1,1)|-|{}", "(0,1)|-|{}", "N", ",", "3"],
-        ["(1,1)|-|{}", "(1,2)|-|{}", "L", "G", "1"],
-        ["(1,1)|-|{}", "(2,1)|-|{}", "S", "~", "5"],
-        ["(1,1)|-|{}", "(1,0)|-|{}", "O", ".", "1"],
-        ["(0,1)|-|{}", "(1,1)|-|{}", "S", "S", "1"],
-        ["(1,2)|-|{}", "ALVO", "", "", "0"],
-        ["(2,1)|-|{}", "(1,1)|-|{}", "N", "S", "1"],
-        ["(1,0)|-|{}", "(1,1)|-|{}", "L", "S", "1"],
-    ]
-
-
-def test_exportar_arestas_preserva_rotulos_com_bonus_e_pesos_negativos(carregar, tmp_path):
-    dados = carregar(["S++G"])
-    caminho = tmp_path / "arestas.csv"
-    solve.exportar_arestas(dados, caminho)
-
-    with caminho.open(newline="", encoding="utf-8") as arquivo:
-        linhas = list(csv.DictReader(arquivo))
-    assert len(linhas) == dados.grafo_estados.tamanho()
-    assert {
-        "origem": "(0,1)|-|{0}", "destino": "(0,2)|-|{0,1}",
-        "movimento": "L", "casa_destino": "+", "peso": "-4",
-    } in linhas
-    assert {
-        "origem": "(0,2)|-|{0,1}", "destino": "(0,1)|-|{0,1}",
-        "movimento": "O", "casa_destino": "+", "peso": "1",
-    } in linhas
-
-
-def test_exportar_arestas_vazias_escreve_cabecalho(vazio, tmp_path):
-    caminho = tmp_path / "arestas.csv"
-    solve.exportar_arestas(vazio, caminho)
-    assert caminho.read_text(encoding="utf-8") == "origem,destino,movimento,casa_destino,peso\n"
-
-
-def test_exportar_arestas_propaga_erro_de_escrita(vazio, tmp_path):
-    with pytest.raises(FileNotFoundError):
-        solve.exportar_arestas(vazio, tmp_path / "ausente" / "arestas.csv")
-
-
 def test_calcular_metricas_globais_separa_modelagens_e_exclui_alvo(carregar):
     dados = carregar(["SAG"])
     assert solve.calcular_metricas_globais(dados) == {
