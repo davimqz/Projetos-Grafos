@@ -1,60 +1,47 @@
-"""Contratos da orquestração e das entregas da Parte 1 (P3).
+"""Orquestração das entregas da Parte 1 e interface pública existente.
 
-As análises foram escritas pelo integrante. Este módulo reutiliza a leitura,
-a construção dos grafos e os algoritmos existentes em src.graphs.
+As responsabilidades estão distribuídas em src.parte1. Os imports abaixo
+mantêm disponíveis os tipos e as funções antes definidos neste módulo.
 As visualizações pertencem a src.viz e src.visualizar_parte1.
-
-As funções de cálculo não gravam arquivos nem modificam os grafos recebidos.
-ALVO participa das buscas, mas ele e seus arcos não entram nas métricas
-físicas. A Parte 2 continua nos seus módulos específicos.
 """
 
-# [IA] Codex - boilerplate original de tipos, assinaturas e contratos.
+# [IA] Codex - separação por responsabilidade, preservando a lógica existente.
 from __future__ import annotations
 
-import csv
-import json
-from collections import Counter
-from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal, TypedDict
 
-from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra
-from src.graphs.estados import (
-    Estado, construir_grafo_estados, construir_grafo_posicoes,
-    rotular_estado, rotular_posicao,
+from src.parte1.analises import (
+    _analisar_graus,
+    analisar_graus,
+    calcular_camadas,
+    calcular_graus,
+    calcular_metricas_globais,
+    classificar_arcos,
+    encontrar_armadilhas,
 )
-from src.graphs.graph import Grafo
-from src.graphs.io import encontrar_inicio, encontrar_saidas, ler_mapa
-from src.viz import reconstruir_percurso
-
-from src.parte1.modelos import AlgoritmoCaminho, StatusSolucao, DadosMapa, GrauEstado, Solucao
-
+from src.parte1.buscas import (
+    _comparar_bonus,
+    _comparar_modelagens,
+    _resolver_mapa,
+    _resultado_busca,
+    comparar_bonus,
+    comparar_modelagens,
+    resolver_mapa,
+)
 from src.parte1.carga import carregar_mapa
+from src.parte1.exportacao import exportar_arestas, exportar_csv, exportar_json
+from src.parte1.modelos import AlgoritmoCaminho, DadosMapa, GrauEstado, Solucao, StatusSolucao
 
-from src.parte1.exportacao import exportar_arestas
+__all__ = [
+    "AlgoritmoCaminho", "DadosMapa", "GrauEstado", "Solucao", "StatusSolucao",
+    "analisar_graus", "calcular_camadas", "calcular_graus", "calcular_metricas_globais",
+    "carregar_mapa", "classificar_arcos", "comparar_bonus", "comparar_modelagens",
+    "encontrar_armadilhas", "executar_parte1", "exportar_arestas", "exportar_csv",
+    "exportar_json", "resolver_mapa",
+]
 
-from src.parte1.exportacao import exportar_csv, exportar_json
 
-from src.parte1.analises import calcular_metricas_globais, _densidade
-
-from src.parte1.analises import calcular_camadas
-
-from src.parte1.analises import calcular_graus, analisar_graus, _analisar_graus
-
-from src.parte1.analises import classificar_arcos, encontrar_armadilhas
-
-from src.parte1.buscas import resolver_mapa, _resultado_busca, _resolver_mapa
-
-from src.parte1.buscas import comparar_modelagens, _comparar_modelagens
-
-from src.parte1.buscas import comparar_bonus, _comparar_bonus
-
-# [IA] Codex - otimização das análises e da integração, preservando a lógica do integrante; algoritmos e construção dos grafos permanecem em src.graphs.
-
-# [IA] Codex - escrita genérica de CSV com resultados já calculados.
-# [IA] Codex - escrita genérica de JSON com dados já preparados.
 # [IA] Codex - integração das análises do integrante e exportação dos resultados.
 def executar_parte1(
     mapas: Iterable[str | Path], saida: str | Path, *, fonte_consumivel: bool = False,
