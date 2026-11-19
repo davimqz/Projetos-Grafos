@@ -1,0 +1,154 @@
+{
+  "nos": 14182,
+  "arestas": 25111,
+  "entrada": {
+    "total": {
+      "carteiras": 14182,
+      "minimo": 0,
+      "q1": 0.0,
+      "mediana": 0.0,
+      "media": 1.7706,
+      "q3": 1.0,
+      "maximo": 2719,
+      "desvio_padrao": 30.5119,
+      "com_grau_zero": 8021
+    },
+    "por_classe": {
+      "desconhecido": {
+        "carteiras": 4713,
+        "minimo": 0,
+        "q1": 0.0,
+        "mediana": 0.0,
+        "media": 1.4719,
+        "q3": 1.0,
+        "maximo": 2719,
+        "desvio_padrao": 41.0348,
+        "com_grau_zero": 3176
+      },
+      "ilicito": {
+        "carteiras": 5208,
+        "minimo": 0,
+        "q1": 0.0,
+        "mediana": 1.0,
+        "media": 2.1964,
+        "q3": 1.0,
+        "maximo": 1996,
+        "desvio_padrao": 31.4079,
+        "com_grau_zero": 1943
+      },
+      "licito": {
+        "carteiras": 4261,
+        "minimo": 0,
+        "q1": 0.0,
+        "mediana": 0.0,
+        "media": 1.5806,
+        "q3": 1.0,
+        "maximo": 162,
+        "desvio_padrao": 5.5205,
+        "com_grau_zero": 2902
+      }
+    },
+    "maiores": [
+      {
+        "endereco": "3QuHejbAAbeRoTkH5wBwGzMipf4R3zpQga",
+        "classe": "desconhecido",
+        "grau": 2719
+      },
+      {
+        "endereco": "1FvtWwP3ePJDeR6K7ZePGujUuusUTds8Vy",
+        "classe": "ilicito",
+        "grau": 1996
+      },
+      {
+        "endereco": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+        "classe": "desconhecido",
+        "grau": 717
+      },
+      {
+        "endereco": "3JUgPFWr3kMLrm1cauMcgcEMm6RZtLWnnM",
+        "classe": "ilicito",
+        "grau": 500
+      },
+      {
+        "endereco": "39nz1urm6Vbkhzdu6FYedBys1Wzc3JFWbE",
+        "classe": "ilicito",
+        "grau": 497
+      }
+    ]
+  },
+  "saida": {
+    "total": {
+      "carteiras": 14182,
+      "minimo": 0,
+      "q1": 1.0,
+      "mediana": 1.0,
+      "media": 1.7706,
+      "q3": 1.0,
+      "maximo": 1002,
+      "desvio_padrao": 9.6724,
+      "com_grau_zero": 2089
+    },
+    "por_classe": {
+      "desconhecido": {
+        "carteiras": 4713,
+        "minimo": 0,
+        "q1": 1.0,
+        "mediana": 1.0,
+        "media": 2.2296,
+        "q3": 1.0,
+        "maximo": 1002,
+        "desvio_padrao": 15.0865,
+        "com_grau_zero": 512
+      },
+      "ilicito": {
+        "carteiras": 5208,
+        "minimo": 0,
+        "q1": 1.0,
+        "mediana": 1.0,
+        "media": 1.0415,
+        "q3": 1.0,
+        "maximo": 398,
+        "desvio_padrao": 5.5247,
+        "com_grau_zero": 426
+      },
+      "licito": {
+        "carteiras": 4261,
+        "minimo": 0,
+        "q1": 0.0,
+        "mediana": 1.0,
+        "media": 2.1542,
+        "q3": 1.0,
+        "maximo": 71,
+        "desvio_padrao": 4.62,
+        "com_grau_zero": 1151
+      }
+    },
+    "maiores": [
+      {
+        "endereco": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+        "classe": "desconhecido",
+        "grau": 1002
+      },
+      {
+        "endereco": "39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K",
+        "classe": "ilicito",
+        "grau": 398
+      },
+      {
+        "endereco": "35fNF5Uwbsoa5ABPCUvKZNyuAV7S9sJTou",
+        "classe": "licito",
+        "grau": 71
+      },
+      {
+        "endereco": "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
+        "classe": "desconhecido",
+        "grau": 57
+      },
+      {
+        "endereco": "39HSySuqMBCmZi7scW8MaGsFdL6wimcvww",
+        "classe": "licito",
+        "grau": 55
+      }
+    ]
+  }
+}
