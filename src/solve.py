@@ -35,6 +35,8 @@ from src.parte1.carga import carregar_mapa
 
 from src.parte1.exportacao import exportar_arestas
 
+from src.parte1.exportacao import exportar_csv, exportar_json
+
 # [IA] Codex - otimização das análises e da integração, preservando a lógica do integrante; algoritmos e construção dos grafos permanecem em src.graphs.
 
 def calcular_metricas_globais(dados: DadosMapa) -> dict[str, object]:
@@ -446,53 +448,7 @@ def _comparar_bonus(dados: DadosMapa, resultados_buscas: dict[str, dict]) -> dic
     }
 
 # [IA] Codex - escrita genérica de CSV com resultados já calculados.
-def exportar_csv(
-    registros: Iterable[Mapping[str, object]],
-    colunas: Sequence[str],
-    caminho: str | Path,
-) -> None:
-    """Grava registros já calculados em UTF-8, na ordem das colunas.
-
-    Cria a pasta de destino quando necessário e escreve o cabeçalho mesmo
-    sem registros. None representa campo vazio. Valores estruturados,
-    como o caminho de solucoes.csv, devem ter representação JSON no campo.
-    Não calcula resultados nem modifica os registros recebidos.
-    """
-    caminho = Path(caminho)
-    caminho.parent.mkdir(parents=True, exist_ok=True)
-
-    with caminho.open("w", newline="", encoding="utf-8") as arquivo:
-        escritor = csv.DictWriter(arquivo, fieldnames=colunas)
-        escritor.writeheader()
-
-        for registro in registros:
-            linha: dict[str, object] = {}
-            for coluna in colunas:
-                valor = registro.get(coluna)
-                if isinstance(valor, Mapping):
-                    valor = dict(valor)
-                if isinstance(valor, (dict, list, tuple)):
-                    valor = json.dumps(valor, ensure_ascii=False, allow_nan=False)
-                linha[coluna] = valor
-            escritor.writerow(linha)
-
-
 # [IA] Codex - escrita genérica de JSON com dados já preparados.
-def exportar_json(dados: object, caminho: str | Path) -> None:
-    """Grava dados já preparados e serializáveis em JSON UTF-8 legível.
-
-    Cria a pasta de destino quando necessário. Os dados devem usar tipos
-    JSON, sem Estados, conjuntos ou valores numéricos não finitos.
-    Não calcula resultados nem modifica os dados recebidos.
-    """
-    caminho = Path(caminho)
-    caminho.parent.mkdir(parents=True, exist_ok=True)
-
-    with caminho.open("w", encoding="utf-8") as arquivo:
-        json.dump(dados, arquivo, ensure_ascii=False, indent=2, allow_nan=False)
-        arquivo.write("\n")
-
-
 # [IA] Codex - integração das análises do integrante e exportação dos resultados.
 def executar_parte1(
     mapas: Iterable[str | Path], saida: str | Path, *, fonte_consumivel: bool = False,
