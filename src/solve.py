@@ -1,6 +1,6 @@
 """Contratos da orquestração e das entregas da Parte 1 (P3).
 
-Os corpos ficam a cargo do integrante. Este módulo reutiliza a leitura,
+As análises foram escritas pelo integrante. Este módulo reutiliza a leitura,
 a construção dos grafos e os algoritmos existentes em src.graphs.
 As visualizações pertencem a src.viz e src.visualizar_parte1.
 
@@ -9,22 +9,27 @@ ALVO participa das buscas, mas ele e seus arcos não entram nas métricas
 físicas. A Parte 2 continua nos seus módulos específicos.
 """
 
-# [IA] Codex - boilerplate de tipos, assinaturas e contratos; sem implementação.
+# [IA] Codex - boilerplate original de tipos, assinaturas e contratos.
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
 import csv
 import json
+from collections import Counter
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypedDict
 
-from src.graphs.estados import Estado, construir_grafo_estados, construir_grafo_posicoes, rotular_estado, rotular_posicao
+from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra
+from src.graphs.estados import (
+    Estado, construir_grafo_estados, construir_grafo_posicoes,
+    rotular_estado, rotular_posicao,
+)
 from src.graphs.graph import Grafo
-from src.graphs.io import encontrar_inicio, ler_mapa, encontrar_saidas
-from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford
+from src.graphs.io import encontrar_inicio, encontrar_saidas, ler_mapa
 from src.viz import reconstruir_percurso
 
+# [IA] Codex - otimização das análises e da integração, preservando a lógica do integrante; algoritmos e construção dos grafos permanecem em src.graphs.
 
 AlgoritmoCaminho = Literal["BFS", "DIJKSTRA", "BELLMAN_FORD"]
 StatusSolucao = Literal["OK", "RECUSA", "CICLO_NEGATIVO", "SEM_SOLUCAO"]
@@ -94,13 +99,12 @@ def carregar_mapa(
     grade = ler_mapa(caminho)
     grafo, estados = construir_grafo_estados(grade, fonte_consumivel=fonte_consumivel)
 
-    cords_inicio = encontrar_inicio(grade)
-    origem = rotular_estado(Estado(cords_inicio[0], cords_inicio[1], frozenset(), frozenset()))
-
+    linha, coluna = encontrar_inicio(grade)
+    origem = rotular_estado(Estado(linha, coluna, frozenset(), frozenset()))
 
     return DadosMapa(
-        nome = caminho.stem if nome is None else nome,
-        grade = grade,
+        nome=caminho.stem if nome is None else nome,
+        grade=grade,
         grafo_posicoes=construir_grafo_posicoes(grade),
         grafo_estados=grafo,
         estados=estados,
@@ -133,12 +137,12 @@ def exportar_arestas(dados: DadosMapa, caminho: str | Path) -> None:
             "peso",
         ])
 
-        data = dados.grafo_estados.arestas()
-
-        for i in data:
-            origem = i[0]
-            destino = i[1]
-            peso= i[2]
+        arcos = (
+            (origem, destino, peso)
+            for origem in dados.grafo_estados.nos()
+            for destino, peso in dados.grafo_estados.vizinhos(origem)
+        )
+        for origem, destino, peso in arcos:
 
             if destino == "ALVO":
                 escritor.writerow([origem, destino, "", "", peso])
@@ -159,8 +163,6 @@ def exportar_arestas(dados: DadosMapa, caminho: str | Path) -> None:
             else:
                 movimento = "L"
 
-            
-
             escritor.writerow([
                 origem,
                 destino,
@@ -179,22 +181,27 @@ def calcular_metricas_globais(dados: DadosMapa) -> dict[str, object]:
     Reutiliza as consultas de Grafo e não grava arquivos.
     """
 
-    casas_livres_list = {".", "S", "G", ",", "~", "a", "b", "c", "d", "A", "B", "C", "D", ">", "<", "^", "v", "+", "*"}
+    simbolos_livres = ".SG,~abcdABCD><^v+*"
 
     ordem_pos = dados.grafo_posicoes.ordem()
     tamanho_pos = dados.grafo_posicoes.tamanho()
-    densidade_pos = dados.grafo_posicoes.densidade()
+    densidade_pos = _densidade(ordem_pos, tamanho_pos)
 
-    grafo_fisico = dados.grafo_estados.subgrafo_induzido(dados.estados)
+    ordem_est = len(dados.estados)
+    tamanho_est = sum(
+        destino in dados.estados
+        for origem in dados.estados
+        for destino, _ in dados.grafo_estados.vizinhos(origem)
+    )
+    densidade_est = _densidade(ordem_est, tamanho_est)
 
-    ordem_est = grafo_fisico.ordem()
-    tamanho_est = grafo_fisico.tamanho()
-    densidade_est = grafo_fisico.densidade()
-
-    casas_livres = sum(linha.count(char) for linha in dados.grade for char in casas_livres_list)
-    chaves_distintas = len({char for linha in dados.grade for char in linha if char in "abcd"})
-    bonus_consumiveis = sum(linha.count("+") for linha in dados.grade)
-    fontes_consumiveis = sum(linha.count("*") for linha in dados.grade)
+    contagem: Counter[str] = Counter()
+    for linha in dados.grade:
+        contagem.update(linha)
+    casas_livres = sum(contagem[char] for char in simbolos_livres)
+    chaves_distintas = sum(char in contagem for char in "abcd")
+    bonus_consumiveis = contagem["+"]
+    fontes_consumiveis = contagem["*"]
     
     teto_teorico = casas_livres * (2 ** chaves_distintas) * (2 ** bonus_consumiveis)
     if dados.fonte_consumivel:
@@ -215,6 +222,11 @@ def calcular_metricas_globais(dados: DadosMapa) -> dict[str, object]:
 
 
 
+def _densidade(ordem: int, tamanho: int) -> float:
+    """Calcula a mesma densidade dirigida sem copiar um subgrafo."""
+    return tamanho / (ordem * (ordem - 1)) if ordem > 1 else 0.0
+
+
 def calcular_camadas(dados: DadosMapa) -> dict[str, object]:
     """Devolve os dados de um mapa para camadas.json.
 
@@ -230,24 +242,33 @@ def calcular_camadas(dados: DadosMapa) -> dict[str, object]:
         camada = "".join(sorted(estado.chaves)) or "-"
         nos_por_camada.setdefault(camada, []).append(rotulo)
 
-    camadas = []
-    for camada, nos in sorted(nos_por_camada.items(), key=lambda x: (0 if x[0] == "-" else len(x[0]), x[0])):
-        subgrafo = dados.grafo_estados.subgrafo_induzido(nos)
-        camadas.append({
-            "camada": camada,
-            "ordem": subgrafo.ordem(),
-            "tamanho": subgrafo.tamanho(),
-            "densidade": subgrafo.densidade(),
-        })
-
+    tamanhos = dict.fromkeys(nos_por_camada, 0)
+    camada_por_no = {no: camada for camada, nos in nos_por_camada.items() for no in nos}
     arcos_entre_camadas = 0
     casas_geradoras_dict: dict[tuple[int, int], str] = {}
 
-    for origem, destino, _ in dados.grafo_estados.arestas():
-        if destino != "ALVO" and dados.estados[origem].chaves != dados.estados[destino].chaves:
-            arcos_entre_camadas += 1
-            est_dest = dados.estados[destino]
-            casas_geradoras_dict[(est_dest.linha, est_dest.coluna)] = dados.grade[est_dest.linha][est_dest.coluna]
+    for origem, camada in camada_por_no.items():
+        for destino, _ in dados.grafo_estados.vizinhos(origem):
+            if destino not in camada_por_no:
+                continue
+            if camada == camada_por_no[destino]:
+                tamanhos[camada] += 1
+            else:
+                arcos_entre_camadas += 1
+                est_dest = dados.estados[destino]
+                casas_geradoras_dict[(est_dest.linha, est_dest.coluna)] = dados.grade[est_dest.linha][est_dest.coluna]
+
+    camadas = [
+        {
+            "camada": camada,
+            "ordem": len(nos),
+            "tamanho": tamanhos[camada],
+            "densidade": _densidade(len(nos), tamanhos[camada]),
+        }
+        for camada, nos in sorted(
+            nos_por_camada.items(), key=lambda item: (0 if item[0] == "-" else len(item[0]), item[0])
+        )
+    ]
 
     casas_geradoras = [
         {"linha": linha, "coluna": coluna, "simbolo": simbolo}
@@ -268,22 +289,17 @@ def calcular_graus(dados: DadosMapa) -> list[GrauEstado]:
     recebidos para permitir uma exportação reproduzível.
     """
 
-    graus: list[GrauEstado] = []
-
-    for rotulo in dados.estados:
-        grau_entrada = dados.grafo_estados.grau_entrada(rotulo)
-        grau_saida = dados.grafo_estados.grau_saida(rotulo)
-
-        if any(destino == "ALVO" for destino, _peso in dados.grafo_estados.vizinhos(rotulo)):
-            grau_saida -= 1
-
-        graus.append({
-            "estado": rotulo,
-            "grau_entrada": grau_entrada,
-            "grau_saida": grau_saida,
-        })
-
-    return graus
+    # Uma única passagem pelos arcos substitui uma varredura por estado.
+    graus: dict[str, GrauEstado] = {
+        rotulo: {"estado": rotulo, "grau_entrada": 0, "grau_saida": 0}
+        for rotulo in dados.estados
+    }
+    for origem, grau in graus.items():
+        for destino, _ in dados.grafo_estados.vizinhos(origem):
+            if destino in graus:
+                grau["grau_saida"] += 1
+                graus[destino]["grau_entrada"] += 1
+    return list(graus.values())
 
 def analisar_graus(dados: DadosMapa) -> dict[str, object]:
     """Devolve rankings, multiplicidades por casa e estados de beco.
@@ -295,14 +311,17 @@ def analisar_graus(dados: DadosMapa) -> dict[str, object]:
     As explicações desses resultados ficam a cargo do grupo no PDF.
     """
 
-    grafo_fisico = dados.grafo_estados.subgrafo_induzido(dados.estados)
-
-    graus_entrada = {rotulo: grafo_fisico.grau_entrada(rotulo) for rotulo in dados.estados}
-    graus_saida = {rotulo: grafo_fisico.grau_saida(rotulo) for rotulo in dados.estados}
+    return _analisar_graus(dados, calcular_graus(dados))
 
 
-    estado_maior_entrada = max(sorted(graus_entrada), key=graus_entrada.get, default=None)
-    estado_maior_saida = max(sorted(graus_saida), key=graus_saida.get, default=None))
+def _analisar_graus(dados: DadosMapa, graus: list[GrauEstado]) -> dict[str, object]:
+    """Reutiliza os graus já calculados durante a orquestração."""
+    graus_entrada = {grau["estado"]: grau["grau_entrada"] for grau in graus}
+    graus_saida = {grau["estado"]: grau["grau_saida"] for grau in graus}
+
+    # Menor rótulo no empate, sem ordenar todos os estados.
+    estado_maior_entrada = min(graus_entrada, key=lambda no: (-graus_entrada[no], no), default=None)
+    estado_maior_saida = min(graus_saida, key=lambda no: (-graus_saida[no], no), default=None)
 
     multiplicidades: dict[tuple[int, int], int] = {}
     for estado in dados.estados.values():
@@ -347,6 +366,19 @@ def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
     Bellman-Ford o detectar e SEM_SOLUCAO para ALVO inalcançável.
     Não implementa novamente os algoritmos e não grava arquivos.
     """
+    return _resolver_mapa(dados, algoritmo, {})
+
+
+def _resultado_busca(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: dict[str, dict]) -> dict:
+    """Executa cada busca no máximo uma vez por mapa na orquestração."""
+    if algoritmo not in resultados:
+        buscar = {"BFS": bfs, "DIJKSTRA": dijkstra, "BELLMAN_FORD": bellman_ford}[algoritmo]
+        resultados[algoritmo] = buscar(dados.grafo_estados, dados.origem)
+    return resultados[algoritmo]
+
+
+def _resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: dict[str, dict]) -> Solucao:
+    """Normaliza buscas existentes, com reutilização local dos resultados."""
 
     grafo = dados.grafo_estados
     inicio = dados.origem
@@ -354,59 +386,32 @@ def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
     if inicio not in grafo.nos():
         raise ValueError(f"Origem '{inicio}' não existe no grafo.")
 
-    if algoritmo == "BFS":
-        try:
-            resultado = bfs(grafo, inicio)
-            caminho = reconstruir_percurso(resultado, dados.origem, "ALVO")
-
-            custo = 0.0
-            for origem, destino in zip(caminho, caminho[1:]):
-                for vizinho, peso in dados.grafo_estados.vizinhos(origem):
-                    if vizinho == destino:
-                        custo += peso
-                        break
-            
-            if resultado["distancia"]["ALVO"] == float("inf"):
-                status = "SEM_SOLUCAO"
-            else:
-                status = "OK"
-                
-        except ValueError:
-                status= "SEM_SOLUCAO"
-
-    elif algoritmo == "DIJKSTRA":
-        try:
-            resultado = dijkstra(grafo, inicio)
-            caminho = reconstruir_percurso(resultado, dados.origem, "ALVO")
-            custo = resultado["distancia"]["ALVO"]
-            status = resultado["status"]
-
-        except ValueError as e:
-            if "negativo" in str(e):
-                status = "RECUSA"
-            else:
-                status = "SEM_SOLUCAO"
-                
-
-    elif algoritmo == "BELLMAN_FORD":
-        try:
-            resultado = bellman_ford(grafo, inicio)
-
-            if not resultado["tem_ciclo_negativo"]:
-                caminho = reconstruir_percurso(resultado, dados.origem, "ALVO")
-                custo = resultado["distancia"]["ALVO"]
-
-            status = resultado["status"]
-
-        except ValueError:
-            status= "SEM_SOLUCAO"
-    else:
+    if algoritmo not in ("BFS", "DIJKSTRA", "BELLMAN_FORD"):
         raise ValueError(f"Algoritmo desconhecido: {algoritmo}")
-    
+
+    caminho: list[str] = []
+    custo: float | None = None
+    try:
+        resultado = _resultado_busca(dados, algoritmo, resultados)
+        status = "OK" if algoritmo == "BFS" else resultado["status"]
+        if status == "OK":
+            caminho = reconstruir_percurso(resultado, inicio, "ALVO")
+            if algoritmo == "BFS":
+                custo = 0.0
+                for origem, destino in zip(caminho, caminho[1:]):
+                    for vizinho, peso in grafo.vizinhos(origem):
+                        if vizinho == destino:
+                            custo += peso
+                            break
+            else:
+                custo = resultado["distancia"]["ALVO"]
+    except ValueError as erro:
+        status = "RECUSA" if algoritmo == "DIJKSTRA" and "negativo" in str(erro) else "SEM_SOLUCAO"
+
     if status != "OK":
-         passos = None
-         custo = None
-         caminho = []
+        passos = None
+        custo = None
+        caminho = []
     else:
         passos = len(caminho) - 2
 
@@ -479,6 +484,11 @@ def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
     As observações interpretativas devem ser escritas pelo integrante.
     Os casos obrigatórios são m02, m03 e m04.
     """
+    return _comparar_modelagens(dados, {})
+
+
+def _comparar_modelagens(dados: DadosMapa, resultados_buscas: dict[str, dict]) -> list[dict[str, object]]:
+    """Compara as modelagens aproveitando a BFS de estados quando disponível."""
 
     inicio_pos = rotular_posicao(encontrar_inicio(dados.grade))
     saidas_pos = {rotular_posicao(pos) for pos in encontrar_saidas(dados.grade)}
@@ -498,12 +508,7 @@ def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
             passos = None
             valido = False
         else:
-            caminho = []
-            atual: str | None = destino
-            while atual is not None:
-                caminho.append(atual)
-                atual = res["pai"][atual]
-            caminho.reverse()
+            caminho = reconstruir_percurso(res, inicio_pos, destino)
 
             passos = len(caminho) - 1
             chaves: set[str] = set()
@@ -525,7 +530,7 @@ def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
             "observacao": obs,
         })
 
-    dist_est = bfs(dados.grafo_estados, dados.origem)["distancia"]["ALVO"]
+    dist_est = _resultado_busca(dados, "BFS", resultados_buscas)["distancia"]["ALVO"]
     passos_est = None if dist_est == float("inf") else int(dist_est) - 1
 
     resultados.append({
@@ -546,12 +551,15 @@ def comparar_bonus(dados: DadosMapa) -> dict[str, object]:
     pelo algoritmo existente. Recebe o m05 na variante padrão.
     Não escreve a prova nem a interpretação exigida no PDF.
     """
+    return _comparar_bonus(dados, {})
 
-    grafo_estados = dados.grafo_estados
+
+def _comparar_bonus(dados: DadosMapa, resultados_buscas: dict[str, dict]) -> dict[str, object]:
+    """Reaproveita o Bellman-Ford de estados sem alterar o experimento."""
+
     grafo_pos = dados.grafo_posicoes
-    inicio = dados.origem
 
-    resultado_estados = bellman_ford(grafo_estados, inicio)
+    resultado_estados = _resultado_busca(dados, "BELLMAN_FORD", resultados_buscas)
     resultado_pos = bellman_ford(grafo_pos, rotular_posicao(encontrar_inicio(dados.grade)))
 
     return{
@@ -620,7 +628,9 @@ def exportar_json(dados: object, caminho: str | Path) -> None:
 
 
 # [IA] Codex - integração das análises do integrante e exportação dos resultados.
-def executar_parte1(mapas: Iterable[str | Path], saida: str | Path, *, fonte_consumivel: bool = False,) -> None:
+def executar_parte1(
+    mapas: Iterable[str | Path], saida: str | Path, *, fonte_consumivel: bool = False,
+) -> None:
     """Orquestra as entregas dos mapas informados, incluindo mapas do grupo.
 
     Prepara os mapas e reúne métricas globais, camadas, graus, rankings,
@@ -642,8 +652,6 @@ def executar_parte1(mapas: Iterable[str | Path], saida: str | Path, *, fonte_con
     Não implementa algoritmos, desenha figuras nem redige análises do PDF.
     Erros de entrada e escrita são propagados para tratamento pela CLI.
     """
-
-    #TODO Adicionar mapas do grupo
 
     nomes_fornecidos = {
         "m01_terreno": "m01",
@@ -675,39 +683,49 @@ def executar_parte1(mapas: Iterable[str | Path], saida: str | Path, *, fonte_con
 
     for arquivo, nome in entradas:
         dados = carregar_mapa(arquivo, nome=nome, fonte_consumivel=fonte_consumivel)
+        graus = calcular_graus(dados)
+        resultados_buscas: dict[str, dict] = {}
         classificacao = classificar_arcos(dados)
         classificacoes.append(classificacao)
         metricas[nome] = {
             **calcular_metricas_globais(dados),
-            **analisar_graus(dados),
+            **_analisar_graus(dados, graus),
             "tem_ciclo_dfs": classificacao["tem_ciclo"],
             "fonte_consumivel": fonte_consumivel,
         }
         camadas[nome] = calcular_camadas(dados)
         exportar_arestas(dados, saida / f"arestas_{nome}.csv")
         exportar_csv(
-            calcular_graus(dados),
+            graus,
             ("estado", "grau_entrada", "grau_saida"),
             saida / f"graus_{nome}.csv",
         )
 
         solucoes_mapa = {}
         for algoritmo in algoritmos:
-            solucao = resolver_mapa(dados, algoritmo)
+            solucao = _resolver_mapa(dados, algoritmo, resultados_buscas)
             solucoes.append(solucao)
             solucoes_mapa[algoritmo] = solucao
+            reutilizar = (
+                algoritmo == "BFS" and nome in ("m02", "m03", "m04")
+                or algoritmo == "BELLMAN_FORD" and (
+                    nome == "m06" or nome == "m05" and not fonte_consumivel
+                )
+            )
+            if not reutilizar:
+                resultados_buscas.pop(algoritmo, None)
 
         if nome in ("m02", "m03", "m04"):
-            comparacoes.extend(comparar_modelagens(dados))
+            comparacoes.extend(_comparar_modelagens(dados, resultados_buscas))
         if nome == "m03":
             percurso = solucoes_mapa["DIJKSTRA"]
             if percurso["status"] == "RECUSA":
                 percurso = solucoes_mapa["BELLMAN_FORD"]
             exportar_json(percurso, saida / "percurso_m03.json")
         if nome == "m05" and not fonte_consumivel:
-            exportar_json(comparar_bonus(dados), saida / "comparacao_bonus_m05.json")
+            exportar_json(_comparar_bonus(dados, resultados_buscas), saida / "comparacao_bonus_m05.json")
         if nome == "m06":
-            resultado = bellman_ford(dados.grafo_estados, dados.origem)
+            resultado = _resultado_busca(dados, "BELLMAN_FORD", resultados_buscas)
             exportar_json(
                 {
                     "mapa": nome,
@@ -719,6 +737,8 @@ def executar_parte1(mapas: Iterable[str | Path], saida: str | Path, *, fonte_con
                 },
                 saida / "ciclo_negativo_m06.json",
             )
+            del resultado
+        resultados_buscas.clear()
         if nome in ("m04", "m07"):
             armadilhas = encontrar_armadilhas(dados)
             exportar_csv(

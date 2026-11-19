@@ -6,6 +6,7 @@ import json
 
 import pytest
 
+from src import solve
 from src.solve import executar_parte1
 
 
@@ -160,3 +161,40 @@ def test_executar_parte1_entrada_vazia_exporta_agregados_vazios(tmp_path):
 def test_executar_parte1_propaga_erro_de_leitura(tmp_path):
     with pytest.raises(FileNotFoundError):
         executar_parte1([tmp_path / "ausente.txt"], tmp_path / "saida")
+
+
+# [IA] Codex - regressão da reutilização de buscas e graus por mapa e execução.
+@pytest.mark.parametrize("consumivel", [False, True])
+def test_executar_parte1_nao_repete_buscas_nem_graus(tmp_path, monkeypatch, consumivel):
+    mapas = [
+        criar_mapa(tmp_path / "entrada", nome, grade)
+        for nome, grade in [("m03_tres_chaves", "S~G\n..."), ("m05_bonus", "S+G"), ("m06_fonte", "S*G")]
+    ]
+    carregar = solve.carregar_mapa
+    preparados = []
+    chamadas = {nome: [] for nome in ("bfs", "bellman_ford", "calcular_graus")}
+
+    def observar_carga(*args, **kwargs):
+        dados = carregar(*args, **kwargs)
+        preparados.append(dados)
+        return dados
+
+    def observar(nome, funcao):
+        def chamar(primeiro, *args, **kwargs):
+            chamadas[nome].append(primeiro)
+            return funcao(primeiro, *args, **kwargs)
+        return chamar
+
+    monkeypatch.setattr(solve, "carregar_mapa", observar_carga)
+    for nome in chamadas:
+        monkeypatch.setattr(solve, nome, observar(nome, getattr(solve, nome)))
+    for rodada in range(2):
+        executar_parte1(mapas, tmp_path / f"saida{rodada}", fonte_consumivel=consumivel)
+
+    assert len(preparados) == 6
+    for dados in preparados:
+        assert sum(item is dados for item in chamadas["calcular_graus"]) == 1
+        for nome in ("bfs", "bellman_ford"):
+            assert sum(item is dados.grafo_estados for item in chamadas[nome]) == 1
+    for arquivo in (tmp_path / "saida0").iterdir():
+        assert arquivo.read_bytes() == (tmp_path / "saida1" / arquivo.name).read_bytes()

@@ -485,3 +485,43 @@ def test_exportacoes_propagam_erro_de_escrita(tmp_path, formato):
             solve.exportar_csv([], ["estado"], tmp_path)
         else:
             solve.exportar_json({}, tmp_path)
+
+
+# [IA] Codex - regressões de desempenho das análises, sem limites de tempo frágeis.
+@pytest.mark.parametrize("funcao", [solve.calcular_graus, solve.analisar_graus])
+def test_graus_consultam_cada_lista_de_vizinhos_uma_vez(carregar, monkeypatch, funcao):
+    dados = carregar(["S" + "." * 100 + "G"])
+    vizinhos = dados.grafo_estados.vizinhos
+    consultas = []
+
+    def consultar(no):
+        consultas.append(no)
+        return vizinhos(no)
+
+    def varredura_repetida(*args):
+        pytest.fail("Calcular cada grau de entrada separadamente volta a custar O(VE).")
+
+    monkeypatch.setattr(dados.grafo_estados, "vizinhos", consultar)
+    monkeypatch.setattr(Grafo, "grau_entrada", varredura_repetida)
+    funcao(dados)
+
+    assert consultas == list(dados.estados)
+
+
+@pytest.mark.parametrize("operacao", ["metricas", "camadas", "arestas"])
+def test_contagens_e_exportacao_nao_copiam_grafos_ou_lista_de_arcos(carregar, tmp_path, monkeypatch, operacao):
+    dados = carregar(["Sa+G"])
+
+    def copiar(*args):
+        pytest.fail("Esta operação deve consultar os arcos sem materializar cópias completas.")
+
+    monkeypatch.setattr(Grafo, "subgrafo_induzido", copiar)
+    monkeypatch.setattr(Grafo, "arestas", copiar)
+    if operacao == "metricas":
+        assert solve.calcular_metricas_globais(dados)["ordem_est"] == len(dados.estados)
+    elif operacao == "camadas":
+        assert sum(c["ordem"] for c in solve.calcular_camadas(dados)["camadas"]) == len(dados.estados)
+    else:
+        solve.exportar_arestas(dados, tmp_path / "arestas.csv")
+        with (tmp_path / "arestas.csv").open(newline="", encoding="utf-8") as arquivo:
+            assert len(list(csv.DictReader(arquivo))) == dados.grafo_estados.tamanho()
