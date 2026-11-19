@@ -7,6 +7,7 @@ import json
 import pytest
 
 from src import solve
+from src.parte1 import buscas
 from src.solve import executar_parte1
 
 
@@ -187,11 +188,8 @@ def test_executar_parte1_nao_repete_buscas_nem_graus(tmp_path, monkeypatch, cons
 
     monkeypatch.setattr(solve, "carregar_mapa", observar_carga)
     for nome in chamadas:
-        if nome == "calcular_graus":
-            monkeypatch.setattr(solve, nome, observar(nome, getattr(solve, nome)))
-        else:
-            dependencias = solve._resultado_busca.__globals__
-            monkeypatch.setitem(dependencias, nome, observar(nome, dependencias[nome]))
+        modulo = solve if nome == "calcular_graus" else buscas
+        monkeypatch.setattr(modulo, nome, observar(nome, getattr(modulo, nome)))
     for rodada in range(2):
         executar_parte1(mapas, tmp_path / f"saida{rodada}", fonte_consumivel=consumivel)
 
