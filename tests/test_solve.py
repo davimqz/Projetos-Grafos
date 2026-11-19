@@ -80,7 +80,7 @@ def test_carregar_mapa_propaga_erro_dos_construtores(carregar, monkeypatch, cons
     def falhar(*args, **kwargs):
         raise erro
 
-    monkeypatch.setattr(solve, construtor, falhar)
+    monkeypatch.setitem(solve.carregar_mapa.__globals__, construtor, falhar)
     with pytest.raises(RuntimeError) as capturado:
         carregar(["SG"])
     assert capturado.value is erro
@@ -369,7 +369,7 @@ def test_classificar_arcos_mapeia_categorias_e_passa_origem(carregar, monkeypatc
         assert grafo is dados.grafo_estados and origem == dados.origem
         return {"contagem_arcos": contagens, "tem_ciclo": True}
 
-    monkeypatch.setattr(solve, "dfs", dfs_simulada)
+    monkeypatch.setitem(solve.classificar_arcos.__globals__, "dfs", dfs_simulada)
     assert solve.classificar_arcos(dados) == {"mapa": "mapa", **contagens, "tem_ciclo": True}
 
 
