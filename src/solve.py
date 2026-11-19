@@ -45,77 +45,9 @@ from src.parte1.analises import calcular_graus, analisar_graus, _analisar_graus
 
 from src.parte1.analises import classificar_arcos, encontrar_armadilhas
 
+from src.parte1.buscas import resolver_mapa, _resultado_busca, _resolver_mapa
+
 # [IA] Codex - otimização das análises e da integração, preservando a lógica do integrante; algoritmos e construção dos grafos permanecem em src.graphs.
-
-def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
-    """Normaliza o resultado de um algoritmo existente até ALVO.
-
-    BFS procura menos passos; Dijkstra e Bellman-Ford procuram menor custo.
-    O caminho com status OK contém os rótulos desde a origem até ALVO.
-    passos conta movimentos físicos, sem o arco virtual; custo representa
-    a soma dos pesos do caminho, inclusive quando a busca usada é BFS.
-
-    Registra RECUSA para Dijkstra com peso negativo, CICLO_NEGATIVO quando
-    Bellman-Ford o detectar e SEM_SOLUCAO para ALVO inalcançável.
-    Não implementa novamente os algoritmos e não grava arquivos.
-    """
-    return _resolver_mapa(dados, algoritmo, {})
-
-
-def _resultado_busca(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: dict[str, dict]) -> dict:
-    """Executa cada busca no máximo uma vez por mapa na orquestração."""
-    if algoritmo not in resultados:
-        buscar = {"BFS": bfs, "DIJKSTRA": dijkstra, "BELLMAN_FORD": bellman_ford}[algoritmo]
-        resultados[algoritmo] = buscar(dados.grafo_estados, dados.origem)
-    return resultados[algoritmo]
-
-
-def _resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: dict[str, dict]) -> Solucao:
-    """Normaliza buscas existentes, com reutilização local dos resultados."""
-
-    grafo = dados.grafo_estados
-    inicio = dados.origem
-
-    if inicio not in grafo.nos():
-        raise ValueError(f"Origem '{inicio}' não existe no grafo.")
-
-    if algoritmo not in ("BFS", "DIJKSTRA", "BELLMAN_FORD"):
-        raise ValueError(f"Algoritmo desconhecido: {algoritmo}")
-
-    caminho: list[str] = []
-    custo: float | None = None
-    try:
-        resultado = _resultado_busca(dados, algoritmo, resultados)
-        status = "OK" if algoritmo == "BFS" else resultado["status"]
-        if status == "OK":
-            caminho = reconstruir_percurso(resultado, inicio, "ALVO")
-            if algoritmo == "BFS":
-                custo = 0.0
-                for origem, destino in zip(caminho, caminho[1:]):
-                    for vizinho, peso in grafo.vizinhos(origem):
-                        if vizinho == destino:
-                            custo += peso
-                            break
-            else:
-                custo = resultado["distancia"]["ALVO"]
-    except ValueError as erro:
-        status = "RECUSA" if algoritmo == "DIJKSTRA" and "negativo" in str(erro) else "SEM_SOLUCAO"
-
-    if status != "OK":
-        passos = None
-        custo = None
-        caminho = []
-    else:
-        passos = len(caminho) - 2
-
-    return Solucao(
-        mapa=dados.nome,
-        algoritmo=algoritmo,
-        passos=passos,
-        custo=custo,
-        status=status,
-        caminho=caminho
-    )
 
 def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
     """Prepara as três linhas de um mapa para comparacao_modelagem.csv.
