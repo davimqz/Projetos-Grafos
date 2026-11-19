@@ -187,7 +187,11 @@ def test_executar_parte1_nao_repete_buscas_nem_graus(tmp_path, monkeypatch, cons
 
     monkeypatch.setattr(solve, "carregar_mapa", observar_carga)
     for nome in chamadas:
-        monkeypatch.setattr(solve, nome, observar(nome, getattr(solve, nome)))
+        if nome == "calcular_graus":
+            monkeypatch.setattr(solve, nome, observar(nome, getattr(solve, nome)))
+        else:
+            dependencias = solve._resultado_busca.__globals__
+            monkeypatch.setitem(dependencias, nome, observar(nome, dependencias[nome]))
     for rodada in range(2):
         executar_parte1(mapas, tmp_path / f"saida{rodada}", fonte_consumivel=consumivel)
 
