@@ -22,6 +22,9 @@ export function Labirinto() {
   const [passo, setPasso] = useState(0)
   const [tocando, setTocando] = useState(false)
   const [vel, setVel] = useState(5)
+  const [gerando, setGerando] = useState(false)
+  const [htmlGerado, setHtmlGerado] = useState(null)
+  const [erroHtml, setErroHtml] = useState('')
 
   const M = MAPAS[mapa]
   const caminho = M.percursos[alg] || []
@@ -29,7 +32,7 @@ export function Labirinto() {
   const temCaminho = caminho.length > 0
   const fim = caminho.length - 1
 
-  useEffect(() => { setPasso(0); setTocando(false) }, [mapa, alg])
+  useEffect(() => { setPasso(0); setTocando(false); setHtmlGerado(null); setErroHtml('') }, [mapa, alg])
   useEffect(() => {
     if (!tocando) return undefined
     const t = setInterval(() => {
@@ -44,6 +47,22 @@ export function Labirinto() {
   const e = temCaminho ? lerRotulo(caminho[Math.min(passo, fim)]) : null
   const rotuloBotao = tocando ? 'Pausar' : passo >= fim && passo > 0 ? 'Recomeçar' : 'Animar'
 
+  async function gerarHtml(conjunto = false) {
+    setGerando(true)
+    setErroHtml('')
+    setHtmlGerado(null)
+    try {
+      const resposta = await fetch(`/__grafos__/html/${conjunto ? 'conjunto' : mapa}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ algoritmo: alg }),
+      })
+      const dados = await resposta.json()
+      if (!resposta.ok) throw new Error(dados.erro || 'Não foi possível gerar o HTML.')
+      setHtmlGerado(dados)
+    } catch (erro) {
+      setErroHtml(erro.message || 'Não foi possível conectar ao gerador local.')
+    } finally { setGerando(false) }
+  }
+
   return (
     <section className="panel">
       <header>
@@ -54,12 +73,12 @@ export function Labirinto() {
         <div className="side">
           <div className="selecao">
           <label className="field">Mapa
-            <select id="sel-mapa" value={mapa} onChange={(ev) => setMapa(ev.target.value)}>
+            <select id="sel-mapa" value={mapa} disabled={gerando} onChange={(ev) => setMapa(ev.target.value)}>
               {nomes.map((n) => <option key={n} value={n}>{NOMES_MAPAS[n] || n}</option>)}
             </select>
           </label>
           <label className="field">Algoritmo
-            <select id="sel-alg" value={alg} onChange={(ev) => setAlg(ev.target.value)}>
+            <select id="sel-alg" value={alg} disabled={gerando} onChange={(ev) => setAlg(ev.target.value)}>
               {ALGORITMOS.map((a) => <option key={a} value={a}>{NOME_ALG[a]}</option>)}
             </select>
           </label>
@@ -99,6 +118,7 @@ export function Labirinto() {
           <LegendaCasas />
         </div>
       </div>
+      <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne todos os mapas disponíveis; os arquivos são salvos em out/parte1.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>
     </section>
   )
 }

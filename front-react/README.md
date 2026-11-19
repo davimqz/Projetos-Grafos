@@ -19,6 +19,18 @@ npm run dev
 
 Para gerar a versão final: `npm run build` (sai em `front-react/dist/`).
 
+No labirinto, **Gerar HTML deste mapa** usa o mapa e o algoritmo selecionados e grava
+`out/parte1/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.
+**Gerar HTML conjunto** reúne todos os mapas de `data/mapas/` e
+`data/mapas_grupo/` com os quatro algoritmos em
+`out/parte1/labirinto_interativo.html`. Gerar novamente substitui o arquivo
+correspondente. O arquivo é independente
+e pode ser aberto fora do servidor. A geração é oferecida pelos comandos locais
+`npm run dev` e `npm run preview`: ela precisa do Python e das dependências do
+projeto instaladas na raiz (prefere `.venv`). Uma hospedagem estática de `dist/`
+não executa o gerador Python. O HTML incorpora JetBrains Mono e sua licença,
+sem depender de instalação da fonte ou acesso à rede.
+
 ## Estrutura
 
 - `src/dados.json`: dados gerados por `scripts/exportar_front.py` (não editar à mão)
