@@ -60,3 +60,54 @@ def test_exportar_arestas_vazias_escreve_cabecalho(vazio, tmp_path):
 def test_exportar_arestas_propaga_erro_de_escrita(vazio, tmp_path):
     with pytest.raises(FileNotFoundError):
         exportacao.exportar_arestas(vazio, tmp_path / "ausente" / "arestas.csv")
+
+
+@pytest.mark.parametrize("tipo_caminho", [str, Path])
+def test_exportar_csv_utf8_escape_campos_json_e_preservacao(tmp_path, tipo_caminho):
+    registros = [{"nome": 'João, "teste"\nlinha 2', "valor": None, "caminho": ["a,b", "fim"], "dados": {"ativo": True}}]
+    antes = deepcopy(registros)
+    destino = tmp_path / "nova" / "dados.csv"
+    colunas = ["nome", "caminho", "valor", "dados", "ausente"]
+    assert exportacao.exportar_csv((r for r in registros), colunas, tipo_caminho(destino)) is None
+    with destino.open(encoding="utf-8", newline="") as arquivo:
+        leitor = csv.DictReader(arquivo)
+        linhas = list(leitor)
+        assert leitor.fieldnames == colunas
+    assert len(linhas) == 1 and linhas[0]["nome"] == registros[0]["nome"]
+    assert linhas[0]["valor"] == linhas[0]["ausente"] == ""
+    assert json.loads(linhas[0]["caminho"]) == registros[0]["caminho"]
+    assert json.loads(linhas[0]["dados"]) == registros[0]["dados"]
+    assert registros == antes
+
+
+def test_exportar_csv_sem_registros_grava_cabecalho(tmp_path):
+    destino = tmp_path / "vazio.csv"
+    exportacao.exportar_csv([], ["estado", "grau"], destino)
+    with destino.open(encoding="utf-8", newline="") as arquivo:
+        assert list(csv.reader(arquivo)) == [["estado", "grau"]]
+
+
+@pytest.mark.parametrize("tipo_caminho", [str, Path])
+def test_exportar_json_roundtrip_utf8_formatacao_e_preservacao(tmp_path, tipo_caminho):
+    dados = {"ação": [1, None, {"ativo": True}]}
+    antes = deepcopy(dados)
+    destino = tmp_path / "nova" / "dados.json"
+    assert exportacao.exportar_json(dados, tipo_caminho(destino)) is None
+    texto = destino.read_text(encoding="utf-8")
+    assert json.loads(texto) == dados == antes
+    assert '"ação"' in texto and "\n  " in texto
+
+
+@pytest.mark.parametrize("dados, erro", [(float("nan"), ValueError), (float("inf"), ValueError), ({1, 2}, TypeError)])
+def test_exportar_json_rejeita_dados_fora_do_contrato(tmp_path, dados, erro):
+    with pytest.raises(erro):
+        exportacao.exportar_json(dados, tmp_path / "invalido.json")
+
+
+@pytest.mark.parametrize("formato", ["csv", "json"])
+def test_exportacoes_propagam_erro_de_escrita(tmp_path, formato):
+    with pytest.raises(OSError):
+        if formato == "csv":
+            exportacao.exportar_csv([], ["estado"], tmp_path)
+        else:
+            exportacao.exportar_json({}, tmp_path)
