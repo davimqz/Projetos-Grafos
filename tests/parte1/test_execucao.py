@@ -200,3 +200,25 @@ def test_executar_parte1_nao_repete_buscas_nem_graus(tmp_path, monkeypatch, cons
             assert sum(item is dados.grafo_estados for item in chamadas[nome]) == 1
     for arquivo in (tmp_path / "saida0").iterdir():
         assert arquivo.read_bytes() == (tmp_path / "saida1" / arquivo.name).read_bytes()
+
+
+# [IA] Codex - regressão da solução finita e da evidência global de ciclo negativo.
+@pytest.mark.parametrize("nome", ["m03_tres_chaves", "m06_fonte"])
+def test_executar_parte1_exporta_solucao_finita_com_ciclo_em_armadilha(tmp_path, nome):
+    mapa = criar_mapa(tmp_path / "entrada", nome, "#######\n#S...G#\n#v#####\n#.*####\n#######")
+    saida = tmp_path / "saida"
+
+    executar_parte1([mapa], saida)
+
+    _, solucoes = ler_csv(saida / "solucoes.csv")
+    bf = next(linha for linha in solucoes if linha["algoritmo"] == "BELLMAN_FORD")
+    assert bf["status"] == "OK" and bf["passos"] == "4" and float(bf["custo"]) == 4
+    assert json.loads(bf["caminho"])[-1] == "ALVO"
+    if nome == "m03_tres_chaves":
+        percurso = ler_json(saida / "percurso_m03.json")
+        assert percurso["algoritmo"] == "BELLMAN_FORD" and percurso["status"] == "OK"
+        assert percurso["custo"] == 4 and percurso["passos"] == 4
+    else:
+        ciclo = ler_json(saida / "ciclo_negativo_m06.json")
+        assert ciclo["status"] == "OK" and ciclo["tem_ciclo_negativo"] is True
+        assert ciclo["custo_ciclo"] < 0 and ciclo["ciclo_negativo"][0] == ciclo["ciclo_negativo"][-1]

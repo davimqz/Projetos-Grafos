@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 
@@ -97,3 +98,41 @@ def test_comparar_bonus_separa_modelagens_e_preserva_ciclo(carregar, grade, cust
         "status": "OK", "tem_ciclo_negativo": False, "ciclo_negativo": [],
         "custo_ciclo": None, "custo_ate_alvo": custo,
     }
+
+
+# [IA] Codex - regressões do ciclo negativo que não afeta a saída, conforme PR #32.
+@pytest.mark.parametrize("rota,status,passos,custo", [
+    ("#S...G#", "OK", 4, 4),
+    ("#S~..G#", "OK", 4, 8),
+    ("#S+..G#", "OK", 4, -1),
+    ("#S#..G#", "SEM_SOLUCAO", None, None),
+    ("#S*..G#", "CICLO_NEGATIVO", None, None),
+])
+def test_bellman_ford_distingue_ciclo_em_armadilha_do_custo_ate_alvo(carregar, rota, status, passos, custo):
+    dados = carregar(["#######", rota, "#v#####", "#.*####", "#######"])
+    arcos = dados.grafo_estados.arestas()
+    assert buscas.bellman_ford(dados.grafo_estados, dados.origem)["tem_ciclo_negativo"] is True
+
+    resultado = buscas.resolver_mapa(dados, "BELLMAN_FORD")
+
+    assert (resultado["status"], resultado["passos"], resultado["custo"]) == (status, passos, custo)
+    if status == "OK":
+        caminho = resultado["caminho"]
+        assert caminho[0] == dados.origem and caminho[-1] == "ALVO"
+        assert len(caminho) - 2 == passos
+        assert sum(dict(dados.grafo_estados.vizinhos(u))[v] for u, v in zip(caminho, caminho[1:])) == custo
+    else:
+        assert resultado["caminho"] == []
+    assert dados.grafo_estados.arestas() == arcos
+
+
+def test_solucao_finita_preserva_resultado_global_em_cache(carregar):
+    dados = carregar(["#######", "#S...G#", "#v#####", "#.*####", "#######"])
+    resultados = {"BELLMAN_FORD": buscas.bellman_ford(dados.grafo_estados, dados.origem)}
+    antes = deepcopy(resultados)
+
+    solucao = buscas._resolver_mapa(dados, "BELLMAN_FORD", resultados)
+
+    assert solucao["status"] == "OK" and solucao["custo"] == 4
+    assert resultados == antes
+    assert resultados["BELLMAN_FORD"]["tem_ciclo_negativo"] is True

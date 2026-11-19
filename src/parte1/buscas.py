@@ -22,18 +22,34 @@ def resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho) -> Solucao:
     a soma dos pesos do caminho, inclusive quando a busca usada é BFS.
 
     Registra RECUSA para Dijkstra com peso negativo, CICLO_NEGATIVO quando
-    Bellman-Ford o detectar e SEM_SOLUCAO para ALVO inalcançável.
+    um ciclo alcançável puder chegar a ALVO e SEM_SOLUCAO para ALVO inalcançável.
     Não implementa novamente os algoritmos e não grava arquivos.
     """
     return _resolver_mapa(dados, algoritmo, {})
 
 
 def _resultado_busca(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: dict[str, dict]) -> dict:
-    """Executa cada busca no máximo uma vez por mapa na orquestração."""
+    """Reutiliza as buscas no grafo completo durante a orquestração."""
     if algoritmo not in resultados:
         buscar = {"BFS": bfs, "DIJKSTRA": dijkstra, "BELLMAN_FORD": bellman_ford}[algoritmo]
         resultados[algoritmo] = buscar(dados.grafo_estados, dados.origem)
     return resultados[algoritmo]
+
+
+# [IA] Codex - correção da normalização até ALVO, reutilizando buscas e subgrafo existentes.
+def _bellman_ford_ate_alvo(dados: DadosMapa, resultado: dict) -> dict:
+    """Separa ciclos presos em armadilhas dos que afetam o custo até ALVO."""
+    if not resultado["tem_ciclo_negativo"] or resultado["distancia"]["ALVO"] == float("inf"):
+        return resultado
+
+    grafo = dados.grafo_estados
+    relevantes = set(bfs(grafo.transposto(), "ALVO")["ordem"])
+    if any(no in relevantes for no in resultado["ciclo_negativo"]):
+        return resultado
+
+    # Pode haver outro ciclo negativo relevante além da testemunha global.
+    subgrafo = grafo.subgrafo_induzido(no for no in grafo.nos() if no in relevantes)
+    return bellman_ford(subgrafo, dados.origem)
 
 
 def _resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: dict[str, dict]) -> Solucao:
@@ -52,7 +68,11 @@ def _resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: di
     custo: float | None = None
     try:
         resultado = _resultado_busca(dados, algoritmo, resultados)
+        if algoritmo == "BELLMAN_FORD":
+            resultado = _bellman_ford_ate_alvo(dados, resultado)
         status = "OK" if algoritmo == "BFS" else resultado["status"]
+        if resultado["distancia"]["ALVO"] == float("inf"):
+            status = "SEM_SOLUCAO"
         if status == "OK":
             caminho = reconstruir_percurso(resultado, inicio, "ALVO")
             if algoritmo == "BFS":
