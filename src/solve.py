@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
 import csv
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypedDict
@@ -570,6 +571,7 @@ def comparar_bonus(dados: DadosMapa) -> dict[str, object]:
         }
     }
 
+# [IA] Codex - escrita genérica de CSV com resultados já calculados.
 def exportar_csv(
     registros: Iterable[Mapping[str, object]],
     colunas: Sequence[str],
@@ -582,9 +584,26 @@ def exportar_csv(
     como o caminho de solucoes.csv, devem ter representação JSON no campo.
     Não calcula resultados nem modifica os registros recebidos.
     """
-    raise NotImplementedError
+    caminho = Path(caminho)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+
+    with caminho.open("w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.DictWriter(arquivo, fieldnames=colunas)
+        escritor.writeheader()
+
+        for registro in registros:
+            linha: dict[str, object] = {}
+            for coluna in colunas:
+                valor = registro.get(coluna)
+                if isinstance(valor, Mapping):
+                    valor = dict(valor)
+                if isinstance(valor, (dict, list, tuple)):
+                    valor = json.dumps(valor, ensure_ascii=False, allow_nan=False)
+                linha[coluna] = valor
+            escritor.writerow(linha)
 
 
+# [IA] Codex - escrita genérica de JSON com dados já preparados.
 def exportar_json(dados: object, caminho: str | Path) -> None:
     """Grava dados já preparados e serializáveis em JSON UTF-8 legível.
 
@@ -592,15 +611,16 @@ def exportar_json(dados: object, caminho: str | Path) -> None:
     JSON, sem Estados, conjuntos ou valores numéricos não finitos.
     Não calcula resultados nem modifica os dados recebidos.
     """
-    raise NotImplementedError
+    caminho = Path(caminho)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+
+    with caminho.open("w", encoding="utf-8") as arquivo:
+        json.dump(dados, arquivo, ensure_ascii=False, indent=2, allow_nan=False)
+        arquivo.write("\n")
 
 
-def executar_parte1(
-    mapas: Iterable[str | Path],
-    saida: str | Path,
-    *,
-    fonte_consumivel: bool = False,
-) -> None:
+# [IA] Codex - integração das análises do integrante e exportação dos resultados.
+def executar_parte1(mapas: Iterable[str | Path], saida: str | Path, *, fonte_consumivel: bool = False,) -> None:
     """Orquestra as entregas dos mapas informados, incluindo mapas do grupo.
 
     Prepara os mapas e reúne métricas globais, camadas, graus, rankings,
@@ -612,11 +632,116 @@ def executar_parte1(
     Para os mapas correspondentes, inclui comparacao_modelagem.csv,
     percurso_m03.json (menor custo, estado a estado), ciclo_negativo_m06.json
     (sequência de estados e custo), armadilhas_m04.csv e armadilhas_m07.csv.
-    Reúne ainda os resultados do experimento do m05 para consulta do grupo.
+    Reúne ainda o experimento padrão em comparacao_bonus_m05.json e listas
+    armadilhas_m04.json/armadilhas_m07.json compatíveis com a CLI existente.
+    Os mapas fornecidos usam identificadores m01 a m08; mapas próprios
+    mantêm o nome do arquivo sem extensão. Identificadores repetidos são erro.
 
     Os resultados da variante fonte_consumivel devem ir para uma pasta
     de saída diferente da execução padrão, escolhida pelo chamador.
     Não implementa algoritmos, desenha figuras nem redige análises do PDF.
     Erros de entrada e escrita são propagados para tratamento pela CLI.
     """
-    raise NotImplementedError
+
+    #TODO Adicionar mapas do grupo
+
+    nomes_fornecidos = {
+        "m01_terreno": "m01",
+        "m02_uma_chave": "m02",
+        "m03_tres_chaves": "m03",
+        "m04_esteiras": "m04",
+        "m05_bonus": "m05",
+        "m06_fonte": "m06",
+        "m07_impossivel": "m07",
+        "m08_grande": "m08",
+    }
+    entradas: list[tuple[Path, str]] = []
+    for mapa in mapas:
+        arquivo = Path(mapa)
+        nome = nomes_fornecidos.get(arquivo.stem, arquivo.stem)
+        entradas.append((arquivo, nome))
+    nomes = [nome for _, nome in entradas]
+    if len(nomes) != len(set(nomes)):
+        raise ValueError("Os mapas devem ter identificadores distintos na mesma execução.")
+
+    saida = Path(saida)
+    saida.mkdir(parents=True, exist_ok=True)
+    metricas: dict[str, object] = {}
+    camadas: dict[str, object] = {}
+    solucoes: list[Solucao] = []
+    classificacoes: list[dict[str, object]] = []
+    comparacoes: list[dict[str, object]] = []
+    algoritmos: tuple[AlgoritmoCaminho, ...] = ("BFS", "DIJKSTRA", "BELLMAN_FORD")
+
+    for arquivo, nome in entradas:
+        dados = carregar_mapa(arquivo, nome=nome, fonte_consumivel=fonte_consumivel)
+        classificacao = classificar_arcos(dados)
+        classificacoes.append(classificacao)
+        metricas[nome] = {
+            **calcular_metricas_globais(dados),
+            **analisar_graus(dados),
+            "tem_ciclo_dfs": classificacao["tem_ciclo"],
+            "fonte_consumivel": fonte_consumivel,
+        }
+        camadas[nome] = calcular_camadas(dados)
+        exportar_arestas(dados, saida / f"arestas_{nome}.csv")
+        exportar_csv(
+            calcular_graus(dados),
+            ("estado", "grau_entrada", "grau_saida"),
+            saida / f"graus_{nome}.csv",
+        )
+
+        solucoes_mapa = {}
+        for algoritmo in algoritmos:
+            solucao = resolver_mapa(dados, algoritmo)
+            solucoes.append(solucao)
+            solucoes_mapa[algoritmo] = solucao
+
+        if nome in ("m02", "m03", "m04"):
+            comparacoes.extend(comparar_modelagens(dados))
+        if nome == "m03":
+            percurso = solucoes_mapa["DIJKSTRA"]
+            if percurso["status"] == "RECUSA":
+                percurso = solucoes_mapa["BELLMAN_FORD"]
+            exportar_json(percurso, saida / "percurso_m03.json")
+        if nome == "m05" and not fonte_consumivel:
+            exportar_json(comparar_bonus(dados), saida / "comparacao_bonus_m05.json")
+        if nome == "m06":
+            resultado = bellman_ford(dados.grafo_estados, dados.origem)
+            exportar_json(
+                {
+                    "mapa": nome,
+                    "fonte_consumivel": fonte_consumivel,
+                    "status": solucoes_mapa["BELLMAN_FORD"]["status"],
+                    "tem_ciclo_negativo": resultado["tem_ciclo_negativo"],
+                    "ciclo_negativo": resultado["ciclo_negativo"],
+                    "custo_ciclo": resultado["custo_ciclo"],
+                },
+                saida / "ciclo_negativo_m06.json",
+            )
+        if nome in ("m04", "m07"):
+            armadilhas = encontrar_armadilhas(dados)
+            exportar_csv(
+                ({"estado": rotulo} for rotulo in armadilhas),
+                ("estado",),
+                saida / f"armadilhas_{nome}.csv",
+            )
+            exportar_json(armadilhas, saida / f"armadilhas_{nome}.json")
+
+    exportar_json(metricas, saida / "metricas_global.json")
+    exportar_json(camadas, saida / "camadas.json")
+    exportar_csv(
+        solucoes,
+        ("mapa", "algoritmo", "passos", "custo", "status", "caminho"),
+        saida / "solucoes.csv",
+    )
+    exportar_csv(
+        classificacoes,
+        ("mapa", "arvore", "retorno", "avanco", "cruzamento"),
+        saida / "dfs_classificacao.csv",
+    )
+    exportar_csv(
+        comparacoes,
+        ("mapa", "abordagem", "passos", "caminho_valido", "observacao"),
+        saida / "comparacao_modelagem.csv",
+    )
