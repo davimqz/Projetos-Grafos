@@ -82,3 +82,75 @@ def _resolver_mapa(dados: DadosMapa, algoritmo: AlgoritmoCaminho, resultados: di
         status=status,
         caminho=caminho
     )
+
+
+def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
+    """Prepara as três linhas de um mapa para comparacao_modelagem.csv.
+
+    Compara BFS com portas como chão, portas como parede e G_est correto.
+    Colunas: mapa,abordagem,passos,caminho_valido,observacao.
+    Os passos são movimentos físicos até uma saída; ausência de caminho
+    deve ser representada explicitamente. Não compara os pesos dos caminhos.
+
+    A validade considera as regras originais de chaves e portas.
+    As observações interpretativas devem ser escritas pelo integrante.
+    Os casos obrigatórios são m02, m03 e m04.
+    """
+    return _comparar_modelagens(dados, {})
+
+
+def _comparar_modelagens(dados: DadosMapa, resultados_buscas: dict[str, dict]) -> list[dict[str, object]]:
+    """Compara as modelagens aproveitando a BFS de estados quando disponível."""
+
+    inicio_pos = rotular_posicao(encontrar_inicio(dados.grade))
+    saidas_pos = {rotular_posicao(pos) for pos in encontrar_saidas(dados.grade)}
+
+    grafos_posicoes = [
+        ("portas_como_chao", dados.grafo_posicoes, "Ignora chaves e atravessa portas diretamente."),
+        ("portas_como_parede", construir_grafo_posicoes(dados.grade, portas="parede"), "Bloqueia portas mesmo quando há chave disponível."),
+    ]
+
+    resultados: list[dict[str, object]] = []
+
+    for abordagem, grafo, obs in grafos_posicoes:
+        res = bfs(grafo, inicio_pos)
+        destino = next((no for no in res["ordem"] if no in saidas_pos), None)
+
+        if destino is None:
+            passos = None
+            valido = False
+        else:
+            caminho = reconstruir_percurso(res, inicio_pos, destino)
+
+            passos = len(caminho) - 1
+            chaves: set[str] = set()
+            valido = True
+            for no in caminho:
+                linha, coluna = map(int, no.strip("()").split(","))
+                casa = dados.grade[linha][coluna]
+                if casa in "abcd":
+                    chaves.add(casa)
+                elif casa in "ABCD" and casa.lower() not in chaves:
+                    valido = False
+                    break
+
+        resultados.append({
+            "mapa": dados.nome,
+            "abordagem": abordagem,
+            "passos": passos,
+            "caminho_valido": valido,
+            "observacao": obs,
+        })
+
+    dist_est = _resultado_busca(dados, "BFS", resultados_buscas)["distancia"]["ALVO"]
+    passos_est = None if dist_est == float("inf") else int(dist_est) - 1
+
+    resultados.append({
+        "mapa": dados.nome,
+        "abordagem": "grafo_estados",
+        "passos": passos_est,
+        "caminho_valido": passos_est is not None,
+        "observacao": "Modelagem exata com memória de chaves coletadas.",
+    })
+
+    return resultados
