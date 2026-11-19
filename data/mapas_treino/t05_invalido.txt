@@ -1,0 +1,5 @@
+; treino: mapa inválido (dois S), deve dar erro claro
+#######
+#S..S.#
+#....G#
+#######

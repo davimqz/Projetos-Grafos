@@ -1,0 +1,6 @@
+; treino: a chave está atrás da própria porta (sem solução)
+###########
+#S...#.a..#
+#.##.#.####
+#...,A...G#
+###########
