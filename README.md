@@ -88,8 +88,9 @@ existe percurso até a saída, o motivo aparece no terminal e no HTML.
 | `labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
 
 As análises do P3 (`metricas_global.json`, `camadas.json`, `graus_<mapa>.csv`, `arestas_<mapa>.csv`,
-`comparacao_modelagem.csv`, `solucoes.csv`, armadilhas do m04 e do m07, m05 e mapas do grupo) ficam em `src/solve.py`
-e ainda estão em andamento.
+`comparacao_modelagem.csv`, `solucoes.csv`, armadilhas do m04 e do m07 e comparações do m05) estão implementadas em
+`src/parte1/`, com orquestração por `src.solve.executar_parte1` para os mapas informados, inclusive os do grupo.
+A integração dessa orquestração com a CLI permanece pendente.
 
 ## Parte 2 — Elliptic++ (rede de carteiras Bitcoin)
 
@@ -197,7 +198,13 @@ Detalhes em [`front-react/README.md`](front-react/README.md).
 │  └─ parte2/
 ├─ src/
 │  ├─ cli.py                   # ponto de entrada das duas partes
-│  ├─ solve.py                 # análises da Parte 1 (P3)
+│  ├─ solve.py                 # orquestração da Parte 1 e interface pública
+│  ├─ parte1/
+│  │  ├─ modelos.py            # tipos compartilhados
+│  │  ├─ carga.py              # preparo dos mapas
+│  │  ├─ analises.py           # métricas, camadas, graus e armadilhas
+│  │  ├─ buscas.py             # normalização das buscas e comparações
+│  │  └─ exportacao.py         # escrita de CSV e JSON
 │  ├─ viz.py                   # figuras e HTML interativo
 │  ├─ visualizar_parte1.py     # gera as figuras do P5a
 │  ├─ carga_parte2.py          # carrega o recorte como grafo
@@ -209,7 +216,13 @@ Detalhes em [`front-react/README.md`](front-react/README.md).
 │     ├─ graph.py              # lista de adjacência dirigida
 │     └─ algorithms.py         # BFS, DFS, Dijkstra, Bellman-Ford
 └─ tests/                      # pytest (networkx só como oráculo)
+   ├─ test_solve.py            # compatibilidade da interface pública
+   └─ parte1/                  # testes por responsabilidade e integração
 ```
+
+As funções e os tipos da Parte 1 continuam disponíveis por `src.solve`.
+Suas implementações ficam em `src/parte1/`, com a lógica existente preservada.
+Os algoritmos e a construção dos grafos permanecem em `src/graphs/`.
 
 ## Uso de IA
 
