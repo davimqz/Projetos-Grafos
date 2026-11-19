@@ -18,9 +18,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, TypedDict
 
-from src.graphs.estados import Estado, construir_grafo_estados, construir_grafo_posicoes, rotular_estado
+from src.graphs.estados import Estado, construir_grafo_estados, construir_grafo_posicoes, rotular_estado, rotular_posicao
 from src.graphs.graph import Grafo
-from src.graphs.io import encontrar_inicio, ler_mapa
+from src.graphs.io import encontrar_inicio, ler_mapa, encontrar_saidas
 from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford
 from src.viz import reconstruir_percurso
 
@@ -453,7 +453,17 @@ def encontrar_armadilhas(dados: DadosMapa) -> list[str]:
     recebidos e serve tanto ao CSV obrigatório quanto à visualização.
     Não grava arquivos nem modifica o grafo original.
     """
-    raise NotImplementedError
+
+    grafo = dados.grafo_estados.transposto()
+    alcancaveis = set(bfs(grafo, "ALVO")["ordem"])
+
+    out = []
+
+    for rotulo in dados.estados:
+        if rotulo not in alcancaveis:
+            out.append(rotulo) 
+
+    return out
 
 
 def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
@@ -468,8 +478,64 @@ def comparar_modelagens(dados: DadosMapa) -> list[dict[str, object]]:
     As observações interpretativas devem ser escritas pelo integrante.
     Os casos obrigatórios são m02, m03 e m04.
     """
-    raise NotImplementedError
 
+    inicio_pos = rotular_posicao(encontrar_inicio(dados.grade))
+    saidas_pos = {rotular_posicao(pos) for pos in encontrar_saidas(dados.grade)}
+
+    grafos_posicoes = [
+        ("portas_como_chao", dados.grafo_posicoes, "Ignora chaves e atravessa portas diretamente."),
+        ("portas_como_parede", construir_grafo_posicoes(dados.grade, portas="parede"), "Bloqueia portas mesmo quando há chave disponível."),
+    ]
+
+    resultados: list[dict[str, object]] = []
+
+    for abordagem, grafo, obs in grafos_posicoes:
+        res = bfs(grafo, inicio_pos)
+        destino = next((no for no in res["ordem"] if no in saidas_pos), None)
+
+        if destino is None:
+            passos = None
+            valido = False
+        else:
+            caminho = []
+            atual: str | None = destino
+            while atual is not None:
+                caminho.append(atual)
+                atual = res["pai"][atual]
+            caminho.reverse()
+
+            passos = len(caminho) - 1
+            chaves: set[str] = set()
+            valido = True
+            for no in caminho:
+                linha, coluna = map(int, no.strip("()").split(","))
+                casa = dados.grade[linha][coluna]
+                if casa in "abcd":
+                    chaves.add(casa)
+                elif casa in "ABCD" and casa.lower() not in chaves:
+                    valido = False
+                    break
+
+        resultados.append({
+            "mapa": dados.nome,
+            "abordagem": abordagem,
+            "passos": passos,
+            "caminho_valido": valido,
+            "observacao": obs,
+        })
+
+    dist_est = bfs(dados.grafo_estados, dados.origem)["distancia"]["ALVO"]
+    passos_est = None if dist_est == float("inf") else int(dist_est) - 1
+
+    resultados.append({
+        "mapa": dados.nome,
+        "abordagem": "grafo_estados",
+        "passos": passos_est,
+        "caminho_valido": passos_est is not None,
+        "observacao": "Modelagem exata com memória de chaves coletadas.",
+    })
+
+    return resultados
 
 def comparar_bonus(dados: DadosMapa) -> dict[str, object]:
     """Reúne as execuções de Bellman-Ford do experimento do m05.
@@ -479,8 +545,30 @@ def comparar_bonus(dados: DadosMapa) -> dict[str, object]:
     pelo algoritmo existente. Recebe o m05 na variante padrão.
     Não escreve a prova nem a interpretação exigida no PDF.
     """
-    raise NotImplementedError
 
+    grafo_estados = dados.grafo_estados
+    grafo_pos = dados.grafo_posicoes
+    inicio = dados.origem
+
+    resultado_estados = bellman_ford(grafo_estados, inicio)
+    resultado_pos = bellman_ford(grafo_pos, rotular_posicao(encontrar_inicio(dados.grade)))
+
+    return{
+        "mapa": dados.nome,
+        "grafo_posicoes": {
+            "status":resultado_pos["status"],
+            "tem_ciclo_negativo": resultado_pos["tem_ciclo_negativo"],
+            "ciclo_negativo":resultado_pos["ciclo_negativo"],
+            "custo_ciclo":resultado_pos["custo_ciclo"]
+        },
+        "grafo_estados": {
+            "status":resultado_estados["status"],
+            "tem_ciclo_negativo": resultado_estados["tem_ciclo_negativo"],
+            "ciclo_negativo":resultado_estados["ciclo_negativo"],
+            "custo_ciclo":resultado_estados["custo_ciclo"],
+            "custo_ate_alvo":resultado_estados["distancia"]["ALVO"]
+        }
+    }
 
 def exportar_csv(
     registros: Iterable[Mapping[str, object]],
