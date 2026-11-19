@@ -1,36 +1,32 @@
-"""Contratos das funções da Parte 1; integração em test_executar_parte1.py."""
+"""Compatibilidade dos imports públicos de src.solve após a separação."""
 
-# [IA] Codex - testes de carga, CSV e análises, sem implementar algoritmos.
-import csv
-import json
-import os
-import subprocess
-import sys
-from copy import deepcopy
-from dataclasses import replace
-from pathlib import Path
+# [IA] Codex - regressões da interface pública preservada na reorganização.
+from importlib import import_module
 
 import pytest
 
 from src import solve
-from src.graphs.estados import Estado
-from src.graphs.graph import Grafo
 
 
-@pytest.fixture
-def carregar(tmp_path):
-    def preparar(grade, **opcoes):
-        caminho = tmp_path / "mapa.txt"
-        caminho.write_text("\n".join(grade) + "\n", encoding="utf-8")
-        return solve.carregar_mapa(caminho, **opcoes)
-
-    return preparar
-
-
-@pytest.fixture
-def vazio():
-    return solve.DadosMapa("vazio", [], Grafo(), Grafo(), {}, "")
+PUBLICOS = {
+    "modelos": ("AlgoritmoCaminho", "DadosMapa", "GrauEstado", "Solucao", "StatusSolucao"),
+    "carga": ("carregar_mapa",),
+    "analises": (
+        "analisar_graus", "calcular_camadas", "calcular_graus",
+        "calcular_metricas_globais", "classificar_arcos", "encontrar_armadilhas",
+    ),
+    "buscas": ("comparar_bonus", "comparar_modelagens", "resolver_mapa"),
+    "exportacao": ("exportar_arestas", "exportar_csv", "exportar_json"),
+}
 
 
-# [IA] Codex - cobertura dos contratos restantes, com mapas sintéticos e IO temporário.
-# [IA] Codex - regressões de desempenho das análises, sem limites de tempo frágeis.
+@pytest.mark.parametrize("modulo,nome", [
+    (modulo, nome) for modulo, nomes in PUBLICOS.items() for nome in nomes
+])
+def test_solve_preserva_imports_publicos(modulo, nome):
+    assert getattr(solve, nome) is getattr(import_module(f"src.parte1.{modulo}"), nome)
+
+
+def test_solve_declara_interface_publica_completa():
+    esperados = {nome for nomes in PUBLICOS.values() for nome in nomes}
+    assert set(solve.__all__) == esperados | {"executar_parte1"}

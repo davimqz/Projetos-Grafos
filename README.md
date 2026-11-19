@@ -81,7 +81,13 @@ que `--armadilhas` não dependa de um arquivo previamente gerado.
 │  └─ parte2/
 ├─ src/
 │  ├─ cli.py
-│  ├─ solve.py
+│  ├─ solve.py            # orquestração da Parte 1 e interface pública
+│  ├─ parte1/
+│  │  ├─ modelos.py      # tipos compartilhados
+│  │  ├─ carga.py        # preparo dos mapas
+│  │  ├─ analises.py     # métricas, camadas, graus e armadilhas
+│  │  ├─ buscas.py       # normalização das buscas e comparações
+│  │  └─ exportacao.py   # escrita de CSV e JSON
 │  ├─ viz.py
 │  └─ graphs/
 │     ├─ io.py            # ler/validar mapas e dataset
@@ -89,7 +95,13 @@ que `--armadilhas` não dependa de um arquivo previamente gerado.
 │     ├─ graph.py         # lista de adjacência DIRIGIDA
 │     └─ algorithms.py    # BFS, DFS, Dijkstra, Bellman-Ford (próprios)
 └─ tests/
+   ├─ test_solve.py       # compatibilidade da interface pública
+   └─ parte1/            # testes por responsabilidade e integração
 ```
+
+As funções e os tipos da Parte 1 continuam disponíveis por `src.solve`.
+Suas implementações ficam em `src/parte1/`, com a lógica existente preservada.
+Os algoritmos e a construção dos grafos permanecem em `src/graphs/`.
 
 ## Uso de IA
 
