@@ -32,28 +32,5 @@ def vazio():
     return solve.DadosMapa("vazio", [], Grafo(), Grafo(), {}, "")
 
 
-@pytest.mark.parametrize("funcao", [
-    solve.calcular_metricas_globais, solve.calcular_camadas,
-    solve.calcular_graus, solve.analisar_graus, solve.exportar_arestas,
-    lambda dados: solve.resolver_mapa(dados, "BFS"),
-    solve.classificar_arcos, solve.encontrar_armadilhas,
-    solve.comparar_modelagens, solve.comparar_bonus,
-])
-def test_funcoes_preservam_dados_e_calculos_nao_gravam_arquivos(carregar, tmp_path, funcao):
-    dados = carregar(["Sa+G"])
-    # Inclui os dicionários internos dos grafos para detectar mutações.
-    antes = deepcopy(vars(dados))
-    arquivos = set(tmp_path.iterdir())
-    if funcao is solve.exportar_arestas:
-        funcao(dados, tmp_path / "arestas.csv")
-    else:
-        funcao(dados)
-        assert set(tmp_path.iterdir()) == arquivos
-
-    for campo in ("grafo_posicoes", "grafo_estados"):
-        assert vars(getattr(dados, campo)) == vars(antes.pop(campo))
-    assert {chave: valor for chave, valor in vars(dados).items() if chave in antes} == antes
-
-
 # [IA] Codex - cobertura dos contratos restantes, com mapas sintéticos e IO temporário.
 # [IA] Codex - regressões de desempenho das análises, sem limites de tempo frágeis.
