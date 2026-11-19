@@ -302,7 +302,7 @@ def analisar_graus(dados: DadosMapa) -> dict[str, object]:
 
 
     estado_maior_entrada = max(sorted(graus_entrada), key=graus_entrada.get, default=None)
-    estado_maior_saida = max(graus_saida, key=graus_saida.get, default=None)
+    estado_maior_saida = max(sorted(graus_saida, key=graus_saida.get, default=None))
 
     multiplicidades: dict[tuple[int, int], int] = {}
     for estado in dados.estados.values():
