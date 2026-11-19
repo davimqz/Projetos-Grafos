@@ -93,6 +93,10 @@ input.controle-faixa::-moz-range-progress{height:6px;border-radius:999px;backgro
 input.controle-faixa::-moz-range-thumb{width:12px;height:12px;border:3px solid #eaf0ff;border-radius:50%;background:#4e80f0;box-shadow:0 0 0 2px #4e80f055}
 input.controle-faixa:focus-visible{outline:2px solid #a5c0ff;outline-offset:3px;border-radius:6px}
 input.controle-faixa:disabled{opacity:.45;cursor:not-allowed}
+.exportar-html{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--line)}
+.exportar-html p{flex-basis:100%;margin:0;color:#eaf0ff;font-size:.85rem;overflow-wrap:anywhere}
+.exportar-html p[role=alert]{color:#ffb8ac}
+.exportar-html a{color:#b8ceff;text-decoration:underline;text-underline-offset:3px}
 .grade-container,.grafo-frame,.scroll{scrollbar-width:thin;scrollbar-color:#7897c5 #12223a;overscroll-behavior:contain}
 .grade-container::-webkit-scrollbar,.grafo-frame::-webkit-scrollbar,.scroll::-webkit-scrollbar{width:10px;height:10px}
 .grade-container::-webkit-scrollbar-track,.grafo-frame::-webkit-scrollbar-track,.scroll::-webkit-scrollbar-track{background:#12223a;border-radius:8px}
