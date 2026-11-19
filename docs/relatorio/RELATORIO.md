@@ -528,6 +528,18 @@ O Dijkstra usou `valor_btc` como peso e validou os pesos de todos os arcos da am
 O Bellman-Ford usou o saldo da carteira de destino como peso. Seu status foi `OK` com parada
 antecipada em 10% e `CICLO_NEGATIVO` em 50% e 100%.
 
+> **[A ESCREVER — Vagner]** Comparar o crescimento observado com a complexidade teórica.
+
+#### Gráficos complementares do benchmark
+
+O gráfico de alcance usa as contagens do benchmark. Os dois diagramas de caminhos usam os
+resultados dos casos da Parte 2 e os pesos do dataset. Para recriar essas três figuras em
+`out/parte2/`, execute na raiz do projeto:
+
+```bash
+python -m scripts.figuras_benchmark
+```
+
 ![Carteiras alcançadas pelos quatro algoritmos nas três amostras](../../out/parte2/benchmark_comportamento.png)
 
 O gráfico de comportamento mostra as contagens registradas no benchmark. O eixo vertical usa escala logarítmica.
@@ -542,8 +554,6 @@ O diagrama mostra os cinco pares da seção 5.4. Cada seta indica a direção do
 Para o par `39sfuA8p…` → `17uQbqBG…`, o caminho retornado pelo BFS tem 3 arcos e o do
 Dijkstra tem 5. Para exibir os custos na mesma escala, a figura soma `valor_btc` nos arcos
 dos dois caminhos. O total do BFS foi calculado depois da busca.
-
-> **[A ESCREVER — Vagner]** Comparar o crescimento observado com a complexidade teórica.
 
 #### Decisões
 
