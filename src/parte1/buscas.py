@@ -154,3 +154,40 @@ def _comparar_modelagens(dados: DadosMapa, resultados_buscas: dict[str, dict]) -
     })
 
     return resultados
+
+
+def comparar_bonus(dados: DadosMapa) -> dict[str, object]:
+    """Reúne as execuções de Bellman-Ford do experimento do m05.
+
+    Compara G_pos com bônus de custo fixo e G_est com memória de consumo.
+    Disponibiliza os resultados, incluindo ciclo e custo quando retornados
+    pelo algoritmo existente. Recebe o m05 na variante padrão.
+    Não escreve a prova nem a interpretação exigida no PDF.
+    """
+    return _comparar_bonus(dados, {})
+
+
+def _comparar_bonus(dados: DadosMapa, resultados_buscas: dict[str, dict]) -> dict[str, object]:
+    """Reaproveita o Bellman-Ford de estados sem alterar o experimento."""
+
+    grafo_pos = dados.grafo_posicoes
+
+    resultado_estados = _resultado_busca(dados, "BELLMAN_FORD", resultados_buscas)
+    resultado_pos = bellman_ford(grafo_pos, rotular_posicao(encontrar_inicio(dados.grade)))
+
+    return{
+        "mapa": dados.nome,
+        "grafo_posicoes": {
+            "status":resultado_pos["status"],
+            "tem_ciclo_negativo": resultado_pos["tem_ciclo_negativo"],
+            "ciclo_negativo":resultado_pos["ciclo_negativo"],
+            "custo_ciclo":resultado_pos["custo_ciclo"]
+        },
+        "grafo_estados": {
+            "status":resultado_estados["status"],
+            "tem_ciclo_negativo": resultado_estados["tem_ciclo_negativo"],
+            "ciclo_negativo":resultado_estados["ciclo_negativo"],
+            "custo_ciclo":resultado_estados["custo_ciclo"],
+            "custo_ate_alvo":resultado_estados["distancia"]["ALVO"]
+        }
+    }
