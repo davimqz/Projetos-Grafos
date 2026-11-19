@@ -155,3 +155,84 @@ def test_analisar_graus_vazios(vazio):
         "quantidade_casas_multiplicidade_maxima": 0,
         "becos": [], "quantidade_becos": 0,
     }
+
+
+@pytest.mark.parametrize("grade, contagens, ciclo", [
+    (["SG"], (2, 0, 0, 0), False),
+    (["S.G"], (3, 1, 0, 0), True),
+    (["S#G"], (0, 0, 0, 0), False),
+])
+def test_classificar_arcos_inclui_alvo_alcancavel_e_indica_ciclo(carregar, grade, contagens, ciclo):
+    resultado = analises.classificar_arcos(carregar(grade))
+    assert resultado == {
+        "mapa": "mapa", **dict(zip(("arvore", "retorno", "avanco", "cruzamento"), contagens)),
+        "tem_ciclo": ciclo,
+    }
+
+
+def test_classificar_arcos_mapeia_categorias_e_passa_origem(carregar, monkeypatch):
+    dados = carregar(["SG"])
+    contagens = {"arvore": 1, "retorno": 2, "avanco": 3, "cruzamento": 4}
+
+    def dfs_simulada(grafo, origem):
+        assert grafo is dados.grafo_estados and origem == dados.origem
+        return {"contagem_arcos": contagens, "tem_ciclo": True}
+
+    monkeypatch.setattr(analises, "dfs", dfs_simulada)
+    assert analises.classificar_arcos(dados) == {"mapa": "mapa", **contagens, "tem_ciclo": True}
+
+
+@pytest.mark.parametrize("inverter", [False, True])
+@pytest.mark.parametrize("grade, esperado", [
+    (["SG"], []),
+    (["S#G"], ["(0,0)|-|{}"]),
+    (["S.G", ".v#"], ["(1,1)|-|{}"]),
+    (["S.G", ".><"], ["(1,1)|-|{}", "(1,2)|-|{}"]),
+    (["S>.AG", "a####"], ["(0,1)|-|{}", "(0,2)|-|{}"]),
+    (["S*G"], []),
+])
+def test_encontrar_armadilhas_reachabilidade_por_estado_e_ordem(carregar, grade, esperado, inverter):
+    dados = carregar(grade)
+    if inverter:
+        dados = replace(dados, estados=dict(reversed(list(dados.estados.items()))))
+        esperado = list(reversed(esperado))
+    assert analises.encontrar_armadilhas(dados) == esperado
+
+
+@pytest.mark.parametrize("funcao", [analises.calcular_graus, analises.analisar_graus])
+def test_graus_consultam_cada_lista_de_vizinhos_uma_vez(carregar, monkeypatch, funcao):
+    dados = carregar(["S" + "." * 100 + "G"])
+    vizinhos = dados.grafo_estados.vizinhos
+    consultas = []
+
+    def consultar(no):
+        consultas.append(no)
+        return vizinhos(no)
+
+    def varredura_repetida(*args):
+        pytest.fail("Calcular cada grau de entrada separadamente volta a custar O(VE).")
+
+    monkeypatch.setattr(dados.grafo_estados, "vizinhos", consultar)
+    monkeypatch.setattr(Grafo, "grau_entrada", varredura_repetida)
+    funcao(dados)
+
+    assert consultas == list(dados.estados)
+
+
+@pytest.mark.parametrize("operacao", ["metricas", "camadas", "arestas"])
+def test_contagens_e_exportacao_nao_copiam_grafos_ou_lista_de_arcos(carregar, tmp_path, monkeypatch, operacao):
+    dados = carregar(["Sa+G"])
+
+    def copiar(*args):
+        pytest.fail("Esta operação deve consultar os arcos sem materializar cópias completas.")
+
+    monkeypatch.setattr(Grafo, "subgrafo_induzido", copiar)
+    monkeypatch.setattr(Grafo, "arestas", copiar)
+    if operacao == "metricas":
+        assert analises.calcular_metricas_globais(dados)["ordem_est"] == len(dados.estados)
+    elif operacao == "camadas":
+        assert sum(c["ordem"] for c in analises.calcular_camadas(dados)["camadas"]) == len(dados.estados)
+    else:
+        exportacao.exportar_arestas(dados, tmp_path / "arestas.csv")
+        with (tmp_path / "arestas.csv").open(newline="", encoding="utf-8") as arquivo:
+            assert len(list(csv.DictReader(arquivo))) == dados.grafo_estados.tamanho()
