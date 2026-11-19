@@ -13,6 +13,8 @@ def test_gera_html_com_resultado_do_mapa_selecionado(tmp_path):
     assert '"m02_uma_chave"' in html
     assert '"BFS"' in html and '"custos"' in html
     assert "data:font/woff2;base64," in html and "SIL OPEN FONT LICENSE" in html
+    assert "<title>Grafos · Teoria e visualização</title>" in html
+    assert 'rel="icon" type="image/svg+xml" href="data:image/svg+xml,' in html
 
 
 def test_gera_html_mesmo_quando_algoritmo_nao_se_aplica(tmp_path):

@@ -714,7 +714,15 @@ Um commit pode contar em mais de um pacote. P5c inclui as linhas do `REGISTRO_IA
 
 ## 11. Uso de IA
 
-Todo trecho feito com apoio de IA está marcado no código com `# [IA] <ferramenta> – <finalidade>` e registrado em
-`docs/REGISTRO_IA.md`. A declaração assinada por todos está em `docs/DECLARACAO_IA.pdf`.
+O grupo utilizou ChatGPT, Codex e Claude Code para organizar e revisar o projeto e também para gerar ou alterar código.
+Esse uso incluiu testes, scripts de entrada e tratamento de dados, benchmark, integração e visualizações, além do
+front-end React e do HTML interativo. O registro também distingue os casos em que a IA forneceu apenas contratos,
+revisão ou sugestões daqueles em que escreveu código; as decisões e interpretações são atribuídas conforme descrito nele.
+
+O histórico detalhado, com ferramenta, finalidade e arquivos afetados, está em
+[`docs/REGISTRO_IA.md`](../REGISTRO_IA.md). Os trechos de código feitos com apoio de IA são identificados com comentários
+`[IA]`, usando a sintaxe adequada a cada arquivo.
+
+A declaração de uso de IA deve ser assinada por todos e adicionada em `docs/DECLARACAO_IA.pdf` antes da entrega.
 
 > **[A ESCREVER — todos]** Reflexão curta do grupo sobre o uso de IA, se a declaração pedir.
