@@ -6,6 +6,8 @@
 
 Status de cada pacote e próximos passos em [`docs/PROXIMOS_PASSOS.md`](docs/PROXIMOS_PASSOS.md).
 
+Enunciado, critérios de avaliação e mapas originais da professora em [`docs/referencias/`](docs/referencias/).
+
 ## Equipe
 
 | Integrante | Pacotes |
@@ -185,6 +187,7 @@ Detalhes em [`front-react/README.md`](front-react/README.md).
 │  ├─ PROXIMOS_PASSOS.md       # status atual
 │  ├─ PARTE2_DATASET.md        # decisões sobre o dataset da Parte 2
 │  ├─ REGISTRO_IA.md           # registro de cada uso de IA
+│  ├─ referencias/             # enunciado, critérios e zip dos mapas (originais da professora)
 │  └─ relatorio/parte2.md      # resultados e interpretação da Parte 2
 ├─ data/
 │  ├─ mapas/                   # mapas fornecidos (m01 a m08)
