@@ -31,14 +31,15 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 | 14/11 | Métricas, camadas, comparação, armadilhas, m05/m06; casos obrigatórios da Parte 2 |
 | **17/11** | Acompanhamento (Grafos + AVD): benchmark/escalabilidade; exploratórias prontas |
 | **19/11** | Acompanhamento: figuras da Parte 1, mapas do grupo, explanatórias |
-| **24/11** | Acompanhamento: HTML interativo, PDF em revisão, ensaio da apresentação (mapa surpresa!) |
+| **24/11** | Acompanhamento: HTML interativo, PDF em revisão, ensaio da apresentação (mapa surpresa rodado no terminal) |
 | **26/11** | Entrega: link do GitHub + PDF + `docs/DECLARACAO_IA.pdf` (todos postam) |
 
 ---
 
 ## Parte 1 — tarefas
 
-> Status atualizado em 16/11/2026. Resumo e próximas ações em `PROXIMOS_PASSOS.md`.
+> Status atualizado em 19/11/2026. Resumo, cronograma e pedidos da reunião de 19/11 (R1 a R8) em `PROXIMOS_PASSOS.md`.
+> Enunciado e critérios em `docs/referencias/`.
 
 ### P1 · Modelagem (Matheus / rev. Thomaz)
 - [x] `io.py`: ler mapa, ignorar linhas `;`, validar (retangular, 1 S, ≥1 G, símbolos conhecidos)
@@ -46,7 +47,8 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] `estados.py`: G_est por exploração a partir de S (chaves, bônus numerados em ordem de leitura)
 - [x] rótulo `(l,c)|chaves|{bônus}` e nó virtual `ALVO` (custo 0 a partir de G)
 - [x] variantes: portas-como-chão, portas-como-parede, `+` fixo em −4, `--fonte-consumivel`
-- [ ] exportar `out/parte1/arestas_<mapa>.csv` (inclusive m08), via `src/solve.py`
+- [x] exportar `arestas_<mapa>.csv` (inclusive m08) via `executar_parte1` em `src/solve.py`
+- [ ] commitar as saídas em `out/parte1/`
 - [x] `test_io.py` e `test_estados.py` (mapa mínimo ≤5×7 contado à mão, esteira→parede, troca de camada)
 
 ### P2 · Algoritmos (Thomaz / rev. Davi)
@@ -56,22 +58,27 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] testes dos 4 algoritmos (networkx só como oráculo em `tests/`)
 
 ### P3 · Análises (Matheus / rev. Thomaz)
-- [ ] `metricas_global.json` (G_pos e G_est, teto teórico, ocupação)
-- [ ] `camadas.json` (por conjunto de chaves + arcos entre camadas e casas que os geram)
-- [ ] `graus_<mapa>.csv`, maior grau de entrada/saída, multiplicidade máxima no m08, becos
-- [ ] `comparacao_modelagem.csv` (m02, m03, m04 × 3 modelagens)
-- [ ] m05: BF no G_pos (ciclo negativo) × G_est (sem ciclo) + prova para o PDF
-- [ ] `solucoes.csv`, `percurso_m03.json`, `ciclo_negativo_m06.json`, `dfs_classificacao.csv`
-- [ ] `armadilhas_m04.csv`, `armadilhas_m07.csv` (busca a partir de ALVO no transposto)
+- [x] `metricas_global.json` (G_pos e G_est, teto teórico, ocupação)
+- [x] `camadas.json` (por conjunto de chaves + arcos entre camadas e casas que os geram)
+- [x] `graus_<mapa>.csv`, maior grau de entrada/saída, multiplicidade máxima no m08, becos
+- [x] `comparacao_modelagem.csv` (m02, m03, m04 × 3 modelagens)
+- [x] m05: BF no G_pos (ciclo negativo) × G_est (sem ciclo) em `comparacao_bonus_m05.json`
+- [ ] prova do m05 escrita no relatório
+- [x] `solucoes.csv`, `percurso_m03.json`, `ciclo_negativo_m06.json`, `dfs_classificacao.csv`
+- [x] `armadilhas_m04.csv`, `armadilhas_m07.csv` (busca a partir de ALVO no transposto)
+- [ ] **R1** CLI: `--mapa` roda `executar_parte1` (mapa surpresa) e `--armadilhas` calcula sem arquivo externo
+- [ ] **R7** tempo e memória por algoritmo e mapa
 - [ ] 2 mapas em `data/mapas_grupo/` (≥3 chaves + esteira + bônus no caminho ótimo; ≥20% armadilhas) + gabarito
 - [ ] textos do PDF: m01 (BFS × Dijkstra), m06 (exploit e correção), m07 (sem solução), grafo não dirigido estaria errado
 
 ### P5a · Visualização Parte 1 (Thomaz / rev. Matheus)
-- [ ] `percurso_m03.png`, `percurso_m08.png` (cor muda a cada chave) — PR #19
-- [ ] G_est do m02 em camadas (destacar arcos entre camadas) · árvore BFS do m02 com níveis — PR #19
-- [ ] heatmap de multiplicidade do m08 — PR #19
-- [ ] `labirinto_interativo.html` (template na main, PR #20; dados reais no PR #19; falta ligar às armadilhas do P3): mapa + algoritmo, passo a passo, estado atual, armadilhas, camadas, controle de velocidade
-- [ ] (bônus) editor de mapas, comparação lado a lado, painel de métricas
+- [x] `percurso_m03.png`, `percurso_m08.png` (cor muda a cada chave)
+- [x] G_est do m02 em camadas (destacar arcos entre camadas) · árvore BFS do m02 com níveis
+- [x] heatmap de multiplicidade do m08
+- [x] `labirinto_interativo.html`: mapa + algoritmo, passo a passo, estado atual, camadas, controle de velocidade
+- [ ] **R2** HTML gerado pelo Python com as armadilhas de m04/m07 realçadas e os mapas do grupo
+- [x] (bônus) front React (`front-react/`) com labirinto, figuras e AVD
+- [ ] **R3** comparação dos 4 algoritmos no mesmo mapa · **R4** upload de `.txt` pelo front
 
 ## Parte 2 — tarefas
 
@@ -84,18 +91,23 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] Bellman-Ford: 1 caso negativo sem ciclo + 1 com ciclo negativo detectado e exibido
 
 ### P4b · Experimentos (Vagner / rev. Davi)
-- [ ] tempo médio de ≥5 execuções por algoritmo e tarefa (memória opcional) — feito para DFS, BFS e Bellman-Ford; falta Dijkstra
+- [ ] tempo médio de ≥5 execuções por algoritmo e tarefa: Dijkstra feito na branch `Vagner`, falta o PR
+- [ ] **R7** memória por algoritmo e tarefa (opcional no enunciado, pedida na reunião de 19/11)
 - [x] escalabilidade 10% / 50% / 100% × complexidade teórica
-- [ ] `out/parte2/parte2_report.json` ✅ + gráficos de comparação (tempo ✅, comportamento, caminhos)
+- [x] `out/parte2/parte2_report.json` e gráfico de tempo
+- [ ] gráficos de comportamento e de caminhos (branch `Vagner`)
+- [ ] **R5** fontes e pares da Parte 2 no front · **R6** view do grafo da Parte 2
 
 ### P5b · AVD (Vagner / rev. Davi)
-- [ ] exploração: estrutural, distribucional, relacional, outliers
+- [x] notebook exploratório e 4 exploratórias em `out/parte2/avd/`
+- [ ] exploração escrita no relatório: estrutural, distribucional, relacional, outliers
 - [ ] dados faltantes: mecanismo de ausência + tratamento justificado (não apagar)
 - [ ] multivariada: atributo-alvo × todos os demais
 - [ ] ≥4 exploratórias + ≥2 explanatórias (1 responde à pergunta), com título/legenda/eixos
 - [ ] nota analítica autoral por visualização + raciocínio exploratória → explanatória
 
 ## Fechamento (P5c · Davi)
+- [ ] **R8** roteiro e slides da apresentação (modelagem, vértice/aresta, solução dos mapas, insights, desempenho, limitações)
 - [ ] README final · PDF (manual + técnica + limitações + conclusões + matriz de contribuição)
 - [ ] `docs/DECLARACAO_IA.pdf` assinada por **todos** + reflexão de 10–15 linhas
 - [ ] conferir marcações `# [IA]` no código e `docs/REGISTRO_IA.md`

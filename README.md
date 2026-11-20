@@ -6,6 +6,8 @@
 
 Status de cada pacote e próximos passos em [`docs/PROXIMOS_PASSOS.md`](docs/PROXIMOS_PASSOS.md).
 
+Enunciado, critérios de avaliação e mapas originais da professora em [`docs/referencias/`](docs/referencias/).
+
 ## Equipe
 
 | Integrante | Pacotes |
@@ -174,6 +176,17 @@ npm run dev
 
 Detalhes em [`front-react/README.md`](front-react/README.md).
 
+## Relatório em PDF e matriz de contribuição
+
+```bash
+python -m scripts.gerar_pdf                         # docs/relatorio/RELATORIO.md -> docs/relatorio/RELATORIO.pdf
+python -m scripts.matriz_contribuicao --revisoes    # tabelas da seção 10.2 (commits por pacote e PRs revisados)
+```
+
+O PDF é impresso pelo Chrome ou pelo Edge em modo headless, com as figuras embutidas. Se nenhum dos dois estiver no
+caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando ainda há marcadores `[A ESCREVER]` ou
+`[COMPLETAR]` no texto. A opção `--revisoes` precisa do `gh` autenticado.
+
 ## Estrutura
 
 ```
@@ -185,6 +198,7 @@ Detalhes em [`front-react/README.md`](front-react/README.md).
 │  ├─ PROXIMOS_PASSOS.md       # status atual
 │  ├─ PARTE2_DATASET.md        # decisões sobre o dataset da Parte 2
 │  ├─ REGISTRO_IA.md           # registro de cada uso de IA
+│  ├─ referencias/             # enunciado, critérios e zip dos mapas (originais da professora)
 │  └─ relatorio/parte2.md      # resultados e interpretação da Parte 2
 ├─ data/
 │  ├─ mapas/                   # mapas fornecidos (m01 a m08)
