@@ -1,0 +1,8 @@
+; treino: chaves, bônus e esteiras (Dijkstra recusa, Bellman-Ford resolve)
+###############
+#S.+...a..>>>.#
+#.#####.###.#.#
+#.#.+.#.#.#.#v#
+#.#.#.#.#.###.#
+#...#...A..+<G#
+###############

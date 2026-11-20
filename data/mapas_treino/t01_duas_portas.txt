@@ -1,0 +1,8 @@
+; treino: duas portas, cada uma liberando um caminho diferente até G
+###############
+#S....B......G#
+#.###.#######.#
+#.,,,.#..b..#.#
+#.###.#.###.#.#
+#...a....~..A.#
+###############
