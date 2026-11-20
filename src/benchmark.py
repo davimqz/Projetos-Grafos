@@ -3,13 +3,14 @@
 - tempo médio de 5 execuções de cada algoritmo
 - escalabilidade em 10% / 50% / 100% dos nós, comparada com a complexidade teórica
   pela coluna tempo_por_custo_teorico_ms = tempo / custo do caso medido
-- a DFS percorre o grafo inteiro (floresta); BFS e Bellman-Ford partem da carteira com
+- a DFS percorre o grafo inteiro (floresta); BFS, Dijkstra e Bellman-Ford partem da carteira com
   mais arcos de saída de cada amostra, então não fazem a mesma tarefa que a DFS
 - status OK no Bellman-Ford significa parada antecipada: o tempo não mede V * E
 """
 # [IA] Claude Code – benchmark da Parte 2
 
 import json
+import math
 import random
 import timeit
 from pathlib import Path
@@ -20,7 +21,7 @@ matplotlib.use("Agg")  # só grava o arquivo, sem abrir janela
 import matplotlib.pyplot as plt
 
 from src.carga_parte2 import carregar_grafo
-from src.graphs.algorithms import bellman_ford, bfs, dfs
+from src.graphs.algorithms import bellman_ford, bfs, dfs, dijkstra
 from src.graphs.graph import Grafo
 
 SEED = 42
@@ -39,11 +40,19 @@ def custo_bellman_ford(grafo, retorno):
     return None
 
 
+def custo_dijkstra(grafo, retorno):
+    """Estima o custo da validação global e das operações de heap na região alcançada."""
+    arcos_alcancados = sum(grafo.grau_saida(no) for no in retorno["ordem"])
+    custo_validacao = grafo.ordem() + grafo.tamanho()
+    return custo_validacao + arcos_alcancados * math.log2(max(2, grafo.ordem()))
+
+
 # Cada novo algoritmo realizado, adiciona aqui:
 # nome: (função, precisa de origem, complexidade, custo do caso medido)
 ALGORITMOS = {
     "DFS": (dfs, False, "O(V + E)", custo_busca),
     "BFS": (bfs, True, "O(V + E)", custo_busca),
+    "Dijkstra": (dijkstra, True, "O((V + E) log V)", custo_dijkstra),
     "Bellman-Ford": (bellman_ford, True, "O(V * E)", custo_bellman_ford),
 }
 
@@ -56,7 +65,7 @@ def amostrar(grafo, fracao):
 
 
 def maior_grau_saida(grafo):
-    """Origem usada por BFS e Bellman-Ford: o nó com mais arcos de saída."""
+    """Origem usada por BFS, Dijkstra e Bellman-Ford: o nó com mais arcos de saída."""
     return max(grafo.nos(), key=grafo.grau_saida)
 
 
@@ -80,10 +89,12 @@ def contar_alcancados(retorno):
 def executar_benchmark(pasta, saida, fracoes=FRACOES):
     """Mede cada algoritmo em cada fração e grava parte2_report.json e o gráfico."""
     grafo = carregar_grafo(Grafo(), pasta)
+    grafo_dijkstra = carregar_grafo(Grafo(), pasta, coluna_peso="valor_btc")
     resultados = []
     for nome, (funcao, usa_origem, complexidade, custo) in ALGORITMOS.items():
+        grafo_base = grafo_dijkstra if nome == "Dijkstra" else grafo
         for fracao in fracoes:
-            g = amostrar(grafo, fracao)
+            g = amostrar(grafo_base, fracao)
             origem = maior_grau_saida(g) if usa_origem else None
             ultimo = {}  # guarda o retorno da última execução, para o relatório
             t = tempo_medio(lambda gr: ultimo.update(funcao(gr, origem)), g)
