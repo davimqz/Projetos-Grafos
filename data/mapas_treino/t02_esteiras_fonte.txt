@@ -1,0 +1,7 @@
+; treino: esteiras de mão única, um beco e duas fontes (ciclo negativo)
+#############
+#S...>>>..*.#
+#.#####.#.#.#
+#..*....v...#
+#######.#.#G#
+#############
