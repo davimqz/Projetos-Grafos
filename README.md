@@ -176,6 +176,17 @@ npm run dev
 
 Detalhes em [`front-react/README.md`](front-react/README.md).
 
+## Relatório em PDF e matriz de contribuição
+
+```bash
+python -m scripts.gerar_pdf                         # docs/relatorio/RELATORIO.md -> docs/relatorio/RELATORIO.pdf
+python -m scripts.matriz_contribuicao --revisoes    # tabelas da seção 10.2 (commits por pacote e PRs revisados)
+```
+
+O PDF é impresso pelo Chrome ou pelo Edge em modo headless, com as figuras embutidas. Se nenhum dos dois estiver no
+caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando ainda há marcadores `[A ESCREVER]` ou
+`[COMPLETAR]` no texto. A opção `--revisoes` precisa do `gh` autenticado.
+
 ## Estrutura
 
 ```

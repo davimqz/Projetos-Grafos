@@ -590,7 +590,7 @@ Para cada uma: figura, título, e a nota analítica (**o que mostra · insight �
 
 ## 7. Testes
 
-Executados com `pytest` (318 testes passando em 18/11/2026).
+Executados com `pytest` (503 testes passando em 19/11/2026).
 
 | Arquivo | O que confere |
 |---|---|
@@ -600,9 +600,14 @@ Executados com `pytest` (318 testes passando em 18/11/2026).
 | `test_bellman_ford.py` | distâncias com pesos negativos sem ciclo; flag e ciclo retornado |
 | `test_estados.py` | mapa mínimo, esteira contra parede, troca de camada ao pegar chave |
 | `test_io.py` | mapas inválidos (não retangular, dois S, sem G, símbolo desconhecido) |
-| `test_graph.py`, `test_carga_parte2.py`, `test_casos_parte2.py`, `test_benchmark.py`, `test_viz.py`, `test_visualizar_parte1.py` | grafo, carga e casos da Parte 2, benchmark e visualizações |
+| `test_graph.py` | lista de adjacência dirigida, graus, densidade, transposto e subgrafo induzido |
+| `tests/parte1/`, `test_solve.py` | saídas da Parte 1: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
+| `test_carga_parte2.py`, `test_casos_parte2.py`, `test_graus_parte2.py` | carga do recorte, casos obrigatórios e graus da Parte 2 |
+| `test_benchmark.py` | medição de tempo e escalabilidade |
+| `test_viz.py`, `test_visualizar_parte1.py`, `test_gerar_html_front.py` | figuras da Parte 1 e geração do HTML interativo |
+| `test_gerar_pdf.py`, `test_matriz_contribuicao.py` | geração deste PDF e contagem da matriz de contribuição |
 
-> **[COMPLETAR]** Atualizar a contagem e incluir `test_solve.py` na véspera da entrega.
+> **[COMPLETAR]** Rodar `pytest` de novo na véspera da entrega e atualizar a contagem.
 
 ---
 
@@ -697,18 +702,29 @@ Essa distinção é fundamental porque a pergunta de pesquisa trata especificame
 
 ### 10.2 Commits por integrante e pacote
 
-Contagem de commits (sem merges) que alteram arquivos de cada pacote, em `main` + branch `matheus`, em 18/11/2026.
-Um commit pode contar em mais de um pacote. P5c inclui as linhas do `REGISTRO_IA.md`, que cada um adiciona.
+Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 19/11/2026, gerada por
+`python -m scripts.matriz_contribuicao`. Um commit conta uma vez em cada pacote cujos arquivos ele altera. P5c inclui as
+linhas do `REGISTRO_IA.md`, que cada um adiciona. A CLI, o `requirements.txt` e os mapas fornecidos não entram em
+nenhum pacote.
 
-| Integrante | P1 | P2 | P3 | P4a | P4b | P5a | P5b | P5c |
-|---|---|---|---|---|---|---|---|---|
-| Matheus | 5 | 1 | 4 | | | | | 6 |
-| Thomaz | | 9 | | | | 8 | | 17 |
-| Davi | 2 | 2 | 1 | 20 | | 2 | 1 | 24 |
-| Vagner | | | | 2 | 4 | 5 | 1 | 11 |
+| Integrante | P1 | P2 | P3 | P4a | P4b | P5a | P5b | P5c | Pacotes com commit | Commits |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Matheus | 5 | 1 | 39 |  |  |  |  | 10 | 4 | 46 |
+| Thomaz |  | 9 |  |  |  | 11 |  | 19 | 3 | 20 |
+| Davi | 2 | 2 | 2 | 23 |  | 2 | 1 | 35 | 7 | 47 |
+| Vagner |  |  |  | 2 | 4 | 5 | 2 | 11 | 5 | 12 |
 
-> **[COMPLETAR — Davi]** Refazer a contagem na véspera da entrega e incluir as revisões de PR de cada um (quem revisou
-> quais PRs).
+PRs mergeados que cada integrante revisou ou mergeou sem ser o autor (`--revisoes`):
+
+| Integrante | PRs revisados |
+|---|---|
+| Matheus | #3, #10, #12, #14, #17, #30, #31 |
+| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32 |
+| Davi | #6, #8, #10, #13, #17, #19 |
+| Vagner | #2, #16, #19, #21, #22, #25 |
+
+> **[COMPLETAR — Davi]** Rodar `python -m scripts.matriz_contribuicao --revisoes` na véspera da entrega e colar as
+> duas tabelas.
 
 ---
 
