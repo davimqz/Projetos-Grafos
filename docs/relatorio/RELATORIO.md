@@ -616,22 +616,133 @@ Fonte: `notebooks/avd/01_exploratoria.ipynb`, figuras em `out/parte2/avd/`.
 
 ### 6.1 Exploração (4 pilares)
 
-> **[A ESCREVER — Vagner]** Estrutural, distribucional, relacional e outliers, a partir das notas do notebook.
+#### Estrutural
+
+É importante enfatizar que nós juntamos previamente os pares ordenados em apenas uma aresta. Logo, se houver 10 ligações A → B, elas viram apenas 1 aresta no nosso recorte, e a variável `n_txs` guarda o número de transações desse par ordenado.
+
+Conseguimos observar que possuímos mais arestas com peso positivo (13.174, 52,5%), mas ainda possuímos muitas arestas com peso nulo e negativo (8.658, 34,5%, e 3.279, 13,1%, respectivamente). O peso neste projeto funciona da seguinte forma: o peso de uma aresta A → B é o saldo líquido da carteira de destino B, ou seja, o total de BTC recebido menos o total enviado. Peso positivo indica que B acumula BTC, negativo indica que B repassa mais do que recebe, e nulo indica que B envia tudo o que recebe.
+
+Em relação à classe das carteiras (ilícito, lícito e desconhecido), temos valores parecidos entre os grupos: 5.208 ilícitas (36,7%), 4.713 desconhecidas (33,2%) e 4.261 lícitas (30,0%).
+
+Além disso, os graus de entrada e de saída têm a mesma média (1,77), o que é esperado, pois cada aresta soma 1 na saída de uma carteira e 1 na entrada de outra. Porém, há uma diferença grande no desvio padrão entre eles (30,51 no grau de entrada contra 9,67 no grau de saída): poucas carteiras recebem de muitas outras (o maior grau de entrada é 2.719, contra 1.002 no de saída).
+
+A densidade do grafo é próxima de 0, então é um grafo esparso: cada carteira se liga a poucas das outras carteiras do recorte.
+
+O grafo é formado por 2.555 transações. Uma transação pode gerar várias arestas, e uma aresta pode juntar várias transações do mesmo par. Por isso, a forma que escolhemos de juntar as ligações em uma aresta poderia fazer uma mesma aresta reunir uma transação lícita e outra ilícita. Mas em nenhum caso do recorte isso ocorre. Das 2.555 transações, 1.130 são desconhecidas, 644 são ilícitas e 781 são lícitas.
+
+#### Distribucional
+
+Na maioria dos atributos, os valores ficam concentrados nos números pequenos, mas algumas carteiras apresentam valores muito altos. Por isso, a média acaba ficando bem maior que a mediana, e o desvio padrão também costuma ser alto. O BTC recebido tem mediana de 0,0038 e média de 2,02. No BTC enviado, a mediana é 0,0051 e a média é 2,97, chegando ao máximo de 19.196 BTC. O número de transações tem mediana 2 e máximo de 639. Em geral, uma carteira movimenta pouco BTC, enquanto poucas carteiras muito grandes concentram a maior parte do volume.
+
+O saldo funciona de um jeito um pouco diferente. Mais da metade das carteiras (52,4%) tem saldo exatamente zero. Mesmo assim, existem alguns saldos negativos muito altos: os valores vão de −12.586 a +1.079 BTC. Por causa desses valores extremos, a média (−0,96) fica abaixo da mediana (0). Lembrando que isso é um recorte, e não toda a história do Bitcoin; por isso, podemos ter valores negativos.
+
+Nas ligações entre as carteiras, o peso tem média de −50,37 e mediana de 0,0037. A média fica negativa por causa de poucos casos muito extremos: as 754 ligações com peso abaixo de −100 pertencem a apenas 4 carteiras e, juntas, têm um peso maior que o total das outras ligações. Isso acontece porque o saldo da carteira de destino é repetido em todas as ligações que chegam até ela. O `valor_btc` tem mediana 4 e média 46,1. O `n_txs` é quase sempre 1: isso acontece em 99% dos pares, com média de 1,01 e máximo de 22. Portanto, cada par de carteiras normalmente faz uma única transação. O `num_timesteps_appeared_in` também tem mediana 1, o que significa que a maioria das carteiras aparece em apenas um intervalo de tempo.
+
+Em resumo, a média sozinha pode dar uma impressão errada sobre esses dados, porque poucos valores muito altos ou muito baixos influenciam bastante o resultado. Por isso, nos gráficos usamos principalmente medianas e proporções.
+
+#### Relacional
+
+No BTC recebido, as medianas das carteiras desconhecidas e ilícitas são próximas, 0,0049 e 0,0047 BTC. Nas lícitas, a mediana é 0 BTC. No BTC enviado, as desconhecidas têm mediana de 0,0099 BTC, contra 0,0051 BTC nas outras duas classes, e o intervalo entre o primeiro e o terceiro quartil também é maior entre elas.
+
+O tempo de vida tem mediana de 1 bloco nas ilícitas e desconhecidas e 0 blocos nas lícitas. As janelas de atividade têm mediana de 1 nas três classes, e tanto o primeiro quanto o terceiro quartil também ficam em 1. No grau de saída, a mediana é 1 aresta nas três classes. Nas lícitas, o primeiro quartil é 0 e o terceiro é 1. Nas outras duas classes, ambos são 1.
+
+A mediana da taxa é maior nas ilícitas (0,0321 BTC) do que nas desconhecidas (0,0035 BTC) e lícitas (0,0039 BTC). A mediana de transações é 2 nas ilícitas e desconhecidas e 1 nas lícitas. O saldo mediano é −0,0016 BTC nas lícitas e 0 nas outras classes. O grau de entrada mediano é 1 nas ilícitas e 0 nas desconhecidas e lícitas.
+
+Na matriz de Spearman, BTC recebido e enviado têm correlação de 0,07, e tempo de vida e janelas de atividade têm correlação de 0,42. As taxas têm correlação de −0,03 com BTC recebido, −0,12 com BTC enviado e 0,40 com o número de transações. Comparando com BTC recebido e enviado, nessa ordem, os coeficientes são −0,25 e 0,55 para o grau de saída e 0,48 e −0,33 para o grau de entrada. O saldo tem correlação de −0,49 com o BTC enviado, o que faz sentido porque o valor enviado é subtraído no cálculo do saldo.
+
+Para comparar classe e atributos, usamos 0 para lícita e 1 para ilícita. As carteiras desconhecidas ficam fora desse cálculo. O Spearman mede se valores maiores de um atributo tendem a acompanhar valores maiores ou menores do outro. Pelo valor absoluto, chamamos a associação de fraca abaixo de 0,30, moderada de 0,30 até abaixo de 0,50 e forte a partir de 0,50. A taxa teve associação forte e positiva (0,511). O número de transações (0,487) e o tempo de vida (0,427) tiveram associações moderadas e positivas. As outras seis foram fracas. Entre os nove atributos, só janelas de atividade teve sinal negativo (−0,101).
+
+O Spearman resume a tendência de subir ou descer. Para ver a forma da relação, olhamos as proporções por faixa. Entre as carteiras rotuladas, 55,0% são ilícitas (5.208 de 9.469). No BTC recebido, a proporção vai de 44,8% na faixa mais baixa para 84,5% na intermediária e cai para 45,9% na mais alta. São três faixas porque o mínimo e o primeiro quartil coincidem em zero. No BTC enviado, a proporção chega a 81,7% na penúltima faixa e cai para 47,8% na última. Nos dois casos, as proporções por faixa sobem e depois caem, um padrão que uma reta não descreve bem. Essa leitura vale para as faixas observadas.
+
+Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os totais de BTC e taxas e o tempo de vida vêm do histórico do endereço registrado no Elliptic++.
+
+Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
+
+#### Outliers
+
+A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, o 1º e o 3º quartis são iguais a 1. Isso significa que cerca de 70% das carteiras enviam para apenas uma outra carteira. Como o IQR é zero, qualquer carteira com grau diferente de 1 é considerada outlier, totalizando 4.204 casos. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
+
+Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. As carteiras lícitas também concentram a maior parcela dos outliers de saldo, com 1.784 casos, e de grau de saída, com 2.022 casos.
+
+Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
 
 ### 6.2 Dados faltantes e outliers
 
-> **[A ESCREVER — Vagner]** Mecanismo de ausência (classe "desconhecido") e tratamento justificado; avaliação e
-> tratamento dos outliers.
+#### Dados faltantes
+
+Nenhuma coluna das tabelas `nos` e `arestas` apresentou valores nulos. A ausência da classificação entre lícito e ilícito está registrada como `desconhecido`. Entre as 2.555 transações distintas que formam o recorte, 1.130 (44,2%) têm esse rótulo. Das 25.111 arestas, 4.778 (19,0%) foram formadas exclusivamente por transações desconhecidas. Entre as carteiras, 4.713 (33,2%) têm classe `desconhecido`.
+
+Uma transação é classificada como desconhecida, então todas as suas arestas são automaticamente classificadas como desconhecidas. Toda aresta recebe a classe de sua transação.
+
+Uma carteira ligada a pelo menos uma transação rotulada como ilícita é classificada como ilícita. Para a desconhecida, tem que ser menor ou igual a 3,7 a razão entre as contagens de transações desconhecidas e lícitas sobre ela.
+
+Então, a única variável verdadeiramente desconhecida é a transação, porque todas as outras desconhecidas herdam valores a partir dela.
+
+As transações desconhecidas vão praticamente para desconhecido e ilícito (40,2% e 59,6%), e as médias de arestas geradas por transação também são mais próximas de ilícito (4,2 e 8,1) contra 19,8. Então, há uma tendência de as transações desconhecidas serem mais próximas da classe ilícita do que da lícita. Também temos a mediana, que é 1 para desconhecidas e ilícitas e 6 para lícitas.
+
+Essas diferenças em características que conseguimos observar são evidência contra MCAR, que pressupõe que a falta do rótulo seja completamente ao acaso. Elas são compatíveis com MAR, em que a falta do rótulo pode ser explicada por variáveis observadas. MNAR seria o caso se, mesmo considerando essas variáveis, a falta do rótulo ainda dependesse da classe da própria transação. Como essa classe é justamente o que falta, os dados não permitem confirmar MNAR nem dizer que as transações desconhecidas têm mais chance de ser ilícitas.
+
+Mantivemos desconhecido como categoria própria, pois excluir essas carteiras removeria 55% das arestas.
+
+#### Outliers
+
+A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, o 1º e o 3º quartis são iguais a 1. Isso significa que cerca de 70% das carteiras enviam para apenas uma outra carteira. Como o IQR é zero, qualquer carteira com grau diferente de 1 é considerada outlier, totalizando 4.204 casos. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
+
+Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. As carteiras lícitas também concentram a maior parcela dos outliers de saldo, com 1.784 casos, e de grau de saída, com 2.022 casos.
+
+Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
 
 ### 6.3 Análise multivariada
 
-> **[A ESCREVER — Vagner]** Relação da classe com todos os demais atributos (direta ou não, linear ou não, força).
+No BTC recebido, as medianas das carteiras desconhecidas e ilícitas são próximas, 0,0049 e 0,0047 BTC. Nas lícitas, a mediana é 0 BTC. No BTC enviado, as desconhecidas têm mediana de 0,0099 BTC, contra 0,0051 BTC nas outras duas classes, e o intervalo entre o primeiro e o terceiro quartil também é maior entre elas.
+
+O tempo de vida tem mediana de 1 bloco nas ilícitas e desconhecidas e 0 blocos nas lícitas. As janelas de atividade têm mediana de 1 nas três classes, e tanto o primeiro quanto o terceiro quartil também ficam em 1. No grau de saída, a mediana é 1 aresta nas três classes. Nas lícitas, o primeiro quartil é 0 e o terceiro é 1. Nas outras duas classes, ambos são 1.
+
+A mediana da taxa é maior nas ilícitas (0,0321 BTC) do que nas desconhecidas (0,0035 BTC) e lícitas (0,0039 BTC). A mediana de transações é 2 nas ilícitas e desconhecidas e 1 nas lícitas. O saldo mediano é −0,0016 BTC nas lícitas e 0 nas outras classes. O grau de entrada mediano é 1 nas ilícitas e 0 nas desconhecidas e lícitas.
+
+Na matriz de Spearman, BTC recebido e enviado têm correlação de 0,07, e tempo de vida e janelas de atividade têm correlação de 0,42. As taxas têm correlação de −0,03 com BTC recebido, −0,12 com BTC enviado e 0,40 com o número de transações. Comparando com BTC recebido e enviado, nessa ordem, os coeficientes são −0,25 e 0,55 para o grau de saída e 0,48 e −0,33 para o grau de entrada. O saldo tem correlação de −0,49 com o BTC enviado, o que faz sentido porque o valor enviado é subtraído no cálculo do saldo.
+
+Para comparar classe e atributos, usamos 0 para lícita e 1 para ilícita. As carteiras desconhecidas ficam fora desse cálculo. O Spearman mede se valores maiores de um atributo tendem a acompanhar valores maiores ou menores do outro. Pelo valor absoluto, chamamos a associação de fraca abaixo de 0,30, moderada de 0,30 até abaixo de 0,50 e forte a partir de 0,50. A taxa teve associação forte e positiva (0,511). O número de transações (0,487) e o tempo de vida (0,427) tiveram associações moderadas e positivas. As outras seis foram fracas. Entre os nove atributos, só janelas de atividade teve sinal negativo (−0,101).
+
+O Spearman resume a tendência de subir ou descer. Para ver a forma da relação, olhamos as proporções por faixa. Entre as carteiras rotuladas, 55,0% são ilícitas (5.208 de 9.469). No BTC recebido, a proporção vai de 44,8% na faixa mais baixa para 84,5% na intermediária e cai para 45,9% na mais alta. São três faixas porque o mínimo e o primeiro quartil coincidem em zero. No BTC enviado, a proporção chega a 81,7% na penúltima faixa e cai para 47,8% na última. Nos dois casos, as proporções por faixa sobem e depois caem, um padrão que uma reta não descreve bem. Essa leitura vale para as faixas observadas.
+
+Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os totais de BTC e taxas e o tempo de vida vêm do histórico do endereço registrado no Elliptic++.
+
+Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
 
 ### 6.4 Visualizações exploratórias
 
-Para cada uma: figura, título, e a nota analítica (**o que mostra · insight · por que esse tipo de gráfico**).
+#### Exploratória 1: número de carteiras por classe
 
-> **[A ESCREVER — Vagner]** Exploratórias 1 a 4.
+![Número de carteiras por classe](../../out/parte2/avd/exploratoria_1.png)
+
+O gráfico mostra que as três classes têm quantidades parecidas de carteiras. A classe ilícita é a maior, com 5.208 carteiras, seguida pela classe desconhecida, com 4.713, e pela lícita, com 4.261. Portanto, nenhuma classe está muito acima das outras. Mesmo assim, é importante lembrar que esses números representam apenas o recorte analisado, e não toda a rede Bitcoin.
+
+Esse gráfico foi escolhido pois dá para ter uma boa visualização de quão próximos são o lícito, o ilícito e o desconhecido no número de carteiras. Por isso, a contagem na barra foi iniciada em 0.
+
+#### Exploratória 2: mediana do BTC total recebido por classe
+
+![Mediana do BTC total recebido por classe](../../out/parte2/avd/exploratoria_2.png)
+
+O gráfico compara a mediana do BTC recebido por classe. As carteiras desconhecidas apresentam o maior valor, com 0,0049 BTC, seguidas pelas ilícitas, com 0,0047 BTC. Já as carteiras lícitas têm mediana igual a 0. Isso mostra que, no recorte analisado, as carteiras desconhecidas e ilícitas recebem valores típicos parecidos, enquanto as lícitas apresentam um valor muito menor.
+
+Escolhi o gráfico de barras porque ele facilita a visualização e a comparação entre os tipos de carteira. A altura das barras mostra rapidamente qual classe tem a maior ou menor mediana, enquanto as cores e os valores escritos acima delas ajudam a identificar cada classe.
+
+#### Exploratória 3: para qual classe vão as arestas de cada classe
+
+![Para qual classe vão as arestas de cada classe](../../out/parte2/avd/exploratoria_3.png)
+
+O gráfico mostra para quais classes vão as arestas que saem de cada tipo de carteira. As carteiras ilícitas se conectam principalmente com outras ilícitas: 96% das suas arestas chegam nessa mesma classe. Já as carteiras desconhecidas e lícitas distribuem suas conexões de forma mais equilibrada entre as três classes, com valores próximos de um terço para cada uma. Isso mostra uma forte concentração das conexões entre carteiras ilícitas.
+
+Esse gráfico foi escolhido pois é de fácil visualização perceber o quanto as outras carteiras vão para distintas carteiras de forma quase igual entre elas, e a carteira ilícita vai praticamente apenas para a carteira ilícita.
+
+#### Exploratória 4: sinal do peso das arestas, pela classe do destino
+
+![Sinal do peso das arestas, pela classe do destino](../../out/parte2/avd/exploratoria_4.png)
+
+O gráfico mostra o sinal do peso das arestas de acordo com a classe da carteira de destino. Nas carteiras ilícitas, predominam os pesos zero, mas também há uma quantidade relevante de pesos positivos e negativos. Nas carteiras desconhecidas, os pesos positivos são maioria, seguidos pelos pesos zero e negativos. Já nas carteiras lícitas, uma grande maioria tem peso positivo, com poucos casos de peso zero ou negativo. Portanto, os pesos positivos aparecem principalmente nas carteiras lícitas, enquanto os pesos negativos são mais comuns nas carteiras ilícitas e desconhecidas.
+
+Esse gráfico foi escolhido pois é de fácil visualização ver o peso de cada aresta dependendo do tipo: com as barras agrupadas, dá para ver os sinais entre as classes.
 
 ### 6.5 Da exploratória à explanatória
 
