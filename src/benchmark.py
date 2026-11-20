@@ -6,6 +6,8 @@
 - a DFS percorre o grafo inteiro (floresta); BFS, Dijkstra e Bellman-Ford partem da carteira com
   mais arcos de saída de cada amostra, então não fazem a mesma tarefa que a DFS
 - status OK no Bellman-Ford significa parada antecipada: o tempo não mede V * E
+- latência: tempo de uma execução isolada; o JSON guarda a menor e a maior das 5
+- memória: pico alocado pelo algoritmo (tracemalloc), sem contar o grafo, que já existia
 """
 # [IA] Claude Code – benchmark da Parte 2
 
@@ -13,6 +15,7 @@ import json
 import math
 import random
 import timeit
+import tracemalloc
 from pathlib import Path
 
 import matplotlib
@@ -69,14 +72,34 @@ def maior_grau_saida(grafo):
     return max(grafo.nos(), key=grafo.grau_saida)
 
 
-def tempo_medio(funcao, grafo, repeticoes=5):
-    """Roda funcao(grafo) `repeticoes` vezes e devolve o tempo médio em segundos.
+def medir_tempos(funcao, grafo, repeticoes=5):
+    """Roda funcao(grafo) `repeticoes` vezes e devolve o tempo de cada execução, em segundos.
 
     O timeit desliga o coletor de lixo enquanto mede; sem isso ele às vezes roda no meio
     de uma execução e infla o tempo (o ponto de 50% saía com ~22 ms em vez de ~12 ms).
     """
-    tempos = timeit.repeat(lambda: funcao(grafo), number=1, repeat=repeticoes)
-    return sum(tempos) / repeticoes
+    return timeit.repeat(lambda: funcao(grafo), number=1, repeat=repeticoes)
+
+
+def tempo_medio(funcao, grafo, repeticoes=5):
+    """Tempo médio de `repeticoes` execuções de funcao(grafo), em segundos."""
+    return sum(medir_tempos(funcao, grafo, repeticoes)) / repeticoes
+
+
+def pico_memoria(funcao, grafo):
+    """Roda funcao(grafo) uma vez e devolve o pico de memória alocada durante a execução, em bytes.
+
+    Fica numa execução separada do timeit porque o tracemalloc deixa o código mais lento.
+    O grafo foi criado antes do start, então só entram as estruturas do próprio algoritmo
+    (visitados, fila, distâncias, predecessores) e o retorno.
+    """
+    tracemalloc.start()
+    try:
+        funcao(grafo)
+        _, pico = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    return pico
 
 
 def contar_alcancados(retorno):
@@ -97,8 +120,10 @@ def executar_benchmark(pasta, saida, fracoes=FRACOES):
             g = amostrar(grafo_base, fracao)
             origem = maior_grau_saida(g) if usa_origem else None
             ultimo = {}  # guarda o retorno da última execução, para o relatório
-            t = tempo_medio(lambda gr: ultimo.update(funcao(gr, origem)), g)
+            tempos = medir_tempos(lambda gr: ultimo.update(funcao(gr, origem)), g)
+            t = sum(tempos) / len(tempos)
             custo_caso = custo(g, ultimo)
+            pico = pico_memoria(lambda gr: funcao(gr, origem), g)
             resultados.append({
                 "algoritmo": nome, "fracao": fracao, "nos": g.ordem(), "arestas": g.tamanho(),
                 "complexidade": complexidade,
@@ -106,7 +131,10 @@ def executar_benchmark(pasta, saida, fracoes=FRACOES):
                 "alcancados": contar_alcancados(ultimo),
                 "status": ultimo.get("status", "-"),
                 "tempo_medio_ms": round(t * 1000, 2),
+                "latencia_min_ms": round(min(tempos) * 1000, 2),
+                "latencia_max_ms": round(max(tempos) * 1000, 2),
                 "tempo_por_custo_teorico_ms": round(t / custo_caso * 1000, 6) if custo_caso else None,
+                "memoria_pico_kb": round(pico / 1024, 1),
             })
     Path(saida).mkdir(parents=True, exist_ok=True)
     with open(Path(saida) / "parte2_report.json", "w", encoding="utf-8") as f:

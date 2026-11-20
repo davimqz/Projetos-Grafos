@@ -507,28 +507,34 @@ Por fim, o valor extremo identificado influencia significativamente a magnitude 
 
 Fonte: `out/parte2/parte2_report.json`, `out/parte2/benchmark_escalabilidade.png`.
 
-Cada tempo é a média aritmética de cinco execuções com `timeit`. O carregamento do grafo e a
-amostragem ficaram fora da medição. As frações de 10%, 50% e 100% são relativas aos vértices
-do recorte. Cada subgrafo induzido mantém os arcos cujas duas extremidades foram selecionadas,
-resultando em 1.418 vértices e 130 arcos, 7.091 vértices e 6.477 arcos, e 14.182 vértices e
-25.111 arcos, respectivamente.
+Para cada algoritmo e tamanho de amostra, medimos o tempo de cinco execuções com `timeit`. A tabela apresenta a média dessas execuções. Para a amostra de 100%, mostramos também a latência mínima e máxima, ou seja, quanto duraram a execução mais rápida e a mais lenta das cinco. Os intervalos das outras amostras estão em `out/parte2/parte2_report.json`. Medimos o pico de memória alocada pelo Python com `tracemalloc` em uma execução separada, sem contar a memória do grafo, que já estava carregado. O carregamento e a amostragem ficaram fora das medições.
 
-| Algoritmo | 10% (ms) | 50% (ms) | 100% (ms) | Complexidade |
-|---|---:|---:|---:|---|
-| BFS | 0,60 | 3,75 | 6,95 | O(V + E) |
-| DFS | 1,60 | 10,87 | 31,35 | O(V + E) |
-| Dijkstra | 0,59 | 4,10 | 8,26 | O((V + E) log V) |
-| Bellman-Ford | 0,66 | 7.139,71 | 88.121,32 | O(V · E) |
+As porcentagens de 10%, 50% e 100% se referem aos vértices do recorte. Cada amostra mantém os arcos cujas duas extremidades foram selecionadas. A amostra de 10% ficou com 1.418 vértices e 130 arcos, a de 50% com 7.091 vértices e 6.477 arcos, e a de 100% com 14.182 vértices e 25.111 arcos.
+
+| Algoritmo | Média 10% (ms) | Média 50% (ms) | Média 100% (ms) | Latência 100% (ms) | Pico de memória em 10% / 50% / 100% (KiB) | Complexidade |
+|---|---:|---:|---:|---:|---|---|
+| BFS | 0,36 | 2,48 | 6,03 | 4,33 a 8,85 | 270 / 1.131 / 2.265 | O(V + E) |
+| DFS | 0,88 | 6,31 | 21,77 | 17,42 a 24,82 | 306 / 1.693 / 4.380 | O(V + E) |
+| Dijkstra | 0,37 | 3,25 | 6,16 | 5,77 a 6,52 | 169 / 726 / 1.454 | O((V + E) log V) |
+| Bellman-Ford | 0,51 | 5.538,81 | 42.610,19 | 41.337,47 a 44.237,39 | 220 / 1.195 / 3.497 | O(V · E) |
 
 ![Tempo médio por tamanho do grafo para BFS, DFS, Dijkstra e Bellman-Ford](../../out/parte2/benchmark_escalabilidade.png)
 
-A DFS percorreu todos os vértices de cada amostra. BFS, Dijkstra e Bellman-Ford partiram da mesma
-carteira em cada amostra e registraram 4, 537 e 1.267 vértices alcançados, respectivamente.
-O Dijkstra usou `valor_btc` como peso e validou os pesos de todos os arcos da amostra.
-O Bellman-Ford usou o saldo da carteira de destino como peso. Seu status foi `OK` com parada
-antecipada em 10% e `CICLO_NEGATIVO` em 50% e 100%.
+**Latência.** Na amostra de 100%, BFS e Dijkstra levaram, em média, cerca de 6 ms. A diferença apareceu na variação entre as cinco execuções. A BFS levou de 4,33 a 8,85 ms, enquanto o Dijkstra ficou entre 5,77 e 6,52 ms. Para o Bellman-Ford, a média foi de 42,61 segundos, com as cinco execuções entre 41,34 e 44,24 segundos.
 
-> **[A ESCREVER — Vagner]** Comparar o crescimento observado com a complexidade teórica.
+**Memória.** A DFS apresentou o maior pico de memória nos três tamanhos. Na amostra de 10%, a BFS usou cerca de 270 KiB mesmo alcançando apenas quatro carteiras, pois prepara estruturas de visita para todos os vértices da amostra. De 50% para 100%, o número de vértices dobrou e o pico de memória da BFS e do Dijkstra também praticamente dobrou. No mesmo intervalo, o pico da DFS cresceu cerca de 2,6 vezes e o do Bellman-Ford, 2,9 vezes.
+
+#### Comparação com a complexidade teórica
+
+Para comparar os tempos com a teoria, calculamos quantas vezes o tempo médio aumentou de uma amostra para outra e quantas vezes a expressão de pior caso cresceu no mesmo intervalo. Usamos o número de vértices (V) e de arcos (E) de cada amostra para calcular essas expressões.
+
+De 10% para 50%, o tempo da DFS cresceu 7,17 vezes, o da BFS cresceu 6,89 vezes e o do Dijkstra cresceu 8,78 vezes. Nesse intervalo, V + E, expressão de referência para DFS e BFS, cresceu 8,76 vezes. Para o Dijkstra, (V + E) log V cresceu 10,71 vezes. A DFS percorreu a amostra inteira e levou mais tempo que a BFS e o Dijkstra nos três tamanhos. No caso da BFS, o número de carteiras alcançadas passou de 4 para 537, cerca de 134 vezes, enquanto o tempo aumentou 6,89 vezes. A quantidade de carteiras visitadas explica apenas parte do tempo, já que a BFS também prepara estruturas para todos os vértices. Na amostra de 10%, os quatro tempos médios ficaram abaixo de 1 ms, o que torna as razões mais sensíveis a pequenas variações na medição.
+
+De 50% para 100%, o tempo da DFS cresceu 3,45 vezes, acima das 2,90 vezes de crescimento de V + E. A BFS tem a mesma complexidade de pior caso, mas seu tempo cresceu 2,43 vezes. Como ela só percorre os arcos que saem das carteiras alcançadas, parte dos arcos da amostra fica fora da busca. O tempo do Dijkstra cresceu 1,90 vez, enquanto (V + E) log V cresceu 3,12 vezes. A implementação verifica os pesos de todos os arcos e usa a fila de prioridade apenas na região alcançável a partir da origem.
+
+O Bellman-Ford teve o maior salto de 10% para 50%. Seu tempo cresceu cerca de 10.860 vezes, enquanto V × E cresceu cerca de 249 vezes. Na amostra de 10%, o algoritmo parou antes. Não havia ciclo negativo alcançável a partir da origem e, depois de uma rodada sem mudança nas distâncias, a busca terminou. Na amostra de 50%, havia um ciclo negativo alcançável. As distâncias continuaram diminuindo, e o algoritmo executou todas as rodadas. Essa mudança de comportamento, junto com o aumento do grafo, ajuda a explicar o salto no tempo.
+
+Na amostra de 100%, o Bellman-Ford também executou todas as rodadas. Entre 50% e 100%, o tempo médio passou de 5,54 para 42,61 segundos, um aumento de 7,69 vezes. Nesse intervalo, o crescimento observado ficou próximo das 7,75 vezes de crescimento de V × E.
 
 #### Gráficos complementares do benchmark
 
@@ -557,9 +563,12 @@ dos dois caminhos. O total do BFS foi calculado depois da busca.
 
 #### Decisões
 
-A escolha da carteira de maior grau de saída como origem no BFS e Bellman-Ford foi arbitrária, escolhido porque com mais graus de saída tem uma maior probabilidade de se conseguir uma maior sequência de nós conectados, mesmo que não tenha sido o caso, a regra diz que a origem pode ser escolhida de forma arbitrária. A escala log foi escolhida porque permite ver melhor a diferença entre os números. A fórmula do custo vem da complexidade de cada algoritmo, com base no código deles.
+A escolha da carteira de maior grau de saída como origem na BFS, no Dijkstra e no Bellman-Ford foi arbitrária, escolhido porque com mais graus de saída tem uma maior probabilidade de se conseguir uma maior sequência de nós conectados, mesmo que não tenha sido o caso, a regra diz que a origem pode ser escolhida de forma arbitrária. A escala log foi escolhida porque permite ver melhor a diferença entre os números. A fórmula do custo vem da complexidade de cada algoritmo, com base no código deles.
 
 O gráfico de tempo é um gráfico de linha, escolhido por ser simples.
+
+A tabela mostra a latência apenas da amostra de 100% para não ficar larga demais e porque, nesse tamanho, as execuções duram o suficiente para a variação entre elas ser comparável. Na amostra de 10%, todas ficaram abaixo de 1 ms. Os intervalos das outras amostras estão no JSON.
+
 
 #### Limitações
 
@@ -567,7 +576,17 @@ Uma limitação é a amostra de 10%. Ela é um sorteio com seed fixa, que pega 1
 
 ### 5.7 Discussão crítica
 
-> **[A ESCREVER — Davi e Vagner]** Quando e por que cada algoritmo é mais adequado.
+#### Quando e por que usar cada algoritmo
+
+Cada algoritmo foi feito para responder a um tipo de pergunta. Conhecendo o objetivo de cada um, podemos dizer qual é mais adequado para cada caso.
+
+BFS. O objetivo da BFS é descobrir quantos repasses separam duas carteiras e quais carteiras podem ser alcançadas em até k passos. Como a busca visita os vértices por camadas, a primeira vez que chega a uma carteira já encontrou um caminho com o menor número de arcos. Por isso, ela é a mais adequada quando todos os repasses têm o mesmo valor para a análise. 
+
+DFS. O objetivo da DFS é explorar a estrutura das conexões. Ela segue um ramo em profundidade antes de voltar. Ela é a mais adequada para para entender se existem ciclos, além de ver quais regiões estão ligadas entre si. No benchmark, a DFS foi executada sem uma fonte específica: sempre que terminava uma busca, recomeçava em um vértice ainda não visitado. Por isso percorreu todas as carteiras de cada amostra.
+
+Dijkstra. O objetivo do Dijkstra é encontrar o caminho com a menor soma dos pesos, desde que todos os arcos tenham peso maior ou igual a zero. Com pesos não negativos, nenhum caminho encontrado depois pode ficar mais barato que a menor distância ainda aberta, e por isso a fila de prioridade pode tratar como definitiva a carteira que ela retira. No projeto, usamos valor_btc como peso.
+
+Bellman-Ford. O objetivo do Bellman-Ford é encontrar a menor soma dos pesos quando existem pesos negativos e detectar um ciclo de custo negativo alcançável a partir da origem. Na Parte 2, o peso de cada arco é o saldo líquido da carteira de destino. Com esse peso existem arcos negativos, e o Dijkstra não pode ser usado: a implementação recusa pesos negativos. O algoritmo atualiza as distâncias por até V − 1 rodadas. Se uma distância ainda puder diminuir na verificação seguinte, existe um ciclo negativo alcançável. Nas situações que tem ciclo negativo, repetir o ciclo reduz a soma dos pesos a cada volta, de modo que não há custo mínimo finito para os destinos alcançáveis a partir dele.
 
 #### Resposta à pergunta de pesquisa
 
