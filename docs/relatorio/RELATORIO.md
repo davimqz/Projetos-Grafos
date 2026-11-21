@@ -507,28 +507,34 @@ Por fim, o valor extremo identificado influencia significativamente a magnitude 
 
 Fonte: `out/parte2/parte2_report.json`, `out/parte2/benchmark_escalabilidade.png`.
 
-Cada tempo é a média aritmética de cinco execuções com `timeit`. O carregamento do grafo e a
-amostragem ficaram fora da medição. As frações de 10%, 50% e 100% são relativas aos vértices
-do recorte. Cada subgrafo induzido mantém os arcos cujas duas extremidades foram selecionadas,
-resultando em 1.418 vértices e 130 arcos, 7.091 vértices e 6.477 arcos, e 14.182 vértices e
-25.111 arcos, respectivamente.
+Para cada algoritmo e tamanho de amostra, medimos o tempo de cinco execuções com `timeit`. A tabela apresenta a média dessas execuções. Para a amostra de 100%, mostramos também a latência mínima e máxima, ou seja, quanto duraram a execução mais rápida e a mais lenta das cinco. Os intervalos das outras amostras estão em `out/parte2/parte2_report.json`. Medimos o pico de memória alocada pelo Python com `tracemalloc` em uma execução separada, sem contar a memória do grafo, que já estava carregado. O carregamento e a amostragem ficaram fora das medições.
 
-| Algoritmo | 10% (ms) | 50% (ms) | 100% (ms) | Complexidade |
-|---|---:|---:|---:|---|
-| BFS | 0,60 | 3,75 | 6,95 | O(V + E) |
-| DFS | 1,60 | 10,87 | 31,35 | O(V + E) |
-| Dijkstra | 0,59 | 4,10 | 8,26 | O((V + E) log V) |
-| Bellman-Ford | 0,66 | 7.139,71 | 88.121,32 | O(V · E) |
+As porcentagens de 10%, 50% e 100% se referem aos vértices do recorte. Cada amostra mantém os arcos cujas duas extremidades foram selecionadas. A amostra de 10% ficou com 1.418 vértices e 130 arcos, a de 50% com 7.091 vértices e 6.477 arcos, e a de 100% com 14.182 vértices e 25.111 arcos.
+
+| Algoritmo | Média 10% (ms) | Média 50% (ms) | Média 100% (ms) | Latência 100% (ms) | Pico de memória em 10% / 50% / 100% (KiB) | Complexidade |
+|---|---:|---:|---:|---:|---|---|
+| BFS | 0,36 | 2,48 | 6,03 | 4,33 a 8,85 | 270 / 1.131 / 2.265 | O(V + E) |
+| DFS | 0,88 | 6,31 | 21,77 | 17,42 a 24,82 | 306 / 1.693 / 4.380 | O(V + E) |
+| Dijkstra | 0,37 | 3,25 | 6,16 | 5,77 a 6,52 | 169 / 726 / 1.454 | O((V + E) log V) |
+| Bellman-Ford | 0,51 | 5.538,81 | 42.610,19 | 41.337,47 a 44.237,39 | 220 / 1.195 / 3.497 | O(V · E) |
 
 ![Tempo médio por tamanho do grafo para BFS, DFS, Dijkstra e Bellman-Ford](../../out/parte2/benchmark_escalabilidade.png)
 
-A DFS percorreu todos os vértices de cada amostra. BFS, Dijkstra e Bellman-Ford partiram da mesma
-carteira em cada amostra e registraram 4, 537 e 1.267 vértices alcançados, respectivamente.
-O Dijkstra usou `valor_btc` como peso e validou os pesos de todos os arcos da amostra.
-O Bellman-Ford usou o saldo da carteira de destino como peso. Seu status foi `OK` com parada
-antecipada em 10% e `CICLO_NEGATIVO` em 50% e 100%.
+**Latência.** Na amostra de 100%, BFS e Dijkstra levaram, em média, cerca de 6 ms. A diferença apareceu na variação entre as cinco execuções. A BFS levou de 4,33 a 8,85 ms, enquanto o Dijkstra ficou entre 5,77 e 6,52 ms. Para o Bellman-Ford, a média foi de 42,61 segundos, com as cinco execuções entre 41,34 e 44,24 segundos.
 
-> **[A ESCREVER — Vagner]** Comparar o crescimento observado com a complexidade teórica.
+**Memória.** A DFS apresentou o maior pico de memória nos três tamanhos. Na amostra de 10%, a BFS usou cerca de 270 KiB mesmo alcançando apenas quatro carteiras, pois prepara estruturas de visita para todos os vértices da amostra. De 50% para 100%, o número de vértices dobrou e o pico de memória da BFS e do Dijkstra também praticamente dobrou. No mesmo intervalo, o pico da DFS cresceu cerca de 2,6 vezes e o do Bellman-Ford, 2,9 vezes.
+
+#### Comparação com a complexidade teórica
+
+Para comparar os tempos com a teoria, calculamos quantas vezes o tempo médio aumentou de uma amostra para outra e quantas vezes a expressão de pior caso cresceu no mesmo intervalo. Usamos o número de vértices (V) e de arcos (E) de cada amostra para calcular essas expressões.
+
+De 10% para 50%, o tempo da DFS cresceu 7,17 vezes, o da BFS cresceu 6,89 vezes e o do Dijkstra cresceu 8,78 vezes. Nesse intervalo, V + E, expressão de referência para DFS e BFS, cresceu 8,76 vezes. Para o Dijkstra, (V + E) log V cresceu 10,71 vezes. A DFS percorreu a amostra inteira e levou mais tempo que a BFS e o Dijkstra nos três tamanhos. No caso da BFS, o número de carteiras alcançadas passou de 4 para 537, cerca de 134 vezes, enquanto o tempo aumentou 6,89 vezes. A quantidade de carteiras visitadas explica apenas parte do tempo, já que a BFS também prepara estruturas para todos os vértices. Na amostra de 10%, os quatro tempos médios ficaram abaixo de 1 ms, o que torna as razões mais sensíveis a pequenas variações na medição.
+
+De 50% para 100%, o tempo da DFS cresceu 3,45 vezes, acima das 2,90 vezes de crescimento de V + E. A BFS tem a mesma complexidade de pior caso, mas seu tempo cresceu 2,43 vezes. Como ela só percorre os arcos que saem das carteiras alcançadas, parte dos arcos da amostra fica fora da busca. O tempo do Dijkstra cresceu 1,90 vez, enquanto (V + E) log V cresceu 3,12 vezes. A implementação verifica os pesos de todos os arcos e usa a fila de prioridade apenas na região alcançável a partir da origem.
+
+O Bellman-Ford teve o maior salto de 10% para 50%. Seu tempo cresceu cerca de 10.860 vezes, enquanto V × E cresceu cerca de 249 vezes. Na amostra de 10%, o algoritmo parou antes. Não havia ciclo negativo alcançável a partir da origem e, depois de uma rodada sem mudança nas distâncias, a busca terminou. Na amostra de 50%, havia um ciclo negativo alcançável. As distâncias continuaram diminuindo, e o algoritmo executou todas as rodadas. Essa mudança de comportamento, junto com o aumento do grafo, ajuda a explicar o salto no tempo.
+
+Na amostra de 100%, o Bellman-Ford também executou todas as rodadas. Entre 50% e 100%, o tempo médio passou de 5,54 para 42,61 segundos, um aumento de 7,69 vezes. Nesse intervalo, o crescimento observado ficou próximo das 7,75 vezes de crescimento de V × E.
 
 #### Gráficos complementares do benchmark
 
@@ -557,9 +563,12 @@ dos dois caminhos. O total do BFS foi calculado depois da busca.
 
 #### Decisões
 
-A escolha da carteira de maior grau de saída como origem no BFS e Bellman-Ford foi arbitrária, escolhido porque com mais graus de saída tem uma maior probabilidade de se conseguir uma maior sequência de nós conectados, mesmo que não tenha sido o caso, a regra diz que a origem pode ser escolhida de forma arbitrária. A escala log foi escolhida porque permite ver melhor a diferença entre os números. A fórmula do custo vem da complexidade de cada algoritmo, com base no código deles.
+A escolha da carteira de maior grau de saída como origem na BFS, no Dijkstra e no Bellman-Ford foi arbitrária, escolhido porque com mais graus de saída tem uma maior probabilidade de se conseguir uma maior sequência de nós conectados, mesmo que não tenha sido o caso, a regra diz que a origem pode ser escolhida de forma arbitrária. A escala log foi escolhida porque permite ver melhor a diferença entre os números. A fórmula do custo vem da complexidade de cada algoritmo, com base no código deles.
 
 O gráfico de tempo é um gráfico de linha, escolhido por ser simples.
+
+A tabela mostra a latência apenas da amostra de 100% para não ficar larga demais e porque, nesse tamanho, as execuções duram o suficiente para a variação entre elas ser comparável. Na amostra de 10%, todas ficaram abaixo de 1 ms. Os intervalos das outras amostras estão no JSON.
+
 
 #### Limitações
 
@@ -567,7 +576,17 @@ Uma limitação é a amostra de 10%. Ela é um sorteio com seed fixa, que pega 1
 
 ### 5.7 Discussão crítica
 
-> **[A ESCREVER — Davi e Vagner]** Quando e por que cada algoritmo é mais adequado.
+#### Quando e por que usar cada algoritmo
+
+Cada algoritmo foi feito para responder a um tipo de pergunta. Conhecendo o objetivo de cada um, podemos dizer qual é mais adequado para cada caso.
+
+BFS. O objetivo da BFS é descobrir quantos repasses separam duas carteiras e quais carteiras podem ser alcançadas em até k passos. Como a busca visita os vértices por camadas, a primeira vez que chega a uma carteira já encontrou um caminho com o menor número de arcos. Por isso, ela é a mais adequada quando todos os repasses têm o mesmo valor para a análise. 
+
+DFS. O objetivo da DFS é explorar a estrutura das conexões. Ela segue um ramo em profundidade antes de voltar. Ela é a mais adequada para para entender se existem ciclos, além de ver quais regiões estão ligadas entre si. No benchmark, a DFS foi executada sem uma fonte específica: sempre que terminava uma busca, recomeçava em um vértice ainda não visitado. Por isso percorreu todas as carteiras de cada amostra.
+
+Dijkstra. O objetivo do Dijkstra é encontrar o caminho com a menor soma dos pesos, desde que todos os arcos tenham peso maior ou igual a zero. Com pesos não negativos, nenhum caminho encontrado depois pode ficar mais barato que a menor distância ainda aberta, e por isso a fila de prioridade pode tratar como definitiva a carteira que ela retira. No projeto, usamos valor_btc como peso.
+
+Bellman-Ford. O objetivo do Bellman-Ford é encontrar a menor soma dos pesos quando existem pesos negativos e detectar um ciclo de custo negativo alcançável a partir da origem. Na Parte 2, o peso de cada arco é o saldo líquido da carteira de destino. Com esse peso existem arcos negativos, e o Dijkstra não pode ser usado: a implementação recusa pesos negativos. O algoritmo atualiza as distâncias por até V − 1 rodadas. Se uma distância ainda puder diminuir na verificação seguinte, existe um ciclo negativo alcançável. Nas situações que tem ciclo negativo, repetir o ciclo reduz a soma dos pesos a cada volta, de modo que não há custo mínimo finito para os destinos alcançáveis a partir dele.
 
 #### Resposta à pergunta de pesquisa
 
@@ -597,22 +616,133 @@ Fonte: `notebooks/avd/01_exploratoria.ipynb`, figuras em `out/parte2/avd/`.
 
 ### 6.1 Exploração (4 pilares)
 
-> **[A ESCREVER — Vagner]** Estrutural, distribucional, relacional e outliers, a partir das notas do notebook.
+#### Estrutural
+
+É importante enfatizar que nós juntamos previamente os pares ordenados em apenas uma aresta. Logo, se houver 10 ligações A → B, elas viram apenas 1 aresta no nosso recorte, e a variável `n_txs` guarda o número de transações desse par ordenado.
+
+Conseguimos observar que possuímos mais arestas com peso positivo (13.174, 52,5%), mas ainda possuímos muitas arestas com peso nulo e negativo (8.658, 34,5%, e 3.279, 13,1%, respectivamente). O peso neste projeto funciona da seguinte forma: o peso de uma aresta A → B é o saldo líquido da carteira de destino B, ou seja, o total de BTC recebido menos o total enviado. Peso positivo indica que B acumula BTC, negativo indica que B repassa mais do que recebe, e nulo indica que B envia tudo o que recebe.
+
+Em relação à classe das carteiras (ilícito, lícito e desconhecido), temos valores parecidos entre os grupos: 5.208 ilícitas (36,7%), 4.713 desconhecidas (33,2%) e 4.261 lícitas (30,0%).
+
+Além disso, os graus de entrada e de saída têm a mesma média (1,77), o que é esperado, pois cada aresta soma 1 na saída de uma carteira e 1 na entrada de outra. Porém, há uma diferença grande no desvio padrão entre eles (30,51 no grau de entrada contra 9,67 no grau de saída): poucas carteiras recebem de muitas outras (o maior grau de entrada é 2.719, contra 1.002 no de saída).
+
+A densidade do grafo é próxima de 0, então é um grafo esparso: cada carteira se liga a poucas das outras carteiras do recorte.
+
+O grafo é formado por 2.555 transações. Uma transação pode gerar várias arestas, e uma aresta pode juntar várias transações do mesmo par. Por isso, a forma que escolhemos de juntar as ligações em uma aresta poderia fazer uma mesma aresta reunir uma transação lícita e outra ilícita. Mas em nenhum caso do recorte isso ocorre. Das 2.555 transações, 1.130 são desconhecidas, 644 são ilícitas e 781 são lícitas.
+
+#### Distribucional
+
+Na maioria dos atributos, os valores ficam concentrados nos números pequenos, mas algumas carteiras apresentam valores muito altos. Por isso, a média acaba ficando bem maior que a mediana, e o desvio padrão também costuma ser alto. O BTC recebido tem mediana de 0,0038 e média de 2,02. No BTC enviado, a mediana é 0,0051 e a média é 2,97, chegando ao máximo de 19.196 BTC. O número de transações tem mediana 2 e máximo de 639. Em geral, uma carteira movimenta pouco BTC, enquanto poucas carteiras muito grandes concentram a maior parte do volume.
+
+O saldo funciona de um jeito um pouco diferente. Mais da metade das carteiras (52,4%) tem saldo exatamente zero. Mesmo assim, existem alguns saldos negativos muito altos: os valores vão de −12.586 a +1.079 BTC. Por causa desses valores extremos, a média (−0,96) fica abaixo da mediana (0). Lembrando que isso é um recorte, e não toda a história do Bitcoin; por isso, podemos ter valores negativos.
+
+Nas ligações entre as carteiras, o peso tem média de −50,37 e mediana de 0,0037. A média fica negativa por causa de poucos casos muito extremos: as 754 ligações com peso abaixo de −100 pertencem a apenas 4 carteiras e, juntas, têm um peso maior que o total das outras ligações. Isso acontece porque o saldo da carteira de destino é repetido em todas as ligações que chegam até ela. O `valor_btc` tem mediana 4 e média 46,1. O `n_txs` é quase sempre 1: isso acontece em 99% dos pares, com média de 1,01 e máximo de 22. Portanto, cada par de carteiras normalmente faz uma única transação. O `num_timesteps_appeared_in` também tem mediana 1, o que significa que a maioria das carteiras aparece em apenas um intervalo de tempo.
+
+Em resumo, a média sozinha pode dar uma impressão errada sobre esses dados, porque poucos valores muito altos ou muito baixos influenciam bastante o resultado. Por isso, nos gráficos usamos principalmente medianas e proporções.
+
+#### Relacional
+
+No BTC recebido, as medianas das carteiras desconhecidas e ilícitas são próximas, 0,0049 e 0,0047 BTC. Nas lícitas, a mediana é 0 BTC. No BTC enviado, as desconhecidas têm mediana de 0,0099 BTC, contra 0,0051 BTC nas outras duas classes, e o intervalo entre o primeiro e o terceiro quartil também é maior entre elas.
+
+O tempo de vida tem mediana de 1 bloco nas ilícitas e desconhecidas e 0 blocos nas lícitas. As janelas de atividade têm mediana de 1 nas três classes, e tanto o primeiro quanto o terceiro quartil também ficam em 1. No grau de saída, a mediana é 1 aresta nas três classes. Nas lícitas, o primeiro quartil é 0 e o terceiro é 1. Nas outras duas classes, ambos são 1.
+
+A mediana da taxa é maior nas ilícitas (0,0321 BTC) do que nas desconhecidas (0,0035 BTC) e lícitas (0,0039 BTC). A mediana de transações é 2 nas ilícitas e desconhecidas e 1 nas lícitas. O saldo mediano é −0,0016 BTC nas lícitas e 0 nas outras classes. O grau de entrada mediano é 1 nas ilícitas e 0 nas desconhecidas e lícitas.
+
+Na matriz de Spearman, BTC recebido e enviado têm correlação de 0,07, e tempo de vida e janelas de atividade têm correlação de 0,42. As taxas têm correlação de −0,03 com BTC recebido, −0,12 com BTC enviado e 0,40 com o número de transações. Comparando com BTC recebido e enviado, nessa ordem, os coeficientes são −0,25 e 0,55 para o grau de saída e 0,48 e −0,33 para o grau de entrada. O saldo tem correlação de −0,49 com o BTC enviado, o que faz sentido porque o valor enviado é subtraído no cálculo do saldo.
+
+Para comparar classe e atributos, usamos 0 para lícita e 1 para ilícita. As carteiras desconhecidas ficam fora desse cálculo. O Spearman mede se valores maiores de um atributo tendem a acompanhar valores maiores ou menores do outro. Pelo valor absoluto, chamamos a associação de fraca abaixo de 0,30, moderada de 0,30 até abaixo de 0,50 e forte a partir de 0,50. A taxa teve associação forte e positiva (0,511). O número de transações (0,487) e o tempo de vida (0,427) tiveram associações moderadas e positivas. As outras seis foram fracas. Entre os nove atributos, só janelas de atividade teve sinal negativo (−0,101).
+
+O Spearman resume a tendência de subir ou descer. Para ver a forma da relação, olhamos as proporções por faixa. Entre as carteiras rotuladas, 55,0% são ilícitas (5.208 de 9.469). No BTC recebido, a proporção vai de 44,8% na faixa mais baixa para 84,5% na intermediária e cai para 45,9% na mais alta. São três faixas porque o mínimo e o primeiro quartil coincidem em zero. No BTC enviado, a proporção chega a 81,7% na penúltima faixa e cai para 47,8% na última. Nos dois casos, as proporções por faixa sobem e depois caem, um padrão que uma reta não descreve bem. Essa leitura vale para as faixas observadas.
+
+Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os totais de BTC e taxas e o tempo de vida vêm do histórico do endereço registrado no Elliptic++.
+
+Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
+
+#### Outliers
+
+A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, o 1º e o 3º quartis são iguais a 1. Isso significa que cerca de 70% das carteiras enviam para apenas uma outra carteira. Como o IQR é zero, qualquer carteira com grau diferente de 1 é considerada outlier, totalizando 4.204 casos. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
+
+Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. As carteiras lícitas também concentram a maior parcela dos outliers de saldo, com 1.784 casos, e de grau de saída, com 2.022 casos.
+
+Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
 
 ### 6.2 Dados faltantes e outliers
 
-> **[A ESCREVER — Vagner]** Mecanismo de ausência (classe "desconhecido") e tratamento justificado; avaliação e
-> tratamento dos outliers.
+#### Dados faltantes
+
+Nenhuma coluna das tabelas `nos` e `arestas` apresentou valores nulos. A ausência da classificação entre lícito e ilícito está registrada como `desconhecido`. Entre as 2.555 transações distintas que formam o recorte, 1.130 (44,2%) têm esse rótulo. Das 25.111 arestas, 4.778 (19,0%) foram formadas exclusivamente por transações desconhecidas. Entre as carteiras, 4.713 (33,2%) têm classe `desconhecido`.
+
+Uma transação é classificada como desconhecida, então todas as suas arestas são automaticamente classificadas como desconhecidas. Toda aresta recebe a classe de sua transação.
+
+Uma carteira ligada a pelo menos uma transação rotulada como ilícita é classificada como ilícita. Para a desconhecida, tem que ser menor ou igual a 3,7 a razão entre as contagens de transações desconhecidas e lícitas sobre ela.
+
+Então, a única variável verdadeiramente desconhecida é a transação, porque todas as outras desconhecidas herdam valores a partir dela.
+
+As transações desconhecidas vão praticamente para desconhecido e ilícito (40,2% e 59,6%), e as médias de arestas geradas por transação também são mais próximas de ilícito (4,2 e 8,1) contra 19,8. Então, há uma tendência de as transações desconhecidas serem mais próximas da classe ilícita do que da lícita. Também temos a mediana, que é 1 para desconhecidas e ilícitas e 6 para lícitas.
+
+Essas diferenças em características que conseguimos observar são evidência contra MCAR, que pressupõe que a falta do rótulo seja completamente ao acaso. Elas são compatíveis com MAR, em que a falta do rótulo pode ser explicada por variáveis observadas. MNAR seria o caso se, mesmo considerando essas variáveis, a falta do rótulo ainda dependesse da classe da própria transação. Como essa classe é justamente o que falta, os dados não permitem confirmar MNAR nem dizer que as transações desconhecidas têm mais chance de ser ilícitas.
+
+Mantivemos desconhecido como categoria própria, pois excluir essas carteiras removeria 55% das arestas.
+
+#### Outliers
+
+A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, o 1º e o 3º quartis são iguais a 1. Isso significa que cerca de 70% das carteiras enviam para apenas uma outra carteira. Como o IQR é zero, qualquer carteira com grau diferente de 1 é considerada outlier, totalizando 4.204 casos. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
+
+Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. As carteiras lícitas também concentram a maior parcela dos outliers de saldo, com 1.784 casos, e de grau de saída, com 2.022 casos.
+
+Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
 
 ### 6.3 Análise multivariada
 
-> **[A ESCREVER — Vagner]** Relação da classe com todos os demais atributos (direta ou não, linear ou não, força).
+No BTC recebido, as medianas das carteiras desconhecidas e ilícitas são próximas, 0,0049 e 0,0047 BTC. Nas lícitas, a mediana é 0 BTC. No BTC enviado, as desconhecidas têm mediana de 0,0099 BTC, contra 0,0051 BTC nas outras duas classes, e o intervalo entre o primeiro e o terceiro quartil também é maior entre elas.
+
+O tempo de vida tem mediana de 1 bloco nas ilícitas e desconhecidas e 0 blocos nas lícitas. As janelas de atividade têm mediana de 1 nas três classes, e tanto o primeiro quanto o terceiro quartil também ficam em 1. No grau de saída, a mediana é 1 aresta nas três classes. Nas lícitas, o primeiro quartil é 0 e o terceiro é 1. Nas outras duas classes, ambos são 1.
+
+A mediana da taxa é maior nas ilícitas (0,0321 BTC) do que nas desconhecidas (0,0035 BTC) e lícitas (0,0039 BTC). A mediana de transações é 2 nas ilícitas e desconhecidas e 1 nas lícitas. O saldo mediano é −0,0016 BTC nas lícitas e 0 nas outras classes. O grau de entrada mediano é 1 nas ilícitas e 0 nas desconhecidas e lícitas.
+
+Na matriz de Spearman, BTC recebido e enviado têm correlação de 0,07, e tempo de vida e janelas de atividade têm correlação de 0,42. As taxas têm correlação de −0,03 com BTC recebido, −0,12 com BTC enviado e 0,40 com o número de transações. Comparando com BTC recebido e enviado, nessa ordem, os coeficientes são −0,25 e 0,55 para o grau de saída e 0,48 e −0,33 para o grau de entrada. O saldo tem correlação de −0,49 com o BTC enviado, o que faz sentido porque o valor enviado é subtraído no cálculo do saldo.
+
+Para comparar classe e atributos, usamos 0 para lícita e 1 para ilícita. As carteiras desconhecidas ficam fora desse cálculo. O Spearman mede se valores maiores de um atributo tendem a acompanhar valores maiores ou menores do outro. Pelo valor absoluto, chamamos a associação de fraca abaixo de 0,30, moderada de 0,30 até abaixo de 0,50 e forte a partir de 0,50. A taxa teve associação forte e positiva (0,511). O número de transações (0,487) e o tempo de vida (0,427) tiveram associações moderadas e positivas. As outras seis foram fracas. Entre os nove atributos, só janelas de atividade teve sinal negativo (−0,101).
+
+O Spearman resume a tendência de subir ou descer. Para ver a forma da relação, olhamos as proporções por faixa. Entre as carteiras rotuladas, 55,0% são ilícitas (5.208 de 9.469). No BTC recebido, a proporção vai de 44,8% na faixa mais baixa para 84,5% na intermediária e cai para 45,9% na mais alta. São três faixas porque o mínimo e o primeiro quartil coincidem em zero. No BTC enviado, a proporção chega a 81,7% na penúltima faixa e cai para 47,8% na última. Nos dois casos, as proporções por faixa sobem e depois caem, um padrão que uma reta não descreve bem. Essa leitura vale para as faixas observadas.
+
+Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os totais de BTC e taxas e o tempo de vida vêm do histórico do endereço registrado no Elliptic++.
+
+Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
 
 ### 6.4 Visualizações exploratórias
 
-Para cada uma: figura, título, e a nota analítica (**o que mostra · insight · por que esse tipo de gráfico**).
+#### Exploratória 1: número de carteiras por classe
 
-> **[A ESCREVER — Vagner]** Exploratórias 1 a 4.
+![Número de carteiras por classe](../../out/parte2/avd/exploratoria_1.png)
+
+O gráfico mostra que as três classes têm quantidades parecidas de carteiras. A classe ilícita é a maior, com 5.208 carteiras, seguida pela classe desconhecida, com 4.713, e pela lícita, com 4.261. Portanto, nenhuma classe está muito acima das outras. Mesmo assim, é importante lembrar que esses números representam apenas o recorte analisado, e não toda a rede Bitcoin.
+
+Esse gráfico foi escolhido pois dá para ter uma boa visualização de quão próximos são o lícito, o ilícito e o desconhecido no número de carteiras. Por isso, a contagem na barra foi iniciada em 0.
+
+#### Exploratória 2: mediana do BTC total recebido por classe
+
+![Mediana do BTC total recebido por classe](../../out/parte2/avd/exploratoria_2.png)
+
+O gráfico compara a mediana do BTC recebido por classe. As carteiras desconhecidas apresentam o maior valor, com 0,0049 BTC, seguidas pelas ilícitas, com 0,0047 BTC. Já as carteiras lícitas têm mediana igual a 0. Isso mostra que, no recorte analisado, as carteiras desconhecidas e ilícitas recebem valores típicos parecidos, enquanto as lícitas apresentam um valor muito menor.
+
+Escolhi o gráfico de barras porque ele facilita a visualização e a comparação entre os tipos de carteira. A altura das barras mostra rapidamente qual classe tem a maior ou menor mediana, enquanto as cores e os valores escritos acima delas ajudam a identificar cada classe.
+
+#### Exploratória 3: para qual classe vão as arestas de cada classe
+
+![Para qual classe vão as arestas de cada classe](../../out/parte2/avd/exploratoria_3.png)
+
+O gráfico mostra para quais classes vão as arestas que saem de cada tipo de carteira. As carteiras ilícitas se conectam principalmente com outras ilícitas: 96% das suas arestas chegam nessa mesma classe. Já as carteiras desconhecidas e lícitas distribuem suas conexões de forma mais equilibrada entre as três classes, com valores próximos de um terço para cada uma. Isso mostra uma forte concentração das conexões entre carteiras ilícitas.
+
+Esse gráfico foi escolhido pois é de fácil visualização perceber o quanto as outras carteiras vão para distintas carteiras de forma quase igual entre elas, e a carteira ilícita vai praticamente apenas para a carteira ilícita.
+
+#### Exploratória 4: sinal do peso das arestas, pela classe do destino
+
+![Sinal do peso das arestas, pela classe do destino](../../out/parte2/avd/exploratoria_4.png)
+
+O gráfico mostra o sinal do peso das arestas de acordo com a classe da carteira de destino. Nas carteiras ilícitas, predominam os pesos zero, mas também há uma quantidade relevante de pesos positivos e negativos. Nas carteiras desconhecidas, os pesos positivos são maioria, seguidos pelos pesos zero e negativos. Já nas carteiras lícitas, uma grande maioria tem peso positivo, com poucos casos de peso zero ou negativo. Portanto, os pesos positivos aparecem principalmente nas carteiras lícitas, enquanto os pesos negativos são mais comuns nas carteiras ilícitas e desconhecidas.
+
+Esse gráfico foi escolhido pois é de fácil visualização ver o peso de cada aresta dependendo do tipo: com as barras agrupadas, dá para ver os sinais entre as classes.
 
 ### 6.5 Da exploratória à explanatória
 

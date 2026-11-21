@@ -6,7 +6,7 @@ import json
 import pytest
 
 from src.benchmark import (FRACOES, custo_bellman_ford, custo_busca, executar_benchmark, maior_grau_saida,
-                           tempo_medio)
+                           pico_memoria, tempo_medio)
 from src.carga_parte2 import PASTA_PADRAO
 from src.graphs.graph import Grafo
 
@@ -26,7 +26,15 @@ def test_relatorio_compara_os_algoritmos(tmp_path):
     assert dijkstra["alcancados"] == bfs["alcancados"]
     assert dijkstra["tempo_por_custo_teorico_ms"] is not None
     assert bellman_ford["status"] == "OK" and bellman_ford["tempo_por_custo_teorico_ms"] is None
+    assert all(r["memoria_pico_kb"] > 0 for r in relatorio)
+    assert all(r["latencia_min_ms"] <= r["tempo_medio_ms"] <= r["latencia_max_ms"] for r in relatorio)
     assert (tmp_path / "benchmark_escalabilidade.png").exists()
+
+
+def test_pico_memoria_conta_o_que_a_funcao_aloca():
+    pequeno = pico_memoria(lambda _: [0] * 10, None)
+    grande = pico_memoria(lambda _: [0] * 1_000_000, None)
+    assert grande > 7_000_000 > pequeno  # 1 milhão de ponteiros de 8 bytes
 
 
 def test_fracoes_do_plano():

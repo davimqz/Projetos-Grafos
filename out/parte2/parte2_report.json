@@ -8,8 +8,11 @@
     "origem": null,
     "alcancados": 1418,
     "status": "-",
-    "tempo_medio_ms": 1.6,
-    "tempo_por_custo_teorico_ms": 0.001037
+    "tempo_medio_ms": 0.88,
+    "latencia_min_ms": 0.84,
+    "latencia_max_ms": 0.93,
+    "tempo_por_custo_teorico_ms": 0.000569,
+    "memoria_pico_kb": 306.4
   },
   {
     "algoritmo": "DFS",
@@ -20,8 +23,11 @@
     "origem": null,
     "alcancados": 7091,
     "status": "-",
-    "tempo_medio_ms": 10.87,
-    "tempo_por_custo_teorico_ms": 0.000801
+    "tempo_medio_ms": 6.31,
+    "latencia_min_ms": 5.96,
+    "latencia_max_ms": 7.15,
+    "tempo_por_custo_teorico_ms": 0.000465,
+    "memoria_pico_kb": 1693.1
   },
   {
     "algoritmo": "DFS",
@@ -32,8 +38,11 @@
     "origem": null,
     "alcancados": 14182,
     "status": "-",
-    "tempo_medio_ms": 31.35,
-    "tempo_por_custo_teorico_ms": 0.000798
+    "tempo_medio_ms": 21.77,
+    "latencia_min_ms": 17.42,
+    "latencia_max_ms": 24.82,
+    "tempo_por_custo_teorico_ms": 0.000554,
+    "memoria_pico_kb": 4380.3
   },
   {
     "algoritmo": "BFS",
@@ -44,8 +53,11 @@
     "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
     "alcancados": 4,
     "status": "-",
-    "tempo_medio_ms": 0.6,
-    "tempo_por_custo_teorico_ms": 0.000419
+    "tempo_medio_ms": 0.36,
+    "latencia_min_ms": 0.31,
+    "latencia_max_ms": 0.43,
+    "tempo_por_custo_teorico_ms": 0.000254,
+    "memoria_pico_kb": 270.1
   },
   {
     "algoritmo": "BFS",
@@ -56,8 +68,11 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 537,
     "status": "-",
-    "tempo_medio_ms": 3.75,
-    "tempo_por_custo_teorico_ms": 0.000486
+    "tempo_medio_ms": 2.48,
+    "latencia_min_ms": 1.79,
+    "latencia_max_ms": 3.74,
+    "tempo_por_custo_teorico_ms": 0.000322,
+    "memoria_pico_kb": 1131.4
   },
   {
     "algoritmo": "BFS",
@@ -68,8 +83,11 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 1267,
     "status": "-",
-    "tempo_medio_ms": 6.95,
-    "tempo_por_custo_teorico_ms": 0.000428
+    "tempo_medio_ms": 6.03,
+    "latencia_min_ms": 4.33,
+    "latencia_max_ms": 8.85,
+    "tempo_por_custo_teorico_ms": 0.000371,
+    "memoria_pico_kb": 2265.0
   },
   {
     "algoritmo": "Dijkstra",
@@ -80,8 +98,11 @@
     "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
     "alcancados": 4,
     "status": "OK",
-    "tempo_medio_ms": 0.59,
-    "tempo_por_custo_teorico_ms": 0.000375
+    "tempo_medio_ms": 0.37,
+    "latencia_min_ms": 0.34,
+    "latencia_max_ms": 0.46,
+    "tempo_por_custo_teorico_ms": 0.000237,
+    "memoria_pico_kb": 168.8
   },
   {
     "algoritmo": "Dijkstra",
@@ -92,8 +113,11 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 537,
     "status": "OK",
-    "tempo_medio_ms": 4.1,
-    "tempo_por_custo_teorico_ms": 0.00019
+    "tempo_medio_ms": 3.25,
+    "latencia_min_ms": 2.46,
+    "latencia_max_ms": 5.01,
+    "tempo_por_custo_teorico_ms": 0.000151,
+    "memoria_pico_kb": 726.0
   },
   {
     "algoritmo": "Dijkstra",
@@ -104,8 +128,11 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 1267,
     "status": "OK",
-    "tempo_medio_ms": 8.26,
-    "tempo_por_custo_teorico_ms": 0.000122
+    "tempo_medio_ms": 6.16,
+    "latencia_min_ms": 5.77,
+    "latencia_max_ms": 6.52,
+    "tempo_por_custo_teorico_ms": 9.1e-05,
+    "memoria_pico_kb": 1454.3
   },
   {
     "algoritmo": "Bellman-Ford",
@@ -116,8 +143,11 @@
     "origem": "3Lk6THpWwGBzz2T3DT6nZD22zB5VeqFgNe",
     "alcancados": 4,
     "status": "OK",
-    "tempo_medio_ms": 0.66,
-    "tempo_por_custo_teorico_ms": null
+    "tempo_medio_ms": 0.51,
+    "latencia_min_ms": 0.42,
+    "latencia_max_ms": 0.76,
+    "tempo_por_custo_teorico_ms": null,
+    "memoria_pico_kb": 219.5
   },
   {
     "algoritmo": "Bellman-Ford",
@@ -128,8 +158,11 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 537,
     "status": "CICLO_NEGATIVO",
-    "tempo_medio_ms": 7139.71,
-    "tempo_por_custo_teorico_ms": 0.000155
+    "tempo_medio_ms": 5538.81,
+    "latencia_min_ms": 5453.75,
+    "latencia_max_ms": 5740.65,
+    "tempo_por_custo_teorico_ms": 0.000121,
+    "memoria_pico_kb": 1194.6
   },
   {
     "algoritmo": "Bellman-Ford",
@@ -140,7 +173,10 @@
     "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
     "alcancados": 1267,
     "status": "CICLO_NEGATIVO",
-    "tempo_medio_ms": 88121.32,
-    "tempo_por_custo_teorico_ms": 0.000247
+    "tempo_medio_ms": 42610.19,
+    "latencia_min_ms": 41337.47,
+    "latencia_max_ms": 44237.39,
+    "tempo_por_custo_teorico_ms": 0.00012,
+    "memoria_pico_kb": 3496.5
   }
 ]
