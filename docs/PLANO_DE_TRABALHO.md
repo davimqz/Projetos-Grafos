@@ -38,7 +38,7 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 
 ## Parte 1 — tarefas
 
-> Status atualizado em 19/11/2026. Resumo, cronograma e pedidos da reunião de 19/11 (R1 a R8) em `PROXIMOS_PASSOS.md`.
+> Status da Parte 1 atualizado em 21/11/2026. Resumo, cronograma e pedidos da reunião de 19/11 (R1 a R8) em `PROXIMOS_PASSOS.md`.
 > Enunciado e critérios em `docs/referencias/`.
 
 ### P1 · Modelagem (Matheus / rev. Thomaz)
@@ -68,7 +68,11 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] `armadilhas_m04.csv`, `armadilhas_m07.csv` (busca a partir de ALVO no transposto)
 - [ ] **R1** CLI: `--mapa` roda `executar_parte1` (mapa surpresa) e `--armadilhas` calcula sem arquivo externo
 - [ ] **R7** tempo e memória por algoritmo e mapa
-- [ ] 2 mapas em `data/mapas_grupo/` (≥3 chaves + esteira + bônus no caminho ótimo; ≥20% armadilhas) + gabarito
+- [x] 2 mapas em `data/mapas_grupo/`: `g01_tres_depositos.txt` e `g02_poco_lateral.txt`, com gabaritos TXT em
+      `data/solucoes_mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes). Requisitos conferidos automaticamente
+      com o código existente; execução pelo agente registrada em `REGISTRO_IA.md`.
+- [ ] conferência final dos mapas e gabaritos pelo grupo e revisão por Thomaz
+- [ ] saídas CSV/JSON dos mapas do grupo em `out/parte1/`, junto das demais saídas obrigatórias
 - [ ] textos do PDF: m01 (BFS × Dijkstra), m06 (exploit e correção), m07 (sem solução), grafo não dirigido estaria errado
 
 ### P5a · Visualização Parte 1 (Thomaz / rev. Matheus)
@@ -76,7 +80,8 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] G_est do m02 em camadas (destacar arcos entre camadas) · árvore BFS do m02 com níveis
 - [x] heatmap de multiplicidade do m08
 - [x] `labirinto_interativo.html`: mapa + algoritmo, passo a passo, estado atual, camadas, controle de velocidade
-- [ ] **R2** HTML gerado pelo Python com as armadilhas de m04/m07 realçadas e os mapas do grupo
+- [x] mapas do grupo incluídos no HTML gerado pelo Python e no React (commit `5b1eba5`, revisão/PR pendentes)
+- [ ] **R2** HTML gerado pelo Python com as armadilhas de m04/m07 realçadas
 - [x] (bônus) front React (`front-react/`) com labirinto, figuras e AVD
 - [ ] **R3** comparação dos 4 algoritmos no mesmo mapa · **R4** upload de `.txt` pelo front
 

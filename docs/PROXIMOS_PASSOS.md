@@ -25,6 +25,9 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 - O relatório tem **23 marcadores** `[A ESCREVER]`/`[COMPLETAR]`: 11 na Parte 1 (seção 4), 4 no manual e na
   implementação (2.2, 2.4, 2.5, 3), 2 na AVD, 5 de fechamento (7, 8, 9, 10.2, 11) e a nota do topo.
 - `python -m scripts.gerar_pdf` já gera o PDF e lista os marcadores que faltam.
+- Nesta branch, os dois mapas do grupo, seus gabaritos TXT e a integração ao HTML/React estão no commit
+  `5b1eba5`. Foram verificados com 157 testes selecionados, build do React e geração das cinco figuras P5a.
+  Revisão por Thomaz e integração na `main` permanecem pendentes; ainda não há número de PR registrado aqui.
 
 ## O que zera nota se faltar
 
@@ -33,7 +36,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 | Item | Consequência se faltar | Situação | Responsável |
 |---|---|---|---|
 | `docs/DECLARACAO_IA.pdf` no modelo da professora, **assinada pelos 4** (manuscrita ou gov.br), também postada no Classroom | Nota **zero** no projeto | **Não existe.** Falta o modelo da professora | Davi consegue o modelo; os 4 assinam |
-| Todo uso de IA declarado, com `# [IA]` no código e linha no `REGISTRO_IA.md` | Nota **zero** no projeto | Em dia até o PR #38. Cada PR novo precisa trazer a sua linha | Cada autor |
+| Todo uso de IA declarado, com `# [IA]` no código e linha no `REGISTRO_IA.md` | Nota **zero** no projeto | Registros até o PR #38 e desta sessão da Parte 1, incluindo a feature dos mapas (`5b1eba5`). Cada PR novo precisa trazer a sua linha | Cada autor |
 | Todo integrante sabe explicar qualquer código, inclusive o feito com IA | Nota **zero** no projeto | Depende do ensaio | Todos |
 | Entregar as duas partes | Apresentação (2,0) **zerada** | As duas partes existem | — |
 | Os 4 postam todo o material no Classroom em 26/11 | Desconto ou falta de entrega individual | — | Cada um |
@@ -75,10 +78,15 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
   - Responsável: Matheus (4.8 com Thomaz). Prazo: 23/11.
 
 **Mapas do grupo (0,2)**
-- [ ] `data/mapas_grupo/` com 2 mapas (hoje está **vazio**):
-  1. pelo menos 3 chaves, esteiras e bônus, com o caminho de menor custo coletando um bônus e passando por uma esteira;
-  2. pelo menos 20% dos estados alcançáveis sendo armadilha.
-- [ ] Os dois rodados pelo código, com saídas em `out/parte1/`.
+- [x] Dois mapas em `data/mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes):
+  1. `g01_tres_depositos.txt`: 3 chaves; o percurso de menor custo retornado pelo código coleta 2 bônus e passa
+     por 3 esteiras. G_est: 104 estados e 194 arcos físicos; BFS: 48 passos; Bellman-Ford: custo 38.
+  2. `g02_poco_lateral.txt`: 75 de 94 estados são armadilha (79,79%). G_est: 94 estados e 230 arcos físicos;
+     BFS: 18 passos; menor custo: 18.
+- [x] Execução pelo agente das funções existentes do grupo e gabaritos com métricas, status e caminhos em
+      `data/solucoes_mapas_grupo/solucao_<mapa>.txt` (commit `5b1eba5`; uso descrito em `REGISTRO_IA.md`).
+- [ ] Conferência final dos mapas e gabaritos pelo grupo, incluindo originalidade em relação aos outros grupos.
+- [ ] CSVs/JSONs definitivos dos dois mapas em `out/parte1/`, junto das saídas obrigatórias dos mapas fornecidos.
 - [ ] Relatório 4.10: desenho de cada mapa e gabarito (estados, arcos, passos BFS e custo).
   - Não podem ser os mapas de `data/mapas_treino/`, nem parecidos com os de outro grupo.
   - Responsável: Matheus. Prazo: 22/11.
@@ -90,7 +98,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [ ] **Realce dos estados-armadilha no HTML (R2).** Hoje o HTML mostra "Não fornecidas" porque `gerar_figuras` não
       passa as armadilhas.
   - Pronto quando: abrir m04 e m07 no HTML e ver as armadilhas marcadas.
-- [ ] Mapas do grupo incluídos no HTML.
+- [x] Mapas do grupo incluídos no HTML e na seleção do React (commit `5b1eba5`, revisão/PR pendentes).
 - [ ] Relatório 4.11: as figuras com legenda e uma frase sobre o que cada uma mostra.
   - Responsável: Thomaz. Prazo: 23/11.
 
@@ -213,7 +221,8 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 
 ### Matheus (P1 + P3, revisor: Thomaz)
 - [ ] R1 completo (lista acima) — 22/11
-- [ ] 2 mapas do grupo com gabarito — 22/11
+- [x] 2 mapas do grupo com gabaritos TXT — commit `5b1eba5` (revisão/PR pendentes).
+- [ ] Conferência final dos mapas/gabaritos pelo grupo e revisão por Thomaz — 22/11
 - [ ] Todas as saídas de `out/parte1/` commitadas — 22/11
 - [ ] R7 da Parte 1: tempo e memória por algoritmo e mapa (pode reaproveitar `src/benchmark.py`) — 23/11
 - [ ] Seções 2.2 e 4.1 a 4.10, com o G_est do m02 desenhado à mão e a prova do m05 — 23/11
@@ -221,7 +230,8 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 - [ ] Limitações da Parte 1 (seção 8) — 25/11
 
 ### Thomaz (P2 + P5a, revisor: Matheus)
-- [ ] R2: armadilhas e mapas do grupo no `labirinto_interativo.html` — 22/11
+- [x] Mapas do grupo no `labirinto_interativo.html` — commit `5b1eba5` (revisão/PR pendentes).
+- [ ] R2: realce das armadilhas no `labirinto_interativo.html` — 22/11
 - [ ] Seções 2.4, 3, 4.8 (com Matheus) e 4.11 — 23/11
 - [ ] R3 e R4 no front — 23/11
 - [ ] Bloco 6 do `APRESENTACAO.md`, com plano B se o front falhar — 24/11
