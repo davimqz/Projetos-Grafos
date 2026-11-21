@@ -6,9 +6,10 @@ As visualizações pertencem a src.viz e src.visualizar_parte1.
 """
 
 # [IA] Codex - separação por responsabilidade, preservando a lógica existente.
+# [IA] Codex - integração das exportações e compartilhamento de resultados com a CLI.
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 
 from src.parte1.analises import (
@@ -32,6 +33,7 @@ from src.parte1.buscas import (
 from src.parte1.carga import carregar_mapa
 from src.parte1.exportacao import exportar_arestas, exportar_csv, exportar_json
 from src.parte1.modelos import AlgoritmoCaminho, DadosMapa, GrauEstado, Solucao, StatusSolucao
+from src.parte1.modelos import ExecucaoMapa
 
 __all__ = [
     "AlgoritmoCaminho", "DadosMapa", "GrauEstado", "Solucao", "StatusSolucao",
@@ -45,6 +47,8 @@ __all__ = [
 # [IA] Codex - integração das análises do integrante e exportação dos resultados.
 def executar_parte1(
     mapas: Iterable[str | Path], saida: str | Path, *, fonte_consumivel: bool = False,
+    ao_processar: Callable[[ExecucaoMapa], None] | None = None,
+    gravar: Callable | None = None,
 ) -> None:
     """Orquestra as entregas dos mapas informados, incluindo mapas do grupo.
 
@@ -64,8 +68,9 @@ def executar_parte1(
 
     Os resultados da variante fonte_consumivel devem ir para uma pasta
     de saída diferente da execução padrão, escolhida pelo chamador.
-    Não implementa algoritmos, desenha figuras nem redige análises do PDF.
-    Erros de entrada e escrita são propagados para tratamento pela CLI.
+    ao_processar recebe os resultados para apresentação, antes de liberar as buscas.
+    gravar permite registrar exportações concluídas e tratar falhas de escrita.
+    Sem esses parâmetros, preserva o retorno None e a propagação de erros.
     """
 
     nomes_fornecidos = {
@@ -89,6 +94,8 @@ def executar_parte1(
 
     saida = Path(saida)
     saida.mkdir(parents=True, exist_ok=True)
+    if gravar is None:
+        gravar = lambda exportador, *args: exportador(*args)
     metricas: dict[str, object] = {}
     camadas: dict[str, object] = {}
     solucoes: list[Solucao] = []
@@ -100,7 +107,7 @@ def executar_parte1(
         dados = carregar_mapa(arquivo, nome=nome, fonte_consumivel=fonte_consumivel)
         graus = calcular_graus(dados)
         resultados_buscas: dict[str, dict] = {}
-        classificacao = classificar_arcos(dados)
+        classificacao = classificar_arcos(dados, resultados_buscas)
         classificacoes.append(classificacao)
         metricas[nome] = {
             **calcular_metricas_globais(dados),
@@ -109,8 +116,8 @@ def executar_parte1(
             "fonte_consumivel": fonte_consumivel,
         }
         camadas[nome] = calcular_camadas(dados)
-        exportar_arestas(dados, saida / f"arestas_{nome}.csv")
-        exportar_csv(
+        gravar(exportar_arestas, dados, saida / f"arestas_{nome}.csv")
+        gravar(exportar_csv,
             graus,
             ("estado", "grau_entrada", "grau_saida"),
             saida / f"graus_{nome}.csv",
@@ -127,21 +134,23 @@ def executar_parte1(
                     nome == "m06" or nome == "m05" and not fonte_consumivel
                 )
             )
-            if not reutilizar:
+            if not reutilizar and ao_processar is None:
                 resultados_buscas.pop(algoritmo, None)
 
         if nome in ("m02", "m03", "m04"):
             comparacoes.extend(_comparar_modelagens(dados, resultados_buscas))
-        if nome == "m03":
+        if nome == "m03" or ao_processar is not None:
             percurso = solucoes_mapa["DIJKSTRA"]
             if percurso["status"] == "RECUSA":
                 percurso = solucoes_mapa["BELLMAN_FORD"]
-            exportar_json(percurso, saida / "percurso_m03.json")
+            gravar(exportar_json, percurso, saida / f"percurso_{nome}.json")
         if nome == "m05" and not fonte_consumivel:
-            exportar_json(_comparar_bonus(dados, resultados_buscas), saida / "comparacao_bonus_m05.json")
-        if nome == "m06":
+            gravar(exportar_json, _comparar_bonus(dados, resultados_buscas), saida / "comparacao_bonus_m05.json")
+        if nome == "m06" or (
+            ao_processar is not None and resultados_buscas["BELLMAN_FORD"]["tem_ciclo_negativo"]
+        ):
             resultado = _resultado_busca(dados, "BELLMAN_FORD", resultados_buscas)
-            exportar_json(
+            gravar(exportar_json,
                 {
                     "mapa": nome,
                     "fonte_consumivel": fonte_consumivel,
@@ -150,32 +159,34 @@ def executar_parte1(
                     "ciclo_negativo": resultado["ciclo_negativo"],
                     "custo_ciclo": resultado["custo_ciclo"],
                 },
-                saida / "ciclo_negativo_m06.json",
+                saida / f"ciclo_negativo_{nome}.json",
             )
             del resultado
-        resultados_buscas.clear()
         # [IA] Codex - exporta o resultado existente também para mapas próprios.
         armadilhas = encontrar_armadilhas(dados)
-        exportar_csv(
+        gravar(exportar_csv,
             ({"estado": rotulo} for rotulo in armadilhas),
             ("estado",),
             saida / f"armadilhas_{nome}.csv",
         )
-        exportar_json(armadilhas, saida / f"armadilhas_{nome}.json")
+        gravar(exportar_json, armadilhas, saida / f"armadilhas_{nome}.json")
+        if ao_processar is not None:
+            ao_processar(ExecucaoMapa(dados, solucoes_mapa, classificacao, dict(resultados_buscas), armadilhas))
+        resultados_buscas.clear()
 
-    exportar_json(metricas, saida / "metricas_global.json")
-    exportar_json(camadas, saida / "camadas.json")
-    exportar_csv(
+    gravar(exportar_json, metricas, saida / "metricas_global.json")
+    gravar(exportar_json, camadas, saida / "camadas.json")
+    gravar(exportar_csv,
         solucoes,
         ("mapa", "algoritmo", "passos", "custo", "status", "caminho"),
         saida / "solucoes.csv",
     )
-    exportar_csv(
+    gravar(exportar_csv,
         classificacoes,
         ("mapa", "arvore", "retorno", "avanco", "cruzamento"),
         saida / "dfs_classificacao.csv",
     )
-    exportar_csv(
+    gravar(exportar_csv,
         comparacoes,
         ("mapa", "abordagem", "passos", "caminho_valido", "observacao"),
         saida / "comparacao_modelagem.csv",

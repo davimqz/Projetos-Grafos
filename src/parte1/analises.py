@@ -5,6 +5,7 @@ ALVO participa das buscas, mas não das métricas físicas.
 """
 
 # [IA] Codex - separação das análises existentes, preservando a lógica do integrante.
+# [IA] Codex - reaproveitamento do resultado da DFS na orquestração e visualização.
 from __future__ import annotations
 
 from collections import Counter
@@ -196,7 +197,7 @@ def _analisar_graus(dados: DadosMapa, graus: list[GrauEstado]) -> dict[str, obje
     }
 
 
-def classificar_arcos(dados: DadosMapa) -> dict[str, object]:
+def classificar_arcos(dados: DadosMapa, resultados: dict[str, dict] | None = None) -> dict[str, object]:
     """Prepara a linha de um mapa para dfs_classificacao.csv.
 
     Usa a DFS existente a partir da origem, preservando a ordem N, L, S, O.
@@ -208,7 +209,11 @@ def classificar_arcos(dados: DadosMapa) -> dict[str, object]:
     grafo = dados.grafo_estados
     inicio = dados.origem
 
-    resultado = dfs(grafo, inicio)
+    if resultados is None:
+        resultados = {}
+    if "DFS" not in resultados:
+        resultados["DFS"] = dfs(grafo, inicio)
+    resultado = resultados["DFS"]
 
     return {
         "mapa": dados.nome,
