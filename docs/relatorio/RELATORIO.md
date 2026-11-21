@@ -775,6 +775,12 @@ Lembrando que uma aresta é a ligação de uma carteira para outra carteira, e u
 
 Esse gráfico foi escolhido em barras horizontais, pois é uma forma de utlizar barras no eixo x,y, também foi considerado útil por no eixo x,y esse gráfico, e as partes principais foram coloridas de azul e vermelho para mostrar a discrepância entre elas. O título foi usado para mostrar que um número alto de transações não quer dizer um alto número de transferências. Ao lado das barras, com a mesma cor delas, foi posta a frase que explica o que cada grupo representa.
 
+#### Explanatória 2: proporção de arestas com peso positivo por classe do destino
+
+![Carteiras lícitas tendem a ser mais positivas do que os outros tipos de carteira](../../out/parte2/avd/explanatoria_2.png)
+
+Escolhi o dot plot porque ele é uma boa forma de apresentar que as carteiras lícitas tendem a ser mais positivas do que as outras. Deixei a bola das lícitas pintada de verde, diferente das outras, para destacar essa classe e deixar claro qual é ela.
+
 > **[A ESCREVER — Vagner]** Explanatórias 1 e 2, com a nota analítica e a justificativa do tipo de gráfico, dos
 > elementos exibidos e dos atributos pré-atentivos. Indicar qual responde à pergunta de pesquisa.
 
