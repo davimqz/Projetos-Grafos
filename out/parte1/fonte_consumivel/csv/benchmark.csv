@@ -1,0 +1,5 @@
+mapa,arquivo,sha256,fonte_consumivel,algoritmo,origem,nos,arestas,status,alvo_alcancavel,mensagem,repeticoes,tempo_medio_ms,latencia_min_ms,latencia_max_ms,memoria_pico_bytes
+m06_fonte,data\mapas\m06_fonte.txt,636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc,True,BFS,"(1,1)|-|{}",41,78,OK,True,,5,0.0375000003259629,0.0335000004270114,0.04720000288216397,7264
+m06_fonte,data\mapas\m06_fonte.txt,636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc,True,DFS,"(1,1)|-|{}",41,78,OK,True,,5,0.04985999912605621,0.0441999982285779,0.05650000093737617,6224
+m06_fonte,data\mapas\m06_fonte.txt,636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc,True,DIJKSTRA,"(1,1)|-|{}",41,78,RECUSA,,"Dijkstra não aceita peso negativo na aresta (3,4)|-|{} -> (3,5)|-|{0} (peso -2).",5,0.00427999984822236,0.0030000010156072676,0.007399998139590025,1329
+m06_fonte,data\mapas\m06_fonte.txt,636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc,True,BELLMAN_FORD,"(1,1)|-|{}",41,78,OK,True,,5,0.06758000017725863,0.0653000024612993,0.07339999865507707,3696

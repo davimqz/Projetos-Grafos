@@ -1,0 +1,121 @@
+{
+  "gerado_em_utc": "2026-11-21T22:55:39.248787+00:00",
+  "ambiente": {
+    "python": "3.13.13 (tags/v3.13.13:01104ce, Apr  7 2026, 19:25:48) [MSC v.1944 64 bit (AMD64)]",
+    "plataforma": "Windows-11-10.0.26300-SP0",
+    "processador": "AMD64 Family 25 Model 33 Stepping 2, AuthenticAMD"
+  },
+  "metodo": {
+    "aquecimentos": 1,
+    "repeticoes_tempo": 5,
+    "execucoes_memoria": 1,
+    "unidade_tempo": "ms",
+    "unidade_memoria": "bytes",
+    "escopo": "Funções originais no G_est completo a partir de S; V/E incluem ALVO.",
+    "status": "Retorno global da busca; não normaliza ciclos para o caminho até ALVO.",
+    "tempo": "timeit, GC desativado, sem tracemalloc; sem IO, construção ou exportação.",
+    "memoria": "Pico de alocações Python da chamada e retorno; exclui o grafo pronto."
+  },
+  "resultados": [
+    {
+      "mapa": "m06_fonte",
+      "arquivo": "data\\mapas\\m06_fonte.txt",
+      "sha256": "636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc",
+      "fonte_consumivel": true,
+      "nos": 41,
+      "arestas": 78,
+      "algoritmo": "BFS",
+      "origem": "(1,1)|-|{}",
+      "status": "OK",
+      "alvo_alcancavel": true,
+      "mensagem": "",
+      "repeticoes": 5,
+      "tempos_ms": [
+        0.04720000288216397,
+        0.03789999755099416,
+        0.035000000934815034,
+        0.0335000004270114,
+        0.03389999983482994
+      ],
+      "tempo_medio_ms": 0.0375000003259629,
+      "latencia_min_ms": 0.0335000004270114,
+      "latencia_max_ms": 0.04720000288216397,
+      "memoria_pico_bytes": 7264
+    },
+    {
+      "mapa": "m06_fonte",
+      "arquivo": "data\\mapas\\m06_fonte.txt",
+      "sha256": "636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc",
+      "fonte_consumivel": true,
+      "nos": 41,
+      "arestas": 78,
+      "algoritmo": "DFS",
+      "origem": "(1,1)|-|{}",
+      "status": "OK",
+      "alvo_alcancavel": true,
+      "mensagem": "",
+      "repeticoes": 5,
+      "tempos_ms": [
+        0.05650000093737617,
+        0.05579999924520962,
+        0.0473000000056345,
+        0.04549999721348286,
+        0.0441999982285779
+      ],
+      "tempo_medio_ms": 0.04985999912605621,
+      "latencia_min_ms": 0.0441999982285779,
+      "latencia_max_ms": 0.05650000093737617,
+      "memoria_pico_bytes": 6224
+    },
+    {
+      "mapa": "m06_fonte",
+      "arquivo": "data\\mapas\\m06_fonte.txt",
+      "sha256": "636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc",
+      "fonte_consumivel": true,
+      "nos": 41,
+      "arestas": 78,
+      "algoritmo": "DIJKSTRA",
+      "origem": "(1,1)|-|{}",
+      "status": "RECUSA",
+      "alvo_alcancavel": null,
+      "mensagem": "Dijkstra não aceita peso negativo na aresta (3,4)|-|{} -> (3,5)|-|{0} (peso -2).",
+      "repeticoes": 5,
+      "tempos_ms": [
+        0.007399998139590025,
+        0.004400000761961564,
+        0.0033999967854470015,
+        0.0032000025385059416,
+        0.0030000010156072676
+      ],
+      "tempo_medio_ms": 0.00427999984822236,
+      "latencia_min_ms": 0.0030000010156072676,
+      "latencia_max_ms": 0.007399998139590025,
+      "memoria_pico_bytes": 1329
+    },
+    {
+      "mapa": "m06_fonte",
+      "arquivo": "data\\mapas\\m06_fonte.txt",
+      "sha256": "636615830b92d45cef33727790a5c2222b91327c0aa49781b77c440f8f0c8ebc",
+      "fonte_consumivel": true,
+      "nos": 41,
+      "arestas": 78,
+      "algoritmo": "BELLMAN_FORD",
+      "origem": "(1,1)|-|{}",
+      "status": "OK",
+      "alvo_alcancavel": true,
+      "mensagem": "",
+      "repeticoes": 5,
+      "tempos_ms": [
+        0.07339999865507707,
+        0.06679999933112413,
+        0.0653000024612993,
+        0.06679999933112413,
+        0.0656000011076685
+      ],
+      "tempo_medio_ms": 0.06758000017725863,
+      "latencia_min_ms": 0.0653000024612993,
+      "latencia_max_ms": 0.07339999865507707,
+      "memoria_pico_bytes": 3696
+    }
+  ]
+}
