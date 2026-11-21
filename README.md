@@ -78,6 +78,12 @@ python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./
 # calcular, listar e realçar os estados-armadilha automaticamente
 python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --interactive --out ./out/parte1/
 
+# benchmark dos dez mapas: cinco medições de tempo por algoritmo
+python -m src.cli --todos-mapas --benchmark --out ./out/parte1/
+
+# benchmark separado do m06 com fonte consumível
+python -m src.cli --mapa ./data/mapas/m06_fonte.txt --benchmark --fonte-consumivel --out ./out/parte1/
+
 # figuras do P5a e o HTML conjunto (mapas fornecidos e mapas do grupo)
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
@@ -96,6 +102,21 @@ O JSON de `--arquivo-armadilhas` permanece opcional para compatibilidade e só p
 O resumo é impresso após as exportações, com passos, custos, status, caminhos e os arquivos concluídos.
 O código de saída é 0 para execução concluída (inclusive recusa ou mapa sem solução), 1 para falha de exportação
 e 2 para entrada ou processamento inválidos. Uma exportação que falha é informada no resumo sem impedir as demais.
+
+Com `--benchmark`, a CLI gera somente `csv/benchmark.csv` e `json/benchmark.json`. Aceita `--mapa`, `--mapas`
+ou `--todos-mapas`; `--alg` limita a medição a um algoritmo e `--repeticoes N` muda o padrão de cinco repetições.
+Não combina com as opções de HTML ou armadilhas. Os arquivos do benchmark são substituídos a cada execução
+na mesma pasta; as outras saídas permanecem intactas. A variante consumível usa `fonte_consumivel/`.
+
+O grafo é preparado uma vez por mapa, antes das medições. Cada algoritmo parte de S no G_est completo,
+incluindo ALVO, com um aquecimento, cinco execuções de tempo sem `tracemalloc` e uma execução separada de memória.
+O tempo usa `timeit`, que desativa temporariamente o coletor de lixo. O pico mede alocações Python da chamada
+e seu retorno, excluindo o grafo pronto; não representa a memória total do processo. O JSON guarda as amostras,
+o ambiente, o hash dos mapas e o método. A preparação, as análises e as exportações ficam fora da medição.
+
+O status do benchmark é o retorno global da busca: `OK`, `RECUSA` ou `CICLO_NEGATIVO`, acompanhado de
+`alvo_alcancavel`. O tempo de recusa do Dijkstra não equivale a uma busca concluída. Um ciclo negativo preso
+em uma armadilha também aparece aqui, mesmo quando a solução normalizada até ALVO tem custo finito.
 
 ### Saídas em `out/parte1/`
 
@@ -117,6 +138,7 @@ out/parte1/
 | `figuras/arvore_bfs_m02.png` | árvore da BFS no m02, com os níveis |
 | `figuras/heatmap_m08.png` | quantos estados existem em cada casa do m08 |
 | `html/labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
+| `csv/benchmark.csv`, `json/benchmark.json` | resumo de tempo e pico de memória por mapa/algoritmo; JSON com amostras e ambiente |
 
 As análises do P3 (`metricas_global.json`, `camadas.json`, `graus_<mapa>.csv`, `arestas_<mapa>.csv`,
 `comparacao_modelagem.csv`, `solucoes.csv`, armadilhas de cada mapa e comparações do m05) estão implementadas em

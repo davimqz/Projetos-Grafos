@@ -10,6 +10,7 @@ Exemplos (do enunciado):
 # [IA] Claude Code – esqueleto do argparse com as flags do enunciado
 # [IA] Codex - orquestração da Parte 1, execução em lote e resumo final.
 # [IA] Codex - atualização do exemplo para a pasta organizada de JSON.
+# [IA] Codex - seleção do benchmark da Parte 1 e número de repetições.
 import argparse
 import sys
 from pathlib import Path
@@ -32,7 +33,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--interactive", action="store_true", help="gera o labirinto interativo")
     p.add_argument("--source", help="nó de origem (Parte 2)")
     p.add_argument("--target", help="nó de destino (Parte 2)")
-    p.add_argument("--benchmark", action="store_true", help="tempos e escalabilidade (Parte 2)")
+    p.add_argument("--benchmark", action="store_true", help="tempo e memória (Parte 1); escalabilidade (Parte 2)")
+    p.add_argument("--repeticoes", type=int, help="execuções de tempo no benchmark da Parte 1 (padrão: 5)")
     return p
 
 
@@ -42,12 +44,23 @@ def main(argv: list[str] | None = None) -> int:
             stream.reconfigure(encoding="utf-8")
     parser = build_parser()
     args = parser.parse_args(argv)
+    parte1 = args.mapa or args.mapas or args.todos_mapas
+    if args.repeticoes is not None and not (parte1 and args.benchmark):
+        parser.error("--repeticoes exige --benchmark com mapas da Parte 1")
     if args.mapa or args.mapas or args.todos_mapas:
-        from src.parte1.interface_cli import executar_interface
         mapas = [args.mapa] if args.mapa else args.mapas
         if args.todos_mapas:
             mapas = [arquivo for pasta in ("data/mapas", "data/mapas_grupo")
                      for arquivo in sorted(Path(pasta).glob("*.txt"))]
+        if args.benchmark:
+            if args.interactive or args.armadilhas or args.arquivo_armadilhas:
+                parser.error("--benchmark gera apenas medições; remova as opções de HTML e armadilhas")
+            from src.parte1.benchmark import executar_interface as executar_benchmark
+            return executar_benchmark(
+                mapas, args.out, fonte_consumivel=args.fonte_consumivel, algoritmo=args.alg,
+                repeticoes=args.repeticoes if args.repeticoes is not None else 5,
+            )
+        from src.parte1.interface_cli import executar_interface
         return executar_interface(
             mapas, args.out, algoritmo=args.alg, interactive=args.interactive,
             fonte_consumivel=args.fonte_consumivel, mostrar_armadilhas=args.armadilhas,

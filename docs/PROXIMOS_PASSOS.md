@@ -19,7 +19,7 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 
 ## Situação em 21/11
 
-- `pytest`: 538 testes passando na última execução local desta branch em 21/11/2026.
+- `pytest`: 553 testes passando na última execução local desta branch em 21/11/2026.
 - PRs mergeados até aqui: 37. Aberto: #38 (roteiro e dados da Parte 2 para o front).
 - Branches `matheus`, `thomaz` e `vagner-front` não têm nada além da `main`.
 - O relatório tem **23 marcadores** `[A ESCREVER]`/`[COMPLETAR]`: 11 na Parte 1 (seção 4), 4 no manual e na
@@ -233,7 +233,9 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 - [x] 2 mapas do grupo com gabaritos TXT — commit `5b1eba5` (revisão/PR pendentes).
 - [ ] Conferência final dos mapas/gabaritos pelo grupo e revisão por Thomaz — 22/11
 - [x] Saídas de `out/parte1/` versionadas nesta branch, organizadas por tipo, incluindo a variante consumível.
-- [ ] R7 da Parte 1: tempo e memória por algoritmo e mapa (pode reaproveitar `src/benchmark.py`) — 23/11
+- [x] R7 da Parte 1: benchmark integrado à CLI, com aquecimento, tempo e memória separados e CSV/JSON.
+- [ ] R7: gerar e versionar as medições finais na máquina da apresentação; confirmar o escopo da memória
+      na Parte 1 com a professora, conforme dúvida da ata de 19/11 — 23/11
 - [ ] Seções 2.2 e 4.1 a 4.10, com o G_est do m02 desenhado à mão e a prova do m05 — 23/11
 - [ ] Blocos 2 a 5 e 9 (Parte 1) do `APRESENTACAO.md` — 24/11
 - [ ] Limitações da Parte 1 (seção 8) — 25/11

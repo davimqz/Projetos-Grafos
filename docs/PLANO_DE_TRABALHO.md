@@ -69,7 +69,9 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] **R1** implementação da CLI: `--mapa` roda `executar_parte1`, calcula armadilhas sem arquivo externo e
       compartilha resultados com figuras/HTML; resumo ao final e execução em lote por `--todos-mapas`/`--mapas`
 - [ ] **R1** revisão por Davi em outra máquina e integração na `main`
-- [ ] **R7** tempo e memória por algoritmo e mapa
+- [x] **R7** rotina de tempo e memória por algoritmo e mapa, com `--benchmark`, CSV e JSON.
+- [ ] **R7** gerar e versionar as medições finais na máquina da apresentação; confirmar com a professora
+      o escopo da memória na Parte 1, dúvida registrada na ata de 19/11.
 - [x] 2 mapas em `data/mapas_grupo/`: `g01_tres_depositos.txt` e `g02_poco_lateral.txt`, com gabaritos TXT em
       `data/solucoes_mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes). Requisitos conferidos automaticamente
       com o código existente; execução pelo agente registrada em `REGISTRO_IA.md`.
