@@ -19,7 +19,7 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 
 ## Situação em 21/11
 
-- `pytest`: 533 testes passando na última execução local desta branch em 21/11/2026.
+- `pytest`: 538 testes passando na última execução local desta branch em 21/11/2026.
 - PRs mergeados até aqui: 37. Aberto: #38 (roteiro e dados da Parte 2 para o front).
 - Branches `matheus`, `thomaz` e `vagner-front` não têm nada além da `main`.
 - O relatório tem **23 marcadores** `[A ESCREVER]`/`[COMPLETAR]`: 11 na Parte 1 (seção 4), 4 no manual e na
@@ -30,7 +30,8 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
   Revisão por Thomaz e integração na `main` permanecem pendentes; ainda não há número de PR registrado aqui.
 - CLI R1 implementada nesta branch: exportações completas, armadilhas automáticas, figuras/HTML compartilhando
   resultados e resumo ao final. Fluxo conferido nos dez mapas e nos cinco mapas de treino, incluindo o inválido.
-  Falta a revisão por Davi em outra máquina; as saídas definitivas em `out/parte1/` continuam pendentes.
+  Falta a revisão por Davi em outra máquina. As saídas geradas pelo usuário foram organizadas por tipo em
+  `out/parte1/csv/`, `json/`, `figuras/` e `html/`, com a mesma estrutura em `fonte_consumivel/`.
 
 ## O que zera nota se faltar
 
@@ -50,14 +51,15 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 
 **Construção do grafo de estados (0,8)**
 - [x] Leitura e validação dos mapas, G_pos, G_est por exploração, rótulo `(l,c)|chaves|{bônus}`, nó ALVO.
-- [ ] `out/parte1/arestas_<mapa>.csv` de m01 a m08 e dos 2 mapas do grupo **commitados**. Hoje são gerados por
-      `executar_parte1`, mas não estão no repositório.
-  - Pronto quando: `git ls-files out/parte1/arestas_*.csv` lista 10 arquivos, inclusive o do m08.
+- [x] `out/parte1/csv/arestas_<mapa>.csv` de m01 a m08 e dos 2 mapas do grupo versionados nesta branch,
+      gerados pelo usuário e organizados por tipo de arquivo.
+  - Pronto quando: `git ls-files out/parte1/csv/arestas_*.csv` lista 10 arquivos, inclusive o do m08.
   - Responsável: Matheus. Prazo: 22/11.
 
 **Métricas, camadas e graus (0,4)**
 - [x] Cálculo em `src/parte1/analises.py`.
-- [ ] `metricas_global.json`, `camadas.json` e `graus_<mapa>.csv` commitados em `out/parte1/`.
+- [x] `metricas_global.json` e `camadas.json` em `out/parte1/json/`, e `graus_<mapa>.csv` em
+      `out/parte1/csv/`, versionados nesta branch.
 - [ ] Relatório 4.4 e 4.5: tabela por mapa (ordem, tamanho, densidade, teto, ocupação), métricas por camada, arcos
       entre camadas e **por que são essas casas**, maior grau de entrada e de saída, multiplicidade máxima no m08,
       becos.
@@ -73,8 +75,8 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 **Caminhos com os 4 algoritmos (0,8)**
 - [x] BFS, Dijkstra com recusa, Bellman-Ford (m05 e ciclo do m06), DFS com classificação, armadilhas e
       `--fonte-consumivel` no código.
-- [ ] `solucoes.csv`, `percurso_m03.json`, `ciclo_negativo_m06.json`, `dfs_classificacao.csv`, `armadilhas_m04.csv`
-      e `armadilhas_m07.csv` commitados em `out/parte1/`.
+- [x] `solucoes.csv`, `dfs_classificacao.csv` e `armadilhas_<mapa>.csv` em `out/parte1/csv/`; percursos,
+      ciclo do m06 e comparação de bônus do m05 em `out/parte1/json/`, versionados nesta branch.
 - [ ] Relatório 4.8: discussão do m01 (BFS × Dijkstra), do m06 (correção da regra e resposta finita) e do m07 (prova
       pela busca e quantos estados são alcançáveis).
 - [ ] Relatório 4.9: método das armadilhas (busca a partir de ALVO no transposto) e quantos estados são armadilha.
@@ -89,7 +91,8 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [x] Execução pelo agente das funções existentes do grupo e gabaritos com métricas, status e caminhos em
       `data/solucoes_mapas_grupo/solucao_<mapa>.txt` (commit `5b1eba5`; uso descrito em `REGISTRO_IA.md`).
 - [ ] Conferência final dos mapas e gabaritos pelo grupo, incluindo originalidade em relação aos outros grupos.
-- [ ] CSVs/JSONs definitivos dos dois mapas em `out/parte1/`, junto das saídas obrigatórias dos mapas fornecidos.
+- [x] CSVs/JSONs definitivos dos dois mapas em `out/parte1/csv/` e `out/parte1/json/`, junto das saídas
+      obrigatórias dos mapas fornecidos, versionados nesta branch.
 - [ ] Relatório 4.10: desenho de cada mapa e gabarito (estados, arcos, passos BFS e custo).
   - Não podem ser os mapas de `data/mapas_treino/`, nem parecidos com os de outro grupo.
   - Responsável: Matheus. Prazo: 22/11.
@@ -99,7 +102,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [x] `labirinto_interativo.html` com escolha de mapa e algoritmo, passo a passo, controle de velocidade e troca de
       camada.
 - [ ] **Realce dos estados-armadilha no HTML (R2).** Os geradores já recebem as armadilhas calculadas pelo código.
-      Falta regenerar o HTML da entrega e conferir o realce visual com Thomaz.
+      O HTML da entrega já contém esses dados; falta conferir o realce visual com Thomaz.
   - Pronto quando: abrir m04 e m07 no HTML e ver as armadilhas marcadas.
 - [x] Mapas do grupo incluídos no HTML e na seleção do React (commit `5b1eba5`, revisão/PR pendentes).
 - [ ] Relatório 4.11: as figuras com legenda e uma frase sobre o que cada uma mostra.
@@ -229,7 +232,7 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 - [ ] R1: revisão por Davi em outra máquina e integração na `main` — 22/11
 - [x] 2 mapas do grupo com gabaritos TXT — commit `5b1eba5` (revisão/PR pendentes).
 - [ ] Conferência final dos mapas/gabaritos pelo grupo e revisão por Thomaz — 22/11
-- [ ] Todas as saídas de `out/parte1/` commitadas — 22/11
+- [x] Saídas de `out/parte1/` versionadas nesta branch, organizadas por tipo, incluindo a variante consumível.
 - [ ] R7 da Parte 1: tempo e memória por algoritmo e mapa (pode reaproveitar `src/benchmark.py`) — 23/11
 - [ ] Seções 2.2 e 4.1 a 4.10, com o G_est do m02 desenhado à mão e a prova do m05 — 23/11
 - [ ] Blocos 2 a 5 e 9 (Parte 1) do `APRESENTACAO.md` — 24/11

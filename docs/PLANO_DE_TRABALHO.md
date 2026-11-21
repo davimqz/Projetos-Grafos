@@ -48,7 +48,7 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] rótulo `(l,c)|chaves|{bônus}` e nó virtual `ALVO` (custo 0 a partir de G)
 - [x] variantes: portas-como-chão, portas-como-parede, `+` fixo em −4, `--fonte-consumivel`
 - [x] exportar `arestas_<mapa>.csv` (inclusive m08) via `executar_parte1` em `src/solve.py`
-- [ ] commitar as saídas em `out/parte1/`
+- [x] saídas versionadas nesta branch em `out/parte1/csv/`, `json/`, `figuras/` e `html/`
 - [x] `test_io.py` e `test_estados.py` (mapa mínimo ≤5×7 contado à mão, esteira→parede, troca de camada)
 
 ### P2 · Algoritmos (Thomaz / rev. Davi)
@@ -74,7 +74,7 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
       `data/solucoes_mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes). Requisitos conferidos automaticamente
       com o código existente; execução pelo agente registrada em `REGISTRO_IA.md`.
 - [ ] conferência final dos mapas e gabaritos pelo grupo e revisão por Thomaz
-- [ ] saídas CSV/JSON dos mapas do grupo em `out/parte1/`, junto das demais saídas obrigatórias
+- [x] saídas CSV/JSON dos mapas do grupo em `out/parte1/csv/` e `out/parte1/json/`, junto das demais saídas
 - [ ] textos do PDF: m01 (BFS × Dijkstra), m06 (exploit e correção), m07 (sem solução), grafo não dirigido estaria errado
 
 ### P5a · Visualização Parte 1 (Thomaz / rev. Matheus)
@@ -84,7 +84,7 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] `labirinto_interativo.html`: mapa + algoritmo, passo a passo, estado atual, camadas, controle de velocidade
 - [x] mapas do grupo incluídos no HTML gerado pelo Python e no React (commit `5b1eba5`, revisão/PR pendentes)
 - [ ] **R2** HTML gerado pelo Python com as armadilhas de m04/m07 realçadas
-      (os geradores já recebem as armadilhas; falta regenerar a entrega e conferir o realce visual com Thomaz)
+      (os geradores e o HTML da entrega já contêm as armadilhas; falta conferir o realce visual com Thomaz)
 - [x] (bônus) front React (`front-react/`) com labirinto, figuras e AVD
 - [ ] **R3** comparação dos 4 algoritmos no mesmo mapa · **R4** upload de `.txt` pelo front
 

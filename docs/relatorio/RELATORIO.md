@@ -95,7 +95,7 @@ python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte
 
 ### 2.4 Labirinto interativo
 
-> **[A ESCREVER — Thomaz]** Como abrir o `out/parte1/labirinto_interativo.html` e o que cada controle faz (seleção de
+> **[A ESCREVER — Thomaz]** Como abrir o `out/parte1/html/labirinto_interativo.html` e o que cada controle faz (seleção de
 > mapa e algoritmo, passo a passo, velocidade, camadas, armadilhas). Incluir 1 captura de tela.
 
 ### 2.5 Front-end em React (extra)
@@ -146,7 +146,7 @@ como oráculo.
 
 ### 4.4 Métricas globais e por camada
 
-Fonte: `out/parte1/metricas_global.json` e `out/parte1/camadas.json`.
+Fonte: `out/parte1/json/metricas_global.json` e `out/parte1/json/camadas.json`.
 
 | Mapa | G_pos: ordem | tamanho | densidade | G_est: ordem | tamanho | densidade | teto teórico | ocupação |
 |---|---|---|---|---|---|---|---|---|
@@ -157,14 +157,14 @@ Fonte: `out/parte1/metricas_global.json` e `out/parte1/camadas.json`.
 
 ### 4.5 Graus, multiplicidade e becos
 
-Fonte: `out/parte1/graus_<mapa>.csv`, `out/parte1/heatmap_m08.png`.
+Fonte: `out/parte1/csv/graus_<mapa>.csv`, `out/parte1/figuras/heatmap_m08.png`.
 
 > **[A ESCREVER — Matheus]** Maior grau de entrada e de saída por mapa; multiplicidade máxima no m08, quantas casas a
 > atingem e por quê; becos encontrados.
 
 ### 4.6 Comparação de modelagens (m02, m03, m04)
 
-Fonte: `out/parte1/comparacao_modelagem.csv`.
+Fonte: `out/parte1/csv/comparacao_modelagem.csv`.
 
 | Mapa | Abordagem | Passos | Caminho válido | Observação |
 |---|---|---|---|---|
@@ -183,7 +183,7 @@ Fonte: Bellman-Ford no G_pos com `+` fixo em −4 × no G_est.
 
 ### 4.8 Caminhos nos mapas
 
-Fonte: `out/parte1/solucoes.csv`, `out/parte1/dfs_classificacao.csv`, `out/parte1/percurso_m03.json`.
+Fonte: `out/parte1/csv/solucoes.csv`, `out/parte1/csv/dfs_classificacao.csv`, `out/parte1/json/percurso_m03.json`.
 
 | Mapa | BFS (passos) | Dijkstra (custo / status) | Bellman-Ford | DFS: árvore / retorno / avanço / cruzamento |
 |---|---|---|---|---|
@@ -197,7 +197,7 @@ Fonte: `out/parte1/solucoes.csv`, `out/parte1/dfs_classificacao.csv`, `out/parte
 
 ### 4.9 Estados-armadilha (m04 e m07)
 
-Fonte: `out/parte1/armadilhas_m04.csv`, `out/parte1/armadilhas_m07.csv`.
+Fonte: `out/parte1/csv/armadilhas_m04.csv`, `out/parte1/csv/armadilhas_m07.csv`.
 
 > **[A ESCREVER — Matheus]** Método (busca a partir de `ALVO` no grafo transposto), quantos estados são armadilha e
 > exemplos.
@@ -215,7 +215,7 @@ Fonte: `data/mapas_grupo/`.
 
 ### 4.11 Visualizações
 
-Figuras em `out/parte1/`:
+Figuras em `out/parte1/figuras/`:
 
 - `percurso_m03.png` e `percurso_m08.png`: percurso de menor custo, com a cor mudando a cada chave;
 - `camadas_m02.png`: G_est do m02 por camada, destacando os arcos entre camadas;

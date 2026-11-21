@@ -1,0 +1,8 @@
+{
+  "mapa": "m06",
+  "algoritmo": "BELLMAN_FORD",
+  "passos": null,
+  "custo": null,
+  "status": "CICLO_NEGATIVO",
+  "caminho": []
+}

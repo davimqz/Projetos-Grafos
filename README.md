@@ -72,7 +72,7 @@ python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg DIJKSTRA --out .
 python -m src.cli --mapa ./data/mapas/m05_bonus.txt --alg BELLMAN_FORD --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
 
-# labirinto interativo de um mapa (gera out/parte1/labirinto_<mapa>.html)
+# labirinto interativo de um mapa (gera out/parte1/html/labirinto_<mapa>.html)
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./out/parte1/
 
 # calcular, listar e realçar os estados-armadilha automaticamente
@@ -89,7 +89,8 @@ a classificação dos arcos e a indicação de ciclo; seu caminho não é necess
 
 `--mapas <arquivo1> <arquivo2> ...` executa uma lista de mapas na mesma chamada, preservando todos nos agregados.
 Executar chamadas separadas na mesma pasta substitui os agregados pelos resultados da última chamada.
-Com `--fonte-consumivel`, os arquivos vão para a subpasta `fonte_consumivel/` da saída solicitada.
+Com `--fonte-consumivel`, os arquivos vão para a subpasta `fonte_consumivel/` da saída solicitada,
+com a mesma separação por tipo de arquivo.
 O JSON de `--arquivo-armadilhas` permanece opcional para compatibilidade e só pode ser usado com um mapa.
 
 O resumo é impresso após as exportações, com passos, custos, status, caminhos e os arquivos concluídos.
@@ -98,18 +99,30 @@ e 2 para entrada ou processamento inválidos. Uma exportação que falha é info
 
 ### Saídas em `out/parte1/`
 
+`--out` continua indicando a pasta da execução. Os geradores organizam os arquivos automaticamente:
+
+```text
+out/parte1/
+├─ csv/                   # arestas, graus, soluções, DFS, comparações e armadilhas
+├─ json/                  # métricas, camadas, percursos, ciclos e armadilhas
+├─ figuras/               # percursos, camadas, árvore BFS e heatmap em PNG
+├─ html/                  # labirintos interativos
+└─ fonte_consumivel/      # variante: csv/, json/, figuras/ e html/
+```
+
 | Arquivo | Conteúdo |
 |---|---|
-| `percurso_m03.png`, `percurso_m08.png` | percurso de menor custo (Dijkstra); a cor muda a cada chave pega |
-| `camadas_m02.png` | G_est do m02 por conjunto de chaves, com os arcos entre camadas em destaque |
-| `arvore_bfs_m02.png` | árvore da BFS no m02, com os níveis |
-| `heatmap_m08.png` | quantos estados existem em cada casa do m08 |
-| `labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
+| `figuras/percurso_m03.png`, `figuras/percurso_m08.png` | percurso de menor custo (Dijkstra); a cor muda a cada chave pega |
+| `figuras/camadas_m02.png` | G_est do m02 por conjunto de chaves, com os arcos entre camadas em destaque |
+| `figuras/arvore_bfs_m02.png` | árvore da BFS no m02, com os níveis |
+| `figuras/heatmap_m08.png` | quantos estados existem em cada casa do m08 |
+| `html/labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
 
 As análises do P3 (`metricas_global.json`, `camadas.json`, `graus_<mapa>.csv`, `arestas_<mapa>.csv`,
 `comparacao_modelagem.csv`, `solucoes.csv`, armadilhas de cada mapa e comparações do m05) estão implementadas em
 `src/parte1/`, com orquestração por `src.solve.executar_parte1` para os mapas informados, inclusive os do grupo.
 A CLI usa essa orquestração e compartilha os resultados com as figuras e o HTML, sem repetir as buscas para desenhá-los.
+Os CSVs ficam em `csv/` e os JSONs em `json/`, dentro da pasta indicada por `--out`.
 
 Os mapas do grupo são `g01_tres_depositos.txt` e `g02_poco_lateral.txt`. Seus gabaritos, calculados pelo código do
 grupo, ficam em [`data/solucoes_mapas_grupo/`](data/solucoes_mapas_grupo/), separados dos labirintos.

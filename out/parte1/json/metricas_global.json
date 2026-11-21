@@ -1,0 +1,2184 @@
+{
+  "m01": {
+    "ordem_pos": 24,
+    "tamanho_pos": 46,
+    "densidade_pos": 0.08333333333333333,
+    "ordem_est": 24,
+    "tamanho_est": 46,
+    "densidade_est": 0.08333333333333333,
+    "teto_teorico": 24,
+    "taxa_ocupacao": 1.0,
+    "estado_maior_grau_entrada": "(1,1)|-|{}",
+    "maior_grau_entrada": 2,
+    "estado_maior_grau_saida": "(1,1)|-|{}",
+    "maior_grau_saida": 2,
+    "multiplicidade_maxima": 1,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "~"
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "~"
+      },
+      {
+        "linha": 1,
+        "coluna": 6,
+        "simbolo": "~"
+      },
+      {
+        "linha": 1,
+        "coluna": 7,
+        "simbolo": "~"
+      },
+      {
+        "linha": 1,
+        "coluna": 8,
+        "simbolo": "~"
+      },
+      {
+        "linha": 1,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 11,
+        "simbolo": "G"
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 2,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 11,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 24,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m02": {
+    "ordem_pos": 23,
+    "tamanho_pos": 43,
+    "densidade_pos": 0.08498023715415019,
+    "ordem_est": 39,
+    "tamanho_est": 74,
+    "densidade_est": 0.04993252361673414,
+    "teto_teorico": 46,
+    "taxa_ocupacao": 0.8478260869565217,
+    "estado_maior_grau_entrada": "(1,1)|-|{}",
+    "maior_grau_entrada": 2,
+    "estado_maior_grau_saida": "(1,1)|-|{}",
+    "maior_grau_saida": 2,
+    "multiplicidade_maxima": 2,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 6,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 10,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 16,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m03": {
+    "ordem_pos": 76,
+    "tamanho_pos": 167,
+    "densidade_pos": 0.029298245614035087,
+    "ordem_est": 213,
+    "tamanho_est": 466,
+    "densidade_est": 0.010319780317122863,
+    "teto_teorico": 608,
+    "taxa_ocupacao": 0.3503289473684211,
+    "estado_maior_grau_entrada": "(1,12)|ab|{}",
+    "maior_grau_entrada": 3,
+    "estado_maior_grau_saida": "(3,12)|abc|{}",
+    "maior_grau_saida": 3,
+    "multiplicidade_maxima": 4,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 1,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 12,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m04": {
+    "ordem_pos": 24,
+    "tamanho_pos": 39,
+    "densidade_pos": 0.07065217391304347,
+    "ordem_est": 37,
+    "tamanho_est": 66,
+    "densidade_est": 0.04954954954954955,
+    "teto_teorico": 48,
+    "taxa_ocupacao": 0.7708333333333334,
+    "estado_maior_grau_entrada": "(3,8)|-|{}",
+    "maior_grau_entrada": 3,
+    "estado_maior_grau_saida": "(3,8)|-|{}",
+    "maior_grau_saida": 3,
+    "multiplicidade_maxima": 2,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "^"
+      },
+      {
+        "linha": 1,
+        "coluna": 8,
+        "simbolo": ">"
+      },
+      {
+        "linha": 1,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 6,
+        "simbolo": "~"
+      },
+      {
+        "linha": 3,
+        "coluna": 7,
+        "simbolo": "~"
+      },
+      {
+        "linha": 3,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 9,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 10,
+        "simbolo": ","
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 17,
+    "becos": [
+      "(1,3)|-|{}",
+      "(1,3)|a|{}"
+    ],
+    "quantidade_becos": 2,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m05": {
+    "ordem_pos": 44,
+    "tamanho_pos": 90,
+    "densidade_pos": 0.04756871035940803,
+    "ordem_est": 215,
+    "tamanho_est": 438,
+    "densidade_est": 0.009519669637035428,
+    "teto_teorico": 352,
+    "taxa_ocupacao": 0.6107954545454546,
+    "estado_maior_grau_entrada": "(3,10)|-|{0,1,2}",
+    "maior_grau_entrada": 4,
+    "estado_maior_grau_saida": "(3,1)|-|{0,1,2}",
+    "maior_grau_saida": 3,
+    "multiplicidade_maxima": 6,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 7,
+        "simbolo": ","
+      },
+      {
+        "linha": 1,
+        "coluna": 8,
+        "simbolo": ","
+      },
+      {
+        "linha": 1,
+        "coluna": 9,
+        "simbolo": ","
+      },
+      {
+        "linha": 1,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 12,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 13,
+        "simbolo": "G"
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 3,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 21,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m06": {
+    "ordem_pos": 24,
+    "tamanho_pos": 46,
+    "densidade_pos": 0.08333333333333333,
+    "ordem_est": 24,
+    "tamanho_est": 46,
+    "densidade_est": 0.08333333333333333,
+    "teto_teorico": 24,
+    "taxa_ocupacao": 1.0,
+    "estado_maior_grau_entrada": "(1,1)|-|{}",
+    "maior_grau_entrada": 2,
+    "estado_maior_grau_saida": "(1,1)|-|{}",
+    "maior_grau_saida": 2,
+    "multiplicidade_maxima": 1,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 11,
+        "simbolo": "G"
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": "*"
+      },
+      {
+        "linha": 3,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 11,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 24,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m07": {
+    "ordem_pos": 31,
+    "tamanho_pos": 69,
+    "densidade_pos": 0.07419354838709677,
+    "ordem_est": 16,
+    "tamanho_est": 38,
+    "densidade_est": 0.15833333333333333,
+    "teto_teorico": 62,
+    "taxa_ocupacao": 0.25806451612903225,
+    "estado_maior_grau_entrada": "(3,1)|-|{}",
+    "maior_grau_entrada": 3,
+    "estado_maior_grau_saida": "(3,1)|-|{}",
+    "maior_grau_saida": 3,
+    "multiplicidade_maxima": 1,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 5,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 16,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "m08": {
+    "ordem_pos": 1169,
+    "tamanho_pos": 2574,
+    "densidade_pos": 0.001885172902726836,
+    "ordem_est": 2919,
+    "tamanho_est": 6364,
+    "densidade_est": 0.0007471551398849588,
+    "teto_teorico": 18704,
+    "taxa_ocupacao": 0.156062874251497,
+    "estado_maior_grau_entrada": "(11,65)|abcd|{}",
+    "maior_grau_entrada": 4,
+    "estado_maior_grau_saida": "(11,65)|abcd|{}",
+    "maior_grau_saida": 4,
+    "multiplicidade_maxima": 5,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 2,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": ","
+      },
+      {
+        "linha": 3,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 4,
+        "simbolo": "~"
+      },
+      {
+        "linha": 5,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 8,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 8,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 8,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 9,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 9,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 9,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 9,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 9,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 10,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 10,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 10,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 11,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 11,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 11,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 11,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 11,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 11,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 12,
+        "coluna": 3,
+        "simbolo": "~"
+      },
+      {
+        "linha": 12,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 13,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 14,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 14,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 14,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 14,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 14,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 15,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 16,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 16,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 16,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 16,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 16,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 3,
+        "simbolo": ","
+      },
+      {
+        "linha": 17,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 17,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 18,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 18,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 18,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 19,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 20,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 20,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 20,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 20,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 5,
+        "simbolo": ","
+      },
+      {
+        "linha": 21,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 21,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 22,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 22,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 22,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 23,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 23,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 23,
+        "coluna": 3,
+        "simbolo": ","
+      },
+      {
+        "linha": 23,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 23,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 23,
+        "coluna": 7,
+        "simbolo": ","
+      },
+      {
+        "linha": 24,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 24,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 24,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 5,
+        "simbolo": "~"
+      },
+      {
+        "linha": 25,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 25,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 26,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 26,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 26,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 26,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 1,
+        "simbolo": ","
+      },
+      {
+        "linha": 27,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 11,
+        "simbolo": ","
+      },
+      {
+        "linha": 27,
+        "coluna": 12,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 16,
+        "simbolo": "."
+      },
+      {
+        "linha": 27,
+        "coluna": 17,
+        "simbolo": ","
+      },
+      {
+        "linha": 28,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 28,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 28,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 28,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 28,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 28,
+        "coluna": 17,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 1,
+        "simbolo": ","
+      },
+      {
+        "linha": 29,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 4,
+        "simbolo": "~"
+      },
+      {
+        "linha": 29,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 16,
+        "simbolo": "."
+      },
+      {
+        "linha": 29,
+        "coluna": 17,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 165,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "g01_tres_depositos": {
+    "ordem_pos": 39,
+    "tamanho_pos": 72,
+    "densidade_pos": 0.048582995951417005,
+    "ordem_est": 104,
+    "tamanho_est": 194,
+    "densidade_est": 0.018110530246452577,
+    "teto_teorico": 1248,
+    "taxa_ocupacao": 0.08333333333333333,
+    "estado_maior_grau_entrada": "(1,13)|abc|{0,1}",
+    "maior_grau_entrada": 3,
+    "estado_maior_grau_saida": "(1,13)|abc|{0,1}",
+    "maior_grau_saida": 3,
+    "multiplicidade_maxima": 5,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": ">"
+      },
+      {
+        "linha": 1,
+        "coluna": 11,
+        "simbolo": ">"
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 2,
+    "becos": [
+      "(1,5)|-|{}",
+      "(1,11)|a|{0}",
+      "(1,17)|ab|{0,1}"
+    ],
+    "quantidade_becos": 3,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  },
+  "g02_poco_lateral": {
+    "ordem_pos": 94,
+    "tamanho_pos": 230,
+    "densidade_pos": 0.0263097689315946,
+    "ordem_est": 94,
+    "tamanho_est": 230,
+    "densidade_est": 0.0263097689315946,
+    "teto_teorico": 94,
+    "taxa_ocupacao": 1.0,
+    "estado_maior_grau_entrada": "(3,5)|-|{}",
+    "maior_grau_entrada": 4,
+    "estado_maior_grau_saida": "(3,5)|-|{}",
+    "maior_grau_saida": 4,
+    "multiplicidade_maxima": 1,
+    "casas_multiplicidade_maxima": [
+      {
+        "linha": 1,
+        "coluna": 1,
+        "simbolo": "S"
+      },
+      {
+        "linha": 1,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 12,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 16,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 17,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 18,
+        "simbolo": "."
+      },
+      {
+        "linha": 1,
+        "coluna": 19,
+        "simbolo": "G"
+      },
+      {
+        "linha": 2,
+        "coluna": 5,
+        "simbolo": "v"
+      },
+      {
+        "linha": 3,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 12,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 16,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 17,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 18,
+        "simbolo": "."
+      },
+      {
+        "linha": 3,
+        "coluna": 19,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 17,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 18,
+        "simbolo": "."
+      },
+      {
+        "linha": 4,
+        "coluna": 19,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 12,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 16,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 17,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 18,
+        "simbolo": "."
+      },
+      {
+        "linha": 5,
+        "coluna": 19,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 6,
+        "coluna": 19,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 1,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 2,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 3,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 4,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 5,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 6,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 7,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 8,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 9,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 10,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 11,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 12,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 13,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 14,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 15,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 16,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 17,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 18,
+        "simbolo": "."
+      },
+      {
+        "linha": 7,
+        "coluna": 19,
+        "simbolo": "."
+      }
+    ],
+    "quantidade_casas_multiplicidade_maxima": 94,
+    "becos": [],
+    "quantidade_becos": 0,
+    "tem_ciclo_dfs": true,
+    "fonte_consumivel": false
+  }
+}

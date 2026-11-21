@@ -1,0 +1,259 @@
+{
+  "m01": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 24,
+        "tamanho": 46,
+        "densidade": 0.08333333333333333
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_geradoras": []
+  },
+  "m02": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 16,
+        "tamanho": 30,
+        "densidade": 0.125
+      },
+      {
+        "camada": "a",
+        "ordem": 23,
+        "tamanho": 43,
+        "densidade": 0.08498023715415019
+      }
+    ],
+    "arcos_entre_camadas": 1,
+    "casas_geradoras": [
+      {
+        "linha": 3,
+        "coluna": 11,
+        "simbolo": "a"
+      }
+    ]
+  },
+  "m03": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 12,
+        "tamanho": 22,
+        "densidade": 0.16666666666666666
+      },
+      {
+        "camada": "a",
+        "ordem": 53,
+        "tamanho": 114,
+        "densidade": 0.041364296081277216
+      },
+      {
+        "camada": "ab",
+        "ordem": 72,
+        "tamanho": 160,
+        "densidade": 0.03129890453834116
+      },
+      {
+        "camada": "abc",
+        "ordem": 76,
+        "tamanho": 167,
+        "densidade": 0.029298245614035087
+      }
+    ],
+    "arcos_entre_camadas": 3,
+    "casas_geradoras": [
+      {
+        "linha": 1,
+        "coluna": 12,
+        "simbolo": "b"
+      },
+      {
+        "linha": 6,
+        "coluna": 6,
+        "simbolo": "c"
+      },
+      {
+        "linha": 8,
+        "coluna": 1,
+        "simbolo": "a"
+      }
+    ]
+  },
+  "m04": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 17,
+        "tamanho": 30,
+        "densidade": 0.11029411764705882
+      },
+      {
+        "camada": "a",
+        "ordem": 20,
+        "tamanho": 35,
+        "densidade": 0.09210526315789473
+      }
+    ],
+    "arcos_entre_camadas": 1,
+    "casas_geradoras": [
+      {
+        "linha": 3,
+        "coluna": 11,
+        "simbolo": "a"
+      }
+    ]
+  },
+  "m05": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 215,
+        "tamanho": 438,
+        "densidade": 0.009519669637035428
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_geradoras": []
+  },
+  "m06": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 24,
+        "tamanho": 46,
+        "densidade": 0.08333333333333333
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_geradoras": []
+  },
+  "m07": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 16,
+        "tamanho": 38,
+        "densidade": 0.15833333333333333
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_geradoras": []
+  },
+  "m08": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 165,
+        "tamanho": 356,
+        "densidade": 0.013155949741315596
+      },
+      {
+        "camada": "a",
+        "ordem": 314,
+        "tamanho": 670,
+        "densidade": 0.006817118088764983
+      },
+      {
+        "camada": "ab",
+        "ordem": 442,
+        "tamanho": 940,
+        "densidade": 0.004822441797231713
+      },
+      {
+        "camada": "abc",
+        "ordem": 829,
+        "tamanho": 1818,
+        "densidade": 0.0026485550951906435
+      },
+      {
+        "camada": "abcd",
+        "ordem": 1169,
+        "tamanho": 2574,
+        "densidade": 0.001885172902726836
+      }
+    ],
+    "arcos_entre_camadas": 6,
+    "casas_geradoras": [
+      {
+        "linha": 3,
+        "coluna": 23,
+        "simbolo": "b"
+      },
+      {
+        "linha": 3,
+        "coluna": 29,
+        "simbolo": "d"
+      },
+      {
+        "linha": 5,
+        "coluna": 37,
+        "simbolo": "c"
+      },
+      {
+        "linha": 27,
+        "coluna": 5,
+        "simbolo": "a"
+      }
+    ]
+  },
+  "g01_tres_depositos": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 9,
+        "tamanho": 15,
+        "densidade": 0.20833333333333334
+      },
+      {
+        "camada": "a",
+        "ordem": 28,
+        "tamanho": 51,
+        "densidade": 0.06746031746031746
+      },
+      {
+        "camada": "ab",
+        "ordem": 39,
+        "tamanho": 72,
+        "densidade": 0.048582995951417005
+      },
+      {
+        "camada": "abc",
+        "ordem": 28,
+        "tamanho": 51,
+        "densidade": 0.06746031746031746
+      }
+    ],
+    "arcos_entre_camadas": 5,
+    "casas_geradoras": [
+      {
+        "linha": 3,
+        "coluna": 4,
+        "simbolo": "a"
+      },
+      {
+        "linha": 3,
+        "coluna": 10,
+        "simbolo": "b"
+      },
+      {
+        "linha": 3,
+        "coluna": 16,
+        "simbolo": "c"
+      }
+    ]
+  },
+  "g02_poco_lateral": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 94,
+        "tamanho": 230,
+        "densidade": 0.0263097689315946
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_geradoras": []
+  }
+}

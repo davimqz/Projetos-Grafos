@@ -1,0 +1,8 @@
+{
+  "mapa": "m07",
+  "algoritmo": "DIJKSTRA",
+  "passos": null,
+  "custo": null,
+  "status": "SEM_SOLUCAO",
+  "caminho": []
+}

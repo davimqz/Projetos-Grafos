@@ -1,0 +1,10 @@
+mapa,abordagem,passos,caminho_valido,observacao
+m02,portas_como_chao,10,False,Ignora chaves e atravessa portas diretamente.
+m02,portas_como_parede,,False,Bloqueia portas mesmo quando há chave disponível.
+m02,grafo_estados,34,True,Modelagem exata com memória de chaves coletadas.
+m03,portas_como_chao,21,False,Ignora chaves e atravessa portas diretamente.
+m03,portas_como_parede,,False,Bloqueia portas mesmo quando há chave disponível.
+m03,grafo_estados,87,True,Modelagem exata com memória de chaves coletadas.
+m04,portas_como_chao,14,False,Ignora chaves e atravessa portas diretamente.
+m04,portas_como_parede,,False,Bloqueia portas mesmo quando há chave disponível.
+m04,grafo_estados,20,True,Modelagem exata com memória de chaves coletadas.
