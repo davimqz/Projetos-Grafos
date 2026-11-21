@@ -658,14 +658,6 @@ Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os 
 
 Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
 
-#### Outliers
-
-A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, o 1º e o 3º quartis são iguais a 1. Isso significa que cerca de 70% das carteiras enviam para apenas uma outra carteira. Como o IQR é zero, qualquer carteira com grau diferente de 1 é considerada outlier, totalizando 4.204 casos. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
-
-Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. As carteiras lícitas também concentram a maior parcela dos outliers de saldo, com 1.784 casos, e de grau de saída, com 2.022 casos.
-
-Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
-
 ### 6.2 Dados faltantes e outliers
 
 #### Dados faltantes
@@ -686,9 +678,25 @@ Mantivemos desconhecido como categoria própria, pois excluir essas carteiras re
 
 #### Outliers
 
-A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, o 1º e o 3º quartis são iguais a 1. Isso significa que cerca de 70% das carteiras enviam para apenas uma outra carteira. Como o IQR é zero, qualquer carteira com grau diferente de 1 é considerada outlier, totalizando 4.204 casos. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
+Os limites do IQR foram calculados com todas as 14.182 carteiras juntas, e não separadamente por classe. Depois, contamos quantas carteiras de cada classe ficaram fora desses limites e dividimos pelo total da classe: 4.261 lícitas, 5.208 ilícitas e 4.713 desconhecidas.
 
-Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. As carteiras lícitas também concentram a maior parcela dos outliers de saldo, com 1.784 casos, e de grau de saída, com 2.022 casos.
+A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, 70,4% das carteiras enviam para apenas uma outra carteira. Por isso, o 1º e o 3º quartis são iguais a 1 e o IQR é 0. Pela fórmula, o limite inferior (Q1 − 1,5 × IQR) e o limite superior (Q3 + 1,5 × IQR) também valem 1. Com esses limites, as 2.089 carteiras com grau 0, que não enviam para nenhuma carteira do recorte, ficariam abaixo do limite inferior. Decidimos não contar essas carteiras e considerar apenas o limite superior. Assim, os outliers de grau de saída são as 2.115 carteiras que enviam para 2 ou mais carteiras. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
+
+Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. No saldo, as lícitas têm a maior proporção de outliers: 41,9% (1.784 de 4.261), contra 28,7% das desconhecidas e 10,2% das ilícitas. No grau de saída, as desconhecidas têm a maior proporção: 22,4% (1.058 de 4.713), contra 20,4% das lícitas e 3,6% das ilícitas.
+
+Proporção de carteiras de cada classe fora dos limites do IQR (entre parênteses, a quantidade de carteiras):
+
+| Atributo | Limites (inferior a superior) | Lícitas | Ilícitas | Desconhecidas | Maior proporção |
+|---|---|---:|---:|---:|---|
+| BTC recebido | −0,0243 a 0,0405 | 23,1% (986) | 7,0% (362) | 23,0% (1.084) | Lícitas (quase igual às desconhecidas) |
+| BTC enviado | −0,0311 a 0,0572 | 17,6% (748) | 5,5% (288) | 26,7% (1.257) | Desconhecidas |
+| Nº de transações | −0,5 a 3,5 | 3,1% (131) | 1,2% (61) | 6,7% (317) | Desconhecidas |
+| Taxas | −0,0528 a 0,0945 | 0,6% (25) | 19,6% (1.022) | 1,1% (50) | Ilícitas |
+| Tempo de vida (blocos) | −4,5 a 7,5 | 7,7% (329) | 3,6% (190) | 13,7% (646) | Desconhecidas |
+| Intervalos em que aparece | 1 a 1 | 6,5% (276) | 2,4% (124) | 8,2% (387) | Desconhecidas |
+| Saldo | −0,0118 a 0,0071 | 41,9% (1.784) | 10,2% (531) | 28,7% (1.352) | Lícitas |
+| Grau de saída | só acima de 1 (grau 2 ou mais) | 20,4% (871) | 3,6% (186) | 22,4% (1.058) | Desconhecidas |
+| Grau de entrada | −1,5 a 2,5 | 14,0% (597) | 10,0% (519) | 6,2% (294) | Lícitas |
 
 Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
 
@@ -720,13 +728,15 @@ O gráfico mostra que as três classes têm quantidades parecidas de carteiras. 
 
 Esse gráfico foi escolhido pois dá para ter uma boa visualização de quão próximos são o lícito, o ilícito e o desconhecido no número de carteiras. Por isso, a contagem na barra foi iniciada em 0.
 
-#### Exploratória 2: mediana do BTC total recebido por classe
+#### Exploratória 2: número de transações por quantidade de arestas geradas
 
-![Mediana do BTC total recebido por classe](../../out/parte2/avd/exploratoria_2.png)
+![Número de transações por quantidade de arestas geradas](../../out/parte2/avd/exploratoria_2.png)
 
-O gráfico compara a mediana do BTC recebido por classe. As carteiras desconhecidas apresentam o maior valor, com 0,0049 BTC, seguidas pelas ilícitas, com 0,0047 BTC. Já as carteiras lícitas têm mediana igual a 0. Isso mostra que, no recorte analisado, as carteiras desconhecidas e ilícitas recebem valores típicos parecidos, enquanto as lícitas apresentam um valor muito menor.
+O gráfico mostra quantas arestas cada transação gera, em um total de 2.555 transações. Dessas, 1.569 (61,4%) geram apenas uma aresta e 55 (2,2%) geram de 101 a 1.000 arestas. Além disso, 2.159 transações geram de 1 a 10 arestas, o que dá 84,5% do total.
 
-Escolhi o gráfico de barras porque ele facilita a visualização e a comparação entre os tipos de carteira. A altura das barras mostra rapidamente qual classe tem a maior ou menor mediana, enquanto as cores e os valores escritos acima delas ajudam a identificar cada classe.
+Esse gráfico é importante, pois é possível perceber quantas arestas há em cada transação, e com as barras horizontais dá para ver isso de forma clara.
+
+Vale ressaltar que transações diferentes podem gerar a mesma aresta de uma carteira A para uma carteira B. Nessa situação, essas arestas são contadas de forma individual em cada transação.
 
 #### Exploratória 3: para qual classe vão as arestas de cada classe
 
@@ -742,6 +752,8 @@ Esse gráfico foi escolhido pois é de fácil visualização perceber o quanto a
 
 O gráfico mostra o sinal do peso das arestas de acordo com a classe da carteira de destino. Nas carteiras ilícitas, predominam os pesos zero, mas também há uma quantidade relevante de pesos positivos e negativos. Nas carteiras desconhecidas, os pesos positivos são maioria, seguidos pelos pesos zero e negativos. Já nas carteiras lícitas, uma grande maioria tem peso positivo, com poucos casos de peso zero ou negativo. Portanto, os pesos positivos aparecem principalmente nas carteiras lícitas, enquanto os pesos negativos são mais comuns nas carteiras ilícitas e desconhecidas.
 
+É importante ressaltar que o peso de uma aresta é o saldo da carteira de destino, ou seja, o total recebido menos o total enviado. Caso uma carteira receba um total de 30 bitcoins de 5 carteiras e envie 50 bitcoins para outra carteira, o saldo dela é −20, e as 5 arestas que chegam nela ficam com peso negativo.
+
 Esse gráfico foi escolhido pois é de fácil visualização ver o peso de cada aresta dependendo do tipo: com as barras agrupadas, dá para ver os sinais entre as classes.
 
 ### 6.5 Da exploratória à explanatória
@@ -750,6 +762,18 @@ Esse gráfico foi escolhido pois é de fácil visualização ver o peso de cada 
 > qual técnica de destaque foi usada.
 
 ### 6.6 Visualizações explanatórias
+
+#### Explanatória 1: número de transações por quantidade de arestas geradas
+
+![Número de transações alto não significa um alto número de transferências entre carteiras](../../out/parte2/avd/explanatoria_arestas_por_transacao.png)
+
+O gráfico mostra que 84,5% das transações geram de 1 a 10 arestas. Contudo, os 15,5% restantes, que geram de 11 a 1000 arestas, respondem por 84,4% do total de arestas (21.520 de 25.487).
+
+Dá para perceber pelo gráfico duas coisas. Primeiro, a grande maioria das transações ocorre com poucas arestas saindo dela. Segundo, as transações com maior número de arestas, mesmo sendo poucas, somam a maior parte do total de arestas.
+
+Lembrando que uma aresta é a ligação de uma carteira para outra carteira, e uma transação é composta por várias dessas ligações.
+
+Esse gráfico foi escolhido em barras horizontais, pois é uma forma de utlizar barras no eixo x,y, também foi considerado útil por no eixo x,y esse gráfico, e as partes principais foram coloridas de azul e vermelho para mostrar a discrepância entre elas. O título foi usado para mostrar que um número alto de transações não quer dizer um alto número de transferências. Ao lado das barras, com a mesma cor delas, foi posta a frase que explica o que cada grupo representa.
 
 > **[A ESCREVER — Vagner]** Explanatórias 1 e 2, com a nota analítica e a justificativa do tipo de gráfico, dos
 > elementos exibidos e dos atributos pré-atentivos. Indicar qual responde à pergunta de pesquisa.
