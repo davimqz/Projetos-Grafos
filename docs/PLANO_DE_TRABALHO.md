@@ -66,7 +66,9 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [ ] prova do m05 escrita no relatório
 - [x] `solucoes.csv`, `percurso_m03.json`, `ciclo_negativo_m06.json`, `dfs_classificacao.csv`
 - [x] `armadilhas_m04.csv`, `armadilhas_m07.csv` (busca a partir de ALVO no transposto)
-- [ ] **R1** CLI: `--mapa` roda `executar_parte1` (mapa surpresa) e `--armadilhas` calcula sem arquivo externo
+- [x] **R1** implementação da CLI: `--mapa` roda `executar_parte1`, calcula armadilhas sem arquivo externo e
+      compartilha resultados com figuras/HTML; resumo ao final e execução em lote por `--todos-mapas`/`--mapas`
+- [ ] **R1** revisão por Davi em outra máquina e integração na `main`
 - [ ] **R7** tempo e memória por algoritmo e mapa
 - [x] 2 mapas em `data/mapas_grupo/`: `g01_tres_depositos.txt` e `g02_poco_lateral.txt`, com gabaritos TXT em
       `data/solucoes_mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes). Requisitos conferidos automaticamente
@@ -82,6 +84,7 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] `labirinto_interativo.html`: mapa + algoritmo, passo a passo, estado atual, camadas, controle de velocidade
 - [x] mapas do grupo incluídos no HTML gerado pelo Python e no React (commit `5b1eba5`, revisão/PR pendentes)
 - [ ] **R2** HTML gerado pelo Python com as armadilhas de m04/m07 realçadas
+      (os geradores já recebem as armadilhas; falta regenerar a entrega e conferir o realce visual com Thomaz)
 - [x] (bônus) front React (`front-react/`) com labirinto, figuras e AVD
 - [ ] **R3** comparação dos 4 algoritmos no mesmo mapa · **R4** upload de `.txt` pelo front
 

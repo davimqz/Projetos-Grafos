@@ -19,7 +19,7 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 
 ## Situação em 21/11
 
-- `pytest`: 515 testes passando (507 na `main` + 8 do PR #38).
+- `pytest`: 533 testes passando na última execução local desta branch em 21/11/2026.
 - PRs mergeados até aqui: 37. Aberto: #38 (roteiro e dados da Parte 2 para o front).
 - Branches `matheus`, `thomaz` e `vagner-front` não têm nada além da `main`.
 - O relatório tem **23 marcadores** `[A ESCREVER]`/`[COMPLETAR]`: 11 na Parte 1 (seção 4), 4 no manual e na
@@ -28,6 +28,9 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 - Nesta branch, os dois mapas do grupo, seus gabaritos TXT e a integração ao HTML/React estão no commit
   `5b1eba5`. Foram verificados com 157 testes selecionados, build do React e geração das cinco figuras P5a.
   Revisão por Thomaz e integração na `main` permanecem pendentes; ainda não há número de PR registrado aqui.
+- CLI R1 implementada nesta branch: exportações completas, armadilhas automáticas, figuras/HTML compartilhando
+  resultados e resumo ao final. Fluxo conferido nos dez mapas e nos cinco mapas de treino, incluindo o inválido.
+  Falta a revisão por Davi em outra máquina; as saídas definitivas em `out/parte1/` continuam pendentes.
 
 ## O que zera nota se faltar
 
@@ -95,8 +98,8 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [x] `percurso_m03.png`, `percurso_m08.png`, `camadas_m02.png`, `arvore_bfs_m02.png` e `heatmap_m08.png`.
 - [x] `labirinto_interativo.html` com escolha de mapa e algoritmo, passo a passo, controle de velocidade e troca de
       camada.
-- [ ] **Realce dos estados-armadilha no HTML (R2).** Hoje o HTML mostra "Não fornecidas" porque `gerar_figuras` não
-      passa as armadilhas.
+- [ ] **Realce dos estados-armadilha no HTML (R2).** Os geradores já recebem as armadilhas calculadas pelo código.
+      Falta regenerar o HTML da entrega e conferir o realce visual com Thomaz.
   - Pronto quando: abrir m04 e m07 no HTML e ver as armadilhas marcadas.
 - [x] Mapas do grupo incluídos no HTML e na seleção do React (commit `5b1eba5`, revisão/PR pendentes).
 - [ ] Relatório 4.11: as figuras com legenda e uma frase sobre o que cada uma mostra.
@@ -135,7 +138,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 | Participação nos acompanhamentos | 0,5 | Ir ao de 24/11 com progresso real. Cada um precisa saber reportar qualquer pacote | Todos | 24/11 |
 | Clareza da apresentação | 0,3 | Slides a partir do roteiro, preencher os blocos `[A PREENCHER]` do `APRESENTACAO.md` e ensaiar com cronômetro (15 a 20 min) | Davi (slides), dono de cada bloco | 24/11 |
 | Domínio conceitual | 0,5 | Cada um estuda as partes que não fez e responde por escrito as perguntas previstas no roteiro | Todos | 25/11 |
-| Demonstração ao vivo (mapa surpresa) | 0,4 | **R1**: a CLI tem que rodar um mapa qualquer de ponta a ponta (ver abaixo). Ensaiar com `data/mapas_treino/` | Matheus | 22/11 |
+| Demonstração ao vivo (mapa surpresa) | 0,4 | **R1** implementado e verificado localmente com os mapas de treino. Falta revisão por Davi em outra máquina e ensaio do grupo | Matheus | 22/11 |
 | Participação equilibrada | 0,3 | Todos já têm commits em 2 ou mais pacotes. Atualizar a matriz da seção 10.2 na véspera | Davi | 25/11 |
 
 Regras da professora: falas divididas ("cada um fala da sua parte") ou leitura mecânica têm redução severa de nota. Se
@@ -146,7 +149,7 @@ alguém parar de contribuir, o grupo tem que avisar a professora por e-mail **an
 | Item | Peso | O que falta | Responsável | Prazo |
 |---|---|---|---|---|
 | Organização do repositório | 0,3 | Pronto. Conferir no fim se `out/parte1/` tem todas as saídas | Davi | 25/11 |
-| Qualidade do código | 0,4 | Pronto. Corrigir os acentos quebrados no terminal do Windows junto com o R1 | Matheus | 22/11 |
+| Qualidade do código | 0,4 | Pronto. CLI com UTF-8 no Windows e teste em subprocesso com ambiente ASCII | Matheus | 22/11 |
 | Testes obrigatórios | 0,4 | Pronto (BFS, DFS, Dijkstra, Bellman-Ford, estados com mapa mínimo, IO). Atualizar a contagem na seção 7 | Davi | 25/11 |
 | README | 0,2 | Comando do mapa surpresa em destaque (depende do R1) e revisão geral | Davi | 25/11 |
 | PDF técnico | 0,4 | Fechar os 23 marcadores, gerar o PDF e conferir figuras e tabelas | Davi junta; cada dono escreve | 25/11 |
@@ -165,18 +168,20 @@ Pedidos da reunião que contam aqui. Não são obrigatórios, mas a professora p
 
 ## R1: o que a CLI precisa fazer
 
-É o item mais arriscado, porque a demonstração ao vivo depende dele. Hoje `--mapa` só gera o PNG e uma linha de
-status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_parte1`.
+Implementação concluída nesta branch e verificada com 533 testes e execuções reais em pastas temporárias.
+Os resultados das buscas são compartilhados entre as exportações e o resumo é apresentado ao final. O aceite
+do R1 depende ainda da revisão por Davi em outra máquina.
 
-- [ ] `python -m src.cli --mapa <arquivo> --out <pasta>` gera todas as saídas daquele mapa: arestas, métricas, graus,
+- [x] `python -m src.cli --mapa <arquivo> --out <pasta>` gera todas as saídas daquele mapa: arestas, métricas, graus,
       soluções dos 4 algoritmos, DFS, armadilhas e figura. Sem `--alg`, roda os quatro.
-- [ ] `--alg BFS|DFS|DIJKSTRA|BELLMAN_FORD` imprime no terminal passos, custo, status e caminho.
-- [ ] `--armadilhas` calcula as armadilhas sozinho, sem `--arquivo-armadilhas`, para qualquer mapa (não só m04/m07).
-- [ ] `--fonte-consumivel` e `--interactive` continuam funcionando.
-- [ ] Mapa inválido dá mensagem clara, sem traceback.
-- [ ] Acentos corretos no terminal do Windows (`sys.stdout.reconfigure(encoding="utf-8")`).
-- [ ] Um comando que gera tudo de `data/mapas/` e `data/mapas_grupo/` em `out/parte1/`.
-- [ ] Testado com os mapas de `data/mapas_treino/`. As respostas têm que bater com o gabarito do README da pasta.
+- [x] `--alg BFS|DFS|DIJKSTRA|BELLMAN_FORD` seleciona o resumo e a visualização; CSVs/JSONs mantêm as análises completas.
+- [x] `--armadilhas` calcula as armadilhas sozinho, sem `--arquivo-armadilhas`, para qualquer mapa (não só m04/m07).
+- [x] `--fonte-consumivel` e `--interactive` continuam funcionando; a variante grava em `fonte_consumivel/`.
+- [x] Mapa inválido dá mensagem clara, sem traceback.
+- [x] Acentos corretos no terminal do Windows (`sys.stdout.reconfigure(encoding="utf-8")`).
+- [x] `--todos-mapas` gera tudo de `data/mapas/` e `data/mapas_grupo/`; `--mapas` aceita uma lista de arquivos.
+- [x] Testado com os mapas de `data/mapas_treino/`: estados, arcos, armadilhas, passos BFS e custo/status do BF
+      conferidos com o gabarito do README da pasta.
 - [ ] Revisado por Davi rodando a CLI numa máquina diferente da do Matheus.
 
 ## Marcadores do relatório
@@ -220,7 +225,8 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 ## Checklist por pessoa
 
 ### Matheus (P1 + P3, revisor: Thomaz)
-- [ ] R1 completo (lista acima) — 22/11
+- [x] Implementação do R1 e verificação local dos oito critérios técnicos — 21/11
+- [ ] R1: revisão por Davi em outra máquina e integração na `main` — 22/11
 - [x] 2 mapas do grupo com gabaritos TXT — commit `5b1eba5` (revisão/PR pendentes).
 - [ ] Conferência final dos mapas/gabaritos pelo grupo e revisão por Thomaz — 22/11
 - [ ] Todas as saídas de `out/parte1/` commitadas — 22/11

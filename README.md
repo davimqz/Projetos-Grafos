@@ -60,6 +60,12 @@ Variantes suportadas: portas como chão, portas como parede, `+` fixo em −4 e 
 ### Como executar
 
 ```bash
+# mapa surpresa: análises completas, figuras e resumo final
+python -m src.cli --mapa ./data/mapas_treino/t01_duas_portas.txt --out ./out/surpresa/ --interactive
+
+# todos os mapas fornecidos e do grupo, com HTML conjunto
+python -m src.cli --todos-mapas --out ./out/parte1/ --interactive
+
 # percurso de um algoritmo em um mapa
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg DIJKSTRA --out ./out/parte1/
@@ -69,15 +75,26 @@ python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-c
 # labirinto interativo de um mapa (gera out/parte1/labirinto_<mapa>.html)
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./out/parte1/
 
-# estados-armadilha a partir de um JSON com a lista de rótulos
-python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --interactive --out ./out/parte1/
+# calcular, listar e realçar os estados-armadilha automaticamente
+python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --interactive --out ./out/parte1/
 
 # figuras do P5a e o HTML conjunto (mapas fornecidos e mapas do grupo)
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
 
-Sem `--alg`, a CLI usa Dijkstra. Se o algoritmo não se aplica ao mapa (por exemplo, Dijkstra com peso negativo) ou não
-existe percurso até a saída, o motivo aparece no terminal e no HTML.
+Sem `--alg`, o resumo e o HTML apresentam os quatro algoritmos. `--alg` seleciona o algoritmo mostrado no resumo
+e na visualização; os CSVs/JSONs mantêm as análises completas. Se um algoritmo não se aplica ao mapa ou não existe
+percurso até a saída, o motivo aparece no terminal e no HTML. A DFS apresenta o caminho da árvore de busca,
+a classificação dos arcos e a indicação de ciclo; seu caminho não é necessariamente mínimo.
+
+`--mapas <arquivo1> <arquivo2> ...` executa uma lista de mapas na mesma chamada, preservando todos nos agregados.
+Executar chamadas separadas na mesma pasta substitui os agregados pelos resultados da última chamada.
+Com `--fonte-consumivel`, os arquivos vão para a subpasta `fonte_consumivel/` da saída solicitada.
+O JSON de `--arquivo-armadilhas` permanece opcional para compatibilidade e só pode ser usado com um mapa.
+
+O resumo é impresso após as exportações, com passos, custos, status, caminhos e os arquivos concluídos.
+O código de saída é 0 para execução concluída (inclusive recusa ou mapa sem solução), 1 para falha de exportação
+e 2 para entrada ou processamento inválidos. Uma exportação que falha é informada no resumo sem impedir as demais.
 
 ### Saídas em `out/parte1/`
 
@@ -92,7 +109,7 @@ existe percurso até a saída, o motivo aparece no terminal e no HTML.
 As análises do P3 (`metricas_global.json`, `camadas.json`, `graus_<mapa>.csv`, `arestas_<mapa>.csv`,
 `comparacao_modelagem.csv`, `solucoes.csv`, armadilhas de cada mapa e comparações do m05) estão implementadas em
 `src/parte1/`, com orquestração por `src.solve.executar_parte1` para os mapas informados, inclusive os do grupo.
-A integração dessa orquestração com a CLI permanece pendente.
+A CLI usa essa orquestração e compartilha os resultados com as figuras e o HTML, sem repetir as buscas para desenhá-los.
 
 Os mapas do grupo são `g01_tres_depositos.txt` e `g02_poco_lateral.txt`. Seus gabaritos, calculados pelo código do
 grupo, ficam em [`data/solucoes_mapas_grupo/`](data/solucoes_mapas_grupo/), separados dos labirintos.
@@ -226,7 +243,9 @@ caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando
 │  │  ├─ carga.py              # preparo dos mapas
 │  │  ├─ analises.py           # métricas, camadas, graus e armadilhas
 │  │  ├─ buscas.py             # normalização das buscas e comparações
-│  │  └─ exportacao.py         # escrita de CSV e JSON
+│  │  ├─ exportacao.py         # escrita de CSV e JSON
+│  │  ├─ interface_cli.py      # exportações visuais e resumo final da Parte 1
+│  │  └─ saidas.py             # arquivos concluídos e falhas de exportação
 │  ├─ viz.py                   # figuras e HTML interativo
 │  ├─ visualizar_parte1.py     # gera as figuras do P5a
 │  ├─ carga_parte2.py          # carrega o recorte como grafo
