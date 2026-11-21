@@ -98,7 +98,8 @@ def carteiras_usadas(dados: dict) -> set[str]:
 
 def tempos(relatorio: list[dict]) -> list[dict]:
     """Linhas do benchmark no grafo inteiro (fração 1.0)."""
-    campos = ("algoritmo", "nos", "arestas", "complexidade", "alcancados", "status", "tempo_medio_ms")
+    campos = ("algoritmo", "nos", "arestas", "complexidade", "alcancados", "status", "tempo_medio_ms",
+              "latencia_min_ms", "latencia_max_ms", "memoria_pico_kb")
     return [{c: linha.get(c) for c in campos} for linha in relatorio if linha.get("fracao") == 1.0]
 
 

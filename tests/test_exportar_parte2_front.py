@@ -73,7 +73,7 @@ def test_montar_com_pasta_de_exemplo(tmp_path):
     }), encoding="utf-8")
     (tmp_path / "parte2_report.json").write_text(json.dumps([
         {"algoritmo": "BFS", "fracao": 0.5, "tempo_medio_ms": 1.0},
-        {"algoritmo": "BFS", "fracao": 1.0, "tempo_medio_ms": 2.0},
+        {"algoritmo": "BFS", "fracao": 1.0, "tempo_medio_ms": 2.0, "memoria_pico_kb": 10.5},
     ]), encoding="utf-8")
     nos = tmp_path / "nos.csv"
     nos.write_text("endereco,classe\na,licito\nb,ilicito\nc,desconhecido\nd,licito\ne,licito\nf,licito\n",
@@ -84,6 +84,7 @@ def test_montar_com_pasta_de_exemplo(tmp_path):
     assert dados["dijkstra"][0]["custo"] == 3.0
     assert dados["bellman_ford"] == []
     assert [t["tempo_medio_ms"] for t in dados["tempos"]] == [2.0]
+    assert dados["tempos"][0]["memoria_pico_kb"] == 10.5
     assert dados["classe"] == {"a": "licito", "b": "ilicito", "c": "desconhecido", "d": "licito", "e": "licito"}
 
 

@@ -113,7 +113,7 @@ O recorte da Parte 2 já está no repositório, então **não é preciso baixar 
 - [x] benchmark de BFS, DFS e Bellman-Ford, escalabilidade 10/50/100%
 - [x] notebook exploratório e 4 exploratórias
 - [x] **abrir PR da branch `Vagner`** (PR #34, mergeado) (Dijkstra no benchmark e figuras de comportamento e caminhos)
-- [ ] **R7 (Parte 2)** memória por algoritmo e tarefa (`tracemalloc`) no `parte2_report.json`, junto com o tempo médio
+- [x] **R7 (Parte 2)** memória por algoritmo e tarefa (`tracemalloc`) no `parte2_report.json`, junto com o tempo médio (PR #37)
 - [ ] **R5** aba da Parte 2 no React: lista das 3 fontes (BFS/DFS) e dos 5 pares (Dijkstra) + casos do Bellman-Ford,
       com caminho, custo, camadas e tempo de cada execução (dados prontos em `front-react/src/parte2.json`, gerado por `scripts/exportar_parte2_front.py`)
 - [ ] **R6** view do grafo da Parte 2: subgrafo em volta das fontes ou dos caminhos, colorido por classe

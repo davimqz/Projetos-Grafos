@@ -147,26 +147,31 @@ Figura de apoio: `benchmark_caminhos_bfs_dijkstra.png`, em que o mesmo par ilíc
 
 Falas e interpretação deste bloco: usar as seções 5.3 a 5.5 do relatório.
 
-### 9. Desempenho por algoritmo e tarefa (1,5 min) **[A PREENCHER — Vagner e Matheus]**
+### 9. Desempenho por algoritmo e tarefa (1,5 min) **[A PREENCHER — Matheus, Parte 1]**
 
-Parte 2, média de 5 execuções com `timeit` (seção 5.6):
+Parte 2, média de 5 execuções com `timeit`, latência (execução mais rápida e mais lenta) e pico de memória com
+`tracemalloc` (seção 5.6):
 
-| Algoritmo | 10% (ms) | 50% (ms) | 100% (ms) | Complexidade |
-|---|---:|---:|---:|---|
-| BFS | 0,60 | 3,75 | 6,95 | O(V + E) |
-| DFS | 1,60 | 10,87 | 31,35 | O(V + E) |
-| Dijkstra | 0,59 | 4,10 | 8,26 | O((V + E) log V) |
-| Bellman-Ford | 0,66 | 7.139,71 | 88.121,32 | O(V · E) |
+| Algoritmo | Média 10% (ms) | Média 50% (ms) | Média 100% (ms) | Latência 100% (ms) | Pico de memória 10% / 50% / 100% (KiB) | Complexidade |
+|---|---:|---:|---:|---:|---|---|
+| BFS | 0,36 | 2,48 | 6,03 | 4,33 a 8,85 | 270 / 1.131 / 2.265 | O(V + E) |
+| DFS | 0,88 | 6,31 | 21,77 | 17,42 a 24,82 | 306 / 1.693 / 4.380 | O(V + E) |
+| Dijkstra | 0,37 | 3,25 | 6,16 | 5,77 a 6,52 | 169 / 726 / 1.454 | O((V + E) log V) |
+| Bellman-Ford | 0,51 | 5.538,81 | 42.610,19 | 41.337,47 a 44.237,39 | 220 / 1.195 / 3.497 | O(V · E) |
 
-Falta, pelo pedido R7: memória por algoritmo, latência e os mesmos números para a Parte 1.
+Falas: seção 5.6 ("Latência", "Memória" e "Comparação com a complexidade teórica").
 
-### 10. AVD (2 min) **[A PREENCHER — Vagner]**
+Falta, pelo pedido R7: os mesmos números para a Parte 1.
 
-- Os 4 pilares da exploração (seção 6.1).
-- As 2 figuras explanatórias e a mensagem de cada uma (seção 6.6).
+### 10. AVD (2 min) **[A PREENCHER — Vagner, explanatórias]**
+
+- Os 4 pilares da exploração (seção 6.1), dados faltantes e outliers (6.2), análise multivariada (6.3).
+- Uma ou duas das exploratórias de `out/parte2/avd/` (seção 6.4), cada uma com o insight dela.
+- As 2 figuras explanatórias e a mensagem de cada uma (seções 6.5 e 6.6, ainda não escritas).
 
 ### 11. Pergunta de pesquisa e limitações (1 min)
 
+- Quando usar cada algoritmo: seção 5.7 ("Quando e por que usar cada algoritmo").
 - Resposta: seção 5.7 do relatório ("Resposta à pergunta de pesquisa").
 - Limitações da Parte 2: seção 8 (quantidade de carteiras, viés do recorte, viés na escolha das fontes, pesos
   negativos, alcançar um ciclo não é participar dele).
@@ -186,7 +191,7 @@ Cada um escreve a resposta da sua parte e todos leem antes do ensaio.
 | O que é vértice e o que é aresta em G_est? E na Parte 2? | Matheus / Davi |
 | Por que o Dijkstra recusa o m05? | Matheus |
 | Por que o peso do Bellman-Ford é o saldo do destino e não a diferença de saldos? | Davi |
-| Por que o Bellman-Ford leva 88 s no grafo inteiro e os outros levam milissegundos? | Vagner |
+| Por que o Bellman-Ford leva 42,6 s no grafo inteiro e os outros levam milissegundos? | Vagner |
 | Por que a DFS alcança todas as carteiras no benchmark e a BFS não? | Vagner |
 | Como o front sabe o resultado da Parte 2? | Thomaz |
 
