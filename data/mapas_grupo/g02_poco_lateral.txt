@@ -1,0 +1,11 @@
+; Poco lateral - proposta 4 escolhida pelo grupo.
+; [IA] Codex - sugestao do desenho; resultados calculados pelo codigo do grupo.
+#####################
+#S.................G#
+#####v###############
+#...................#
+#.###.###.###.###...#
+#...................#
+#...###...###...###.#
+#...................#
+#####################

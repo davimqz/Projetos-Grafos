@@ -1,0 +1,7 @@
+; Tres depositos - proposta 2 escolhida pelo grupo.
+; [IA] Codex - sugestao do desenho; resultados calculados pelo codigo do grupo.
+#####################
+#S...>A.+..>B.+..>CG#
+#.#####.#####.#######
+#...a.#...b.#...c...#
+#####################

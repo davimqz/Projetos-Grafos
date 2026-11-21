@@ -13,6 +13,8 @@ const NOMES_MAPAS = {
   m06_fonte: 'M06 · Fonte',
   m07_impossivel: 'M07 · Impossível',
   m08_grande: 'M08 · Grande',
+  g01_tres_depositos: 'G01 · Três depósitos',
+  g02_poco_lateral: 'G02 · Poço lateral',
 }
 
 export function Labirinto() {

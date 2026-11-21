@@ -70,12 +70,12 @@ def gerar_mapa(arquivo, saida, *, algoritmo="DIJKSTRA", interactive=False, fonte
 
 
 def gerar_figuras(arquivos, saida):
-    """Gera o conjunto P5a a partir dos caminhos m02, m03 e m08."""
+    """Gera as figuras P5a e inclui todos os mapas informados no HTML."""
     saida = Path(saida)
     mapas = {}
-    for nome in ("m02", "m03", "m08"):
+    for nome, arquivo in arquivos.items():
         dados, grafo, _, resultados = preparar_mapa(
-            arquivos[nome], ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD")
+            arquivo, ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD")
         )
         mapas[nome] = dados
         if nome in ("m03", "m08"):
@@ -96,8 +96,16 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Gerar figuras P5a com mapas reais")
     parser.add_argument("--mapas", default="data/mapas", help="diretório dos mapas")
+    parser.add_argument("--mapas-grupo", default="data/mapas_grupo", help="diretório dos mapas do grupo")
     parser.add_argument("--out", default="out/parte1", help="diretório de saída")
     args = parser.parse_args()
-    diretorio = Path(args.mapas)
-    gerar_figuras({"m02": diretorio / "m02_uma_chave.txt", "m03": diretorio / "m03_tres_chaves.txt",
-                   "m08": diretorio / "m08_grande.txt"}, args.out)
+    # [IA] Codex - inclui os mapas próprios sem manter uma lista fixa de arquivos.
+    nomes_figuras = {"m02_uma_chave": "m02", "m03_tres_chaves": "m03", "m08_grande": "m08"}
+    arquivos = {}
+    for pasta in (args.mapas, args.mapas_grupo):
+        for arquivo in sorted(Path(pasta).glob("*.txt")):
+            nome = nomes_figuras.get(arquivo.stem, arquivo.stem)
+            if nome in arquivos:
+                parser.error(f"Há mapas com o mesmo identificador: {nome}")
+            arquivos[nome] = arquivo
+    gerar_figuras(arquivos, args.out)

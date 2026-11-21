@@ -56,9 +56,9 @@ def executar_parte1(
     arestas_<mapa>.csv, solucoes.csv e dfs_classificacao.csv.
     Para os mapas correspondentes, inclui comparacao_modelagem.csv,
     percurso_m03.json (menor custo, estado a estado), ciclo_negativo_m06.json
-    (sequência de estados e custo), armadilhas_m04.csv e armadilhas_m07.csv.
-    Reúne ainda o experimento padrão em comparacao_bonus_m05.json e listas
-    armadilhas_m04.json/armadilhas_m07.json compatíveis com a CLI existente.
+    (sequência de estados e custo). Para cada mapa, exporta armadilhas_<mapa>.csv
+    e armadilhas_<mapa>.json, incluindo os mapas do grupo.
+    Reúne ainda o experimento padrão em comparacao_bonus_m05.json.
     Os mapas fornecidos usam identificadores m01 a m08; mapas próprios
     mantêm o nome do arquivo sem extensão. Identificadores repetidos são erro.
 
@@ -154,14 +154,14 @@ def executar_parte1(
             )
             del resultado
         resultados_buscas.clear()
-        if nome in ("m04", "m07"):
-            armadilhas = encontrar_armadilhas(dados)
-            exportar_csv(
-                ({"estado": rotulo} for rotulo in armadilhas),
-                ("estado",),
-                saida / f"armadilhas_{nome}.csv",
-            )
-            exportar_json(armadilhas, saida / f"armadilhas_{nome}.json")
+        # [IA] Codex - exporta o resultado existente também para mapas próprios.
+        armadilhas = encontrar_armadilhas(dados)
+        exportar_csv(
+            ({"estado": rotulo} for rotulo in armadilhas),
+            ("estado",),
+            saida / f"armadilhas_{nome}.csv",
+        )
+        exportar_json(armadilhas, saida / f"armadilhas_{nome}.json")
 
     exportar_json(metricas, saida / "metricas_global.json")
     exportar_json(camadas, saida / "camadas.json")

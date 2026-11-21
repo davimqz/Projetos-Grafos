@@ -72,7 +72,7 @@ python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./
 # estados-armadilha a partir de um JSON com a lista de rótulos
 python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --interactive --out ./out/parte1/
 
-# figuras do P5a e o HTML conjunto (m02, m03 e m08)
+# figuras do P5a e o HTML conjunto (mapas fornecidos e mapas do grupo)
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
 
@@ -90,9 +90,15 @@ existe percurso até a saída, o motivo aparece no terminal e no HTML.
 | `labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
 
 As análises do P3 (`metricas_global.json`, `camadas.json`, `graus_<mapa>.csv`, `arestas_<mapa>.csv`,
-`comparacao_modelagem.csv`, `solucoes.csv`, armadilhas do m04 e do m07 e comparações do m05) estão implementadas em
+`comparacao_modelagem.csv`, `solucoes.csv`, armadilhas de cada mapa e comparações do m05) estão implementadas em
 `src/parte1/`, com orquestração por `src.solve.executar_parte1` para os mapas informados, inclusive os do grupo.
 A integração dessa orquestração com a CLI permanece pendente.
+
+Os mapas do grupo são `g01_tres_depositos.txt` e `g02_poco_lateral.txt`. Seus gabaritos, calculados pelo código do
+grupo, ficam em [`data/solucoes_mapas_grupo/`](data/solucoes_mapas_grupo/), separados dos labirintos.
+O gerador de visualizações inclui automaticamente os arquivos de `data/mapas_grupo/` no HTML conjunto;
+use `--mapas-grupo <pasta>` para mudar esse diretório. Para atualizar a seleção de mapas no React,
+execute `python -m scripts.exportar_front` novamente.
 
 ## Parte 2 — Elliptic++ (rede de carteiras Bitcoin)
 
@@ -204,6 +210,7 @@ caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando
 ├─ data/
 │  ├─ mapas/                   # mapas fornecidos (m01 a m08)
 │  ├─ mapas_grupo/             # 2 mapas criados pelo grupo
+│  ├─ solucoes_mapas_grupo/     # gabaritos em TXT, fora da seleção de labirintos
 │  └─ dataset_parte2/          # recorte (nos.csv, arestas.csv); o bruto fica em raw/, fora do git
 ├─ notebooks/avd/              # análise exploratória (AVD)
 ├─ scripts/                    # download e recorte do dataset, exportação para o front
