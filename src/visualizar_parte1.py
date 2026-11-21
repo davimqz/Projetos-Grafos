@@ -2,11 +2,13 @@
 
 # [IA] Codex – integração das visualizações com mapas e algoritmos existentes.
 # [IA] Codex - apresentação dos resultados compartilhados pela orquestração.
+# [IA] Codex - separacao das saidas em csv, json, figuras e html.
 from pathlib import Path
 
 from src.parte1.analises import classificar_arcos, encontrar_armadilhas
 from src.parte1.buscas import _resolver_mapa
 from src.parte1.carga import carregar_mapa
+from src.parte1.caminhos import caminho_saida
 from src.parte1.modelos import ExecucaoMapa
 from src.viz import (desenhar_arvore_bfs, desenhar_camadas, desenhar_heatmap,
                      desenhar_percurso, gerar_html_interativo, reconstruir_percurso)
@@ -65,12 +67,12 @@ def exportar_figuras(execucao, apresentacao, saida, gravar):
     algoritmo = next((nome for nome in preferidos if apresentacao["algoritmos"].get(nome)), None)
     if algoritmo:
         gravar(desenhar_percurso, dados.grade, apresentacao["algoritmos"][algoritmo],
-               saida / f"percurso_{dados.nome}.png", titulo=f"{dados.nome} — {algoritmo}")
+               caminho_saida(saida, f"percurso_{dados.nome}.png"), titulo=f"{dados.nome} — {algoritmo}")
     if dados.nome == "m02":
-        gravar(desenhar_camadas, dados.grafo_estados, saida / "camadas_m02.png")
-        gravar(desenhar_arvore_bfs, execucao.buscas["BFS"], saida / "arvore_bfs_m02.png")
+        gravar(desenhar_camadas, dados.grafo_estados, caminho_saida(saida, "camadas_m02.png"))
+        gravar(desenhar_arvore_bfs, execucao.buscas["BFS"], caminho_saida(saida, "arvore_bfs_m02.png"))
     if dados.nome == "m08":
-        gravar(desenhar_heatmap, dados.grade, dados.grafo_estados, saida / "heatmap_m08.png")
+        gravar(desenhar_heatmap, dados.grade, dados.grafo_estados, caminho_saida(saida, "heatmap_m08.png"))
 
 
 def gerar_mapa(arquivo, saida, *, algoritmo="DIJKSTRA", interactive=False, fonte_consumivel=False,
@@ -86,10 +88,10 @@ def gerar_mapa(arquivo, saida, *, algoritmo="DIJKSTRA", interactive=False, fonte
     caminho = dados["algoritmos"][algoritmo]
     if caminho:
         nome_mapa = {"m03_tres_chaves": "m03", "m08_grande": "m08"}.get(Path(arquivo).stem, Path(arquivo).stem)
-        desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{nome_mapa}.png",
+        desenhar_percurso(dados["grade"], caminho, caminho_saida(saida, f"percurso_{nome_mapa}.png"),
                           titulo=f"{Path(arquivo).stem} — {algoritmo}")
     if interactive:
-        gerar_html_interativo({Path(arquivo).stem: dados}, saida / f"labirinto_{Path(arquivo).stem}.html")
+        gerar_html_interativo({Path(arquivo).stem: dados}, caminho_saida(saida, f"labirinto_{Path(arquivo).stem}.html"))
     return dados["status"][algoritmo]
 
 
@@ -106,14 +108,14 @@ def gerar_figuras(arquivos, saida):
             caminho = dados["algoritmos"]["DIJKSTRA"]
             if not caminho:
                 raise ValueError(f"{nome}: {dados['status']['DIJKSTRA']}")
-            desenhar_percurso(dados["grade"], caminho, saida / f"percurso_{nome}.png",
+            desenhar_percurso(dados["grade"], caminho, caminho_saida(saida, f"percurso_{nome}.png"),
                               titulo=f"{nome} — Dijkstra (menor custo)")
         if nome == "m02":
-            desenhar_camadas(grafo, saida / "camadas_m02.png")
-            desenhar_arvore_bfs(resultados["BFS"], saida / "arvore_bfs_m02.png")
+            desenhar_camadas(grafo, caminho_saida(saida, "camadas_m02.png"))
+            desenhar_arvore_bfs(resultados["BFS"], caminho_saida(saida, "arvore_bfs_m02.png"))
         if nome == "m08":
-            desenhar_heatmap(dados["grade"], grafo, saida / "heatmap_m08.png")
-    gerar_html_interativo(mapas, saida / "labirinto_interativo.html")
+            desenhar_heatmap(dados["grade"], grafo, caminho_saida(saida, "heatmap_m08.png"))
+    gerar_html_interativo(mapas, caminho_saida(saida, "labirinto_interativo.html"))
 
 
 if __name__ == "__main__":

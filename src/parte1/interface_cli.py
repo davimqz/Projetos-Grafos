@@ -1,6 +1,7 @@
 """Coordena as saídas da Parte 1 e imprime o resumo após as exportações."""
 
 # [IA] Codex - integração da CLI com os resultados e exportadores existentes.
+# [IA] Codex - separacao das saidas em csv, json, figuras e html.
 import json
 import sys
 from pathlib import Path
@@ -11,6 +12,7 @@ from src.solve import executar_parte1
 from src.visualizar_parte1 import exportar_figuras, preparar_apresentacao
 from src.viz import gerar_html_interativo
 from .saidas import RegistroSaidas
+from .caminhos import caminho_saida
 
 
 ALGORITMOS = ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD")
@@ -70,7 +72,7 @@ def executar_interface(
 
     if interactive and apresentacoes:
         nome_html = "labirinto_interativo.html" if lote else f"labirinto_{mapas[0].stem}.html"
-        registro.gravar(gerar_html_interativo, apresentacoes, saida / nome_html)
+        registro.gravar(gerar_html_interativo, apresentacoes, caminho_saida(saida, nome_html))
     imprimir_resumo(resumos, apresentacoes, algoritmos, registro, mostrar_armadilhas)
     return codigo or (1 if registro.erros else 0)
 

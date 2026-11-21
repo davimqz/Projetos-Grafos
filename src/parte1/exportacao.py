@@ -1,6 +1,7 @@
 """Exportação dos arcos e resultados já calculados da Parte 1."""
 
 # [IA] Codex - separação das exportações existentes, sem alterar os resultados.
+# [IA] Codex - criação da pasta de destino para a exportação organizada de arestas.
 from __future__ import annotations
 
 import csv
@@ -24,6 +25,7 @@ def exportar_arestas(dados: DadosMapa, caminho: str | Path) -> None:
     Não constrói novas transições nem altera as regras do mapa.
     """
 
+    Path(caminho).parent.mkdir(parents=True, exist_ok=True)
     with open(caminho, "w", newline="", encoding="utf-8") as arquivo:
         escritor = csv.writer(arquivo)
 

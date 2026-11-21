@@ -7,6 +7,7 @@ As visualizações pertencem a src.viz e src.visualizar_parte1.
 
 # [IA] Codex - separação por responsabilidade, preservando a lógica existente.
 # [IA] Codex - integração das exportações e compartilhamento de resultados com a CLI.
+# [IA] Codex - separacao das saidas em csv, json, figuras e html.
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
@@ -31,6 +32,7 @@ from src.parte1.buscas import (
     resolver_mapa,
 )
 from src.parte1.carga import carregar_mapa
+from src.parte1.caminhos import caminho_saida
 from src.parte1.exportacao import exportar_arestas, exportar_csv, exportar_json
 from src.parte1.modelos import AlgoritmoCaminho, DadosMapa, GrauEstado, Solucao, StatusSolucao
 from src.parte1.modelos import ExecucaoMapa
@@ -116,11 +118,11 @@ def executar_parte1(
             "fonte_consumivel": fonte_consumivel,
         }
         camadas[nome] = calcular_camadas(dados)
-        gravar(exportar_arestas, dados, saida / f"arestas_{nome}.csv")
+        gravar(exportar_arestas, dados, caminho_saida(saida, f"arestas_{nome}.csv"))
         gravar(exportar_csv,
             graus,
             ("estado", "grau_entrada", "grau_saida"),
-            saida / f"graus_{nome}.csv",
+            caminho_saida(saida, f"graus_{nome}.csv"),
         )
 
         solucoes_mapa = {}
@@ -143,9 +145,9 @@ def executar_parte1(
             percurso = solucoes_mapa["DIJKSTRA"]
             if percurso["status"] == "RECUSA":
                 percurso = solucoes_mapa["BELLMAN_FORD"]
-            gravar(exportar_json, percurso, saida / f"percurso_{nome}.json")
+            gravar(exportar_json, percurso, caminho_saida(saida, f"percurso_{nome}.json"))
         if nome == "m05" and not fonte_consumivel:
-            gravar(exportar_json, _comparar_bonus(dados, resultados_buscas), saida / "comparacao_bonus_m05.json")
+            gravar(exportar_json, _comparar_bonus(dados, resultados_buscas), caminho_saida(saida, "comparacao_bonus_m05.json"))
         if nome == "m06" or (
             ao_processar is not None and resultados_buscas["BELLMAN_FORD"]["tem_ciclo_negativo"]
         ):
@@ -159,7 +161,7 @@ def executar_parte1(
                     "ciclo_negativo": resultado["ciclo_negativo"],
                     "custo_ciclo": resultado["custo_ciclo"],
                 },
-                saida / f"ciclo_negativo_{nome}.json",
+                caminho_saida(saida, f"ciclo_negativo_{nome}.json"),
             )
             del resultado
         # [IA] Codex - exporta o resultado existente também para mapas próprios.
@@ -167,27 +169,27 @@ def executar_parte1(
         gravar(exportar_csv,
             ({"estado": rotulo} for rotulo in armadilhas),
             ("estado",),
-            saida / f"armadilhas_{nome}.csv",
+            caminho_saida(saida, f"armadilhas_{nome}.csv"),
         )
-        gravar(exportar_json, armadilhas, saida / f"armadilhas_{nome}.json")
+        gravar(exportar_json, armadilhas, caminho_saida(saida, f"armadilhas_{nome}.json"))
         if ao_processar is not None:
             ao_processar(ExecucaoMapa(dados, solucoes_mapa, classificacao, dict(resultados_buscas), armadilhas))
         resultados_buscas.clear()
 
-    gravar(exportar_json, metricas, saida / "metricas_global.json")
-    gravar(exportar_json, camadas, saida / "camadas.json")
+    gravar(exportar_json, metricas, caminho_saida(saida, "metricas_global.json"))
+    gravar(exportar_json, camadas, caminho_saida(saida, "camadas.json"))
     gravar(exportar_csv,
         solucoes,
         ("mapa", "algoritmo", "passos", "custo", "status", "caminho"),
-        saida / "solucoes.csv",
+        caminho_saida(saida, "solucoes.csv"),
     )
     gravar(exportar_csv,
         classificacoes,
         ("mapa", "arvore", "retorno", "avanco", "cruzamento"),
-        saida / "dfs_classificacao.csv",
+        caminho_saida(saida, "dfs_classificacao.csv"),
     )
     gravar(exportar_csv,
         comparacoes,
         ("mapa", "abordagem", "passos", "caminho_valido", "observacao"),
-        saida / "comparacao_modelagem.csv",
+        caminho_saida(saida, "comparacao_modelagem.csv"),
     )

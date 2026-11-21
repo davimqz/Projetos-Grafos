@@ -3,12 +3,13 @@
 Exemplos (do enunciado):
     python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
     python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
-    python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --out ./out/parte1/
+    python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/json/armadilhas_m04.json --out ./out/parte1/
     python -m src.cli --dataset ./data/dataset_parte2/ --alg DIJKSTRA --source A --target Z --out ./out/parte2/
     python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte2/
 """
 # [IA] Claude Code – esqueleto do argparse com as flags do enunciado
 # [IA] Codex - orquestração da Parte 1, execução em lote e resumo final.
+# [IA] Codex - atualização do exemplo para a pasta organizada de JSON.
 import argparse
 import sys
 from pathlib import Path

@@ -1,5 +1,6 @@
 // [IA] Claude Code – labirinto interativo: escolha de mapa/algoritmo e animação passo a passo
 // [IA] Codex – organização dos controles, navegação pelo percurso e apresentação
+// [IA] Codex - indicação da pasta organizada de saída do HTML.
 import { useEffect, useState } from 'react'
 import { ALGORITMOS, MAPAS, NOME_ALG, fmtInt, lerRotulo } from '../util.js'
 import { Grade, LegendaCasas } from './Grade.jsx'
@@ -120,7 +121,7 @@ export function Labirinto() {
           <LegendaCasas />
         </div>
       </div>
-      <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne todos os mapas disponíveis; os arquivos são salvos em out/parte1.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>
+      <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne todos os mapas disponíveis; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>
     </section>
   )
 }
