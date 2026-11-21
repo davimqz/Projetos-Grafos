@@ -169,6 +169,7 @@ exploratórios da AVD. Precisa do Node.js.
 
 ```bash
 python -m scripts.exportar_front   # gera front-react/src/dados.json com os resultados do código do grupo
+python -m scripts.exportar_parte2_front   # gera front-react/src/parte2.json com fontes, pares e recortes da Parte 2
 cd front-react
 npm install
 npm run dev
