@@ -112,10 +112,10 @@ O recorte da Parte 2 já está no repositório, então **não é preciso baixar 
 
 - [x] benchmark de BFS, DFS e Bellman-Ford, escalabilidade 10/50/100%
 - [x] notebook exploratório e 4 exploratórias
-- [ ] **abrir PR da branch `Vagner`** (Dijkstra no benchmark e figuras de comportamento e caminhos)
+- [x] **abrir PR da branch `Vagner`** (PR #34, mergeado) (Dijkstra no benchmark e figuras de comportamento e caminhos)
 - [ ] **R7 (Parte 2)** memória por algoritmo e tarefa (`tracemalloc`) no `parte2_report.json`, junto com o tempo médio
 - [ ] **R5** aba da Parte 2 no React: lista das 3 fontes (BFS/DFS) e dos 5 pares (Dijkstra) + casos do Bellman-Ford,
-      com caminho, custo, camadas e tempo de cada execução (dados exportados por `scripts/exportar_front.py`)
+      com caminho, custo, camadas e tempo de cada execução (dados prontos em `front-react/src/parte2.json`, gerado por `scripts/exportar_parte2_front.py`)
 - [ ] **R6** view do grafo da Parte 2: subgrafo em volta das fontes ou dos caminhos, colorido por classe
 - [ ] 2 explanatórias (uma responde à pergunta de pesquisa), nascidas de algo visto nas exploratórias
 - [ ] nota analítica autoral para cada uma das 6 visualizações (o que mostra, insight, por que esse gráfico)
@@ -126,9 +126,11 @@ O recorte da Parte 2 já está no repositório, então **não é preciso baixar 
 - [x] carga do recorte, casos obrigatórios, distribuição de graus e seções 5.1 a 5.7 do relatório
 - [x] documentos de referência em `docs/referencias/` e reunião de 19/11 registrada
 - [ ] revisar e mergear o PR do Vagner; revisar R1 (Matheus) testando a CLI com um mapa novo
-- [ ] **R8** roteiro da apresentação (15 a 20 min) e slides: vértice e aresta nas duas partes, modelagem, solução dos
-      mapas, figuras com insight, desempenho, limitações, resposta à pergunta de pesquisa
-- [ ] preparar 2 ou 3 mapas surpresa de treino (diferentes dos nossos) para o ensaio de 24/11
+- [x] **R8** roteiro da apresentação em [`APRESENTACAO.md`](APRESENTACAO.md) (blocos da Parte 2 preenchidos; os outros
+      esperam as seções do relatório)
+- [ ] **R8** slides a partir do roteiro
+- [x] preparar mapas surpresa de treino para o ensaio de 24/11 (`data/mapas_treino/`)
+- [x] dados da Parte 2 para o front (R5/R6): `python -m scripts.exportar_parte2_front` gera `front-react/src/parte2.json`
 - [ ] README final: comando do mapa surpresa em destaque, front React e `docs/referencias/`
 - [ ] PDF: juntar as seções, matriz de contribuição (10.2 com commits reais), testes atualizados, conclusões
 - [ ] `docs/DECLARACAO_IA.pdf` com a reflexão de 10 a 15 linhas, assinada por **todos**; conferir `# [IA]` e `REGISTRO_IA.md`
