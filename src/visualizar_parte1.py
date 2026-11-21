@@ -1,39 +1,46 @@
 """Geração das visualizações da Parte 1 com os componentes do projeto."""
 
 # [IA] Codex – integração das visualizações com mapas e algoritmos existentes.
+# [IA] Codex - apresentação dos resultados compartilhados pela orquestração.
 from pathlib import Path
 
-from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford
-from src.graphs.estados import Estado, construir_grafo_estados, rotular_estado
-from src.graphs.io import encontrar_inicio, ler_mapa
+from src.parte1.analises import classificar_arcos, encontrar_armadilhas
+from src.parte1.buscas import _resolver_mapa
+from src.parte1.carga import carregar_mapa
+from src.parte1.modelos import ExecucaoMapa
 from src.viz import (desenhar_arvore_bfs, desenhar_camadas, desenhar_heatmap,
                      desenhar_percurso, gerar_html_interativo, reconstruir_percurso)
 
 
 def preparar_mapa(arquivo, algoritmos=("BFS",), *, fonte_consumivel=False):
-    grade = ler_mapa(arquivo)
-    grafo, estados = construir_grafo_estados(grade, fonte_consumivel=fonte_consumivel)
-    linha, coluna = encontrar_inicio(grade)
-    origem = rotular_estado(Estado(linha, coluna, frozenset(), frozenset()))
-    funcoes = {"BFS": bfs, "DFS": dfs, "DIJKSTRA": dijkstra, "BELLMAN_FORD": bellman_ford}
-    percursos, status, resultados = {}, {}, {}
-    for nome in algoritmos:
+    """Entrada independente; a CLI usa preparar_apresentacao com seus resultados."""
+    dados = carregar_mapa(arquivo, fonte_consumivel=fonte_consumivel)
+    resultados = {}
+    solucoes = {nome: _resolver_mapa(dados, nome, resultados) for nome in algoritmos if nome != "DFS"}
+    classificacao = classificar_arcos(dados, resultados) if "DFS" in algoritmos else {}
+    execucao = ExecucaoMapa(dados, solucoes, classificacao, resultados, encontrar_armadilhas(dados))
+    return preparar_apresentacao(execucao, algoritmos), dados.grafo_estados, dados.estados, resultados
+
+
+def preparar_apresentacao(execucao, algoritmos):
+    """Formata caminhos existentes para figuras/HTML, sem executar buscas."""
+    dados = execucao.dados
+    grafo = dados.grafo_estados
+    solucoes = dict(execucao.solucoes)
+    if "DFS" in algoritmos:
         try:
-            resultado = funcoes[nome](grafo, origem)
-        except ValueError as erro:
-            if nome != "DIJKSTRA" or "peso negativo" not in str(erro):
-                raise
-            percursos[nome], status[nome] = [], str(erro)
-            continue
-        resultados[nome] = resultado
-        if resultado.get("tem_ciclo_negativo"):
-            percursos[nome], status[nome] = [], "Ciclo negativo detectado; caminho mínimo não definido."
-            continue
-        try:
-            percursos[nome] = reconstruir_percurso(resultado, origem, "ALVO")[:-1]
-            status[nome] = "Percurso encontrado."
+            caminho = reconstruir_percurso(execucao.buscas["DFS"], dados.origem, "ALVO")
         except ValueError:
-            percursos[nome], status[nome] = [], "Saída não alcançável."
+            caminho = []
+        solucoes["DFS"] = {"caminho": caminho, "status": "OK" if caminho else "SEM_SOLUCAO"}
+    mensagens_status = {
+        "OK": "Percurso encontrado.",
+        "RECUSA": "Dijkstra recusa grafo com peso negativo.",
+        "SEM_SOLUCAO": "Saída não alcançável.",
+        "CICLO_NEGATIVO": "Ciclo negativo detectado; caminho mínimo não definido.",
+    }
+    percursos = {nome: solucoes[nome]["caminho"][:-1] for nome in algoritmos}
+    status = {nome: mensagens_status[solucoes[nome]["status"]] for nome in algoritmos}
     # [IA] Codex – prepara os dados de apresentação a partir dos arcos existentes.
     custos = {}
     for nome, caminho in percursos.items():
@@ -44,9 +51,26 @@ def preparar_mapa(arquivo, algoritmos=("BFS",), *, fonte_consumivel=False):
             peso = next(peso for destino, peso in grafo.vizinhos(u) if destino == v)
             acumulados.append(acumulados[-1] + peso)
         custos[nome] = acumulados
-    return {"grade": grade, "algoritmos": percursos, "status": status,
+    return {"grade": dados.grade, "algoritmos": percursos, "status": status,
             "mensagens": {nome: texto for nome, texto in status.items() if not percursos[nome]},
-            "estados": list(estados), "custos": custos}, grafo, estados, resultados
+            "estados": list(dados.estados), "custos": custos,
+            "armadilhas_estados": execucao.armadilhas}
+
+
+def exportar_figuras(execucao, apresentacao, saida, gravar):
+    """Desenha os resultados recebidos e registra cada arquivo concluído."""
+    dados = execucao.dados
+    saida = Path(saida)
+    preferidos = ("DIJKSTRA", "BELLMAN_FORD", "BFS", "DFS")
+    algoritmo = next((nome for nome in preferidos if apresentacao["algoritmos"].get(nome)), None)
+    if algoritmo:
+        gravar(desenhar_percurso, dados.grade, apresentacao["algoritmos"][algoritmo],
+               saida / f"percurso_{dados.nome}.png", titulo=f"{dados.nome} — {algoritmo}")
+    if dados.nome == "m02":
+        gravar(desenhar_camadas, dados.grafo_estados, saida / "camadas_m02.png")
+        gravar(desenhar_arvore_bfs, execucao.buscas["BFS"], saida / "arvore_bfs_m02.png")
+    if dados.nome == "m08":
+        gravar(desenhar_heatmap, dados.grade, dados.grafo_estados, saida / "heatmap_m08.png")
 
 
 def gerar_mapa(arquivo, saida, *, algoritmo="DIJKSTRA", interactive=False, fonte_consumivel=False,
