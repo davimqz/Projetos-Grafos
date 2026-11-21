@@ -1,6 +1,7 @@
 """Integração da CLI com mapas novos e falhas independentes nas exportações."""
 
 # [IA] Codex - testes do fluxo completo, reutilização de buscas e resumo final.
+# [IA] Codex - verificacao da estrutura de saida por tipo de arquivo.
 import csv
 import json
 import os
@@ -52,19 +53,20 @@ def test_cli_compartilha_buscas_e_resume_depois_das_exportacoes(tmp_path, monkey
     gerar_html = interface_cli.gerar_html_interativo
 
     def finalizar_html(*args):
-        assert (saida / "solucoes.csv").is_file()
-        assert (saida / "percurso_surpresa.png").is_file()
+        assert (saida / "csv" / "solucoes.csv").is_file()
+        assert (saida / "figuras" / "percurso_surpresa.png").is_file()
         assert "Resumo da execução" not in capsys.readouterr().out
         return gerar_html(*args)
 
     monkeypatch.setattr(interface_cli, "gerar_html_interativo", finalizar_html)
     assert main(["--mapa", str(mapa), "--out", str(saida), "--interactive"]) == 0
+    assert {p.name for p in saida.iterdir()} == {"csv", "json", "figuras", "html"}
     assert all(sum(n == nome for n, _ in chamadas) == 1
                for nome in ("carregar_mapa", "bfs", "dijkstra", "bellman_ford", "dfs"))
     assert len({id(grafo) for nome, grafo in chamadas if nome != "carregar_mapa"}) == 1
-    resultados = linhas_csv(saida / "solucoes.csv")
+    resultados = linhas_csv(saida / "csv" / "solucoes.csv")
     assert [r["status"] for r in resultados] == ["OK", "RECUSA", "OK"]
-    html = dados_html(saida / "labirinto_surpresa.html")["surpresa"]
+    html = dados_html(saida / "html" / "labirinto_surpresa.html")["surpresa"]
     assert set(html["algoritmos"]) == set(interface_cli.ALGORITMOS)
     assert html["custos"]["BELLMAN_FORD"][-1] == -3
     assert html["armadilhas_estados"] == []
@@ -85,10 +87,10 @@ def test_cli_status_e_html_para_mapa_sem_nome_especial(tmp_path, capsys, grade, 
     assert main(["--mapa", str(mapa), "--out", str(saida), "--alg", algoritmo, "--interactive", "--armadilhas"]) == 0
     texto = capsys.readouterr().out
     assert f"{algoritmo}: status={status}" in texto
-    html = dados_html(saida / "labirinto_surpresa.html")["surpresa"]
+    html = dados_html(saida / "html" / "labirinto_surpresa.html")["surpresa"]
     assert list(html["algoritmos"]) == [algoritmo]
-    assert len(linhas_csv(saida / "solucoes.csv")) == 3
-    assert json.loads((saida / "armadilhas_surpresa.json").read_text()) == html["armadilhas_estados"]
+    assert len(linhas_csv(saida / "csv" / "solucoes.csv")) == 3
+    assert json.loads((saida / "json" / "armadilhas_surpresa.json").read_text()) == html["armadilhas_estados"]
     if custo is not None:
         assert html["custos"][algoritmo][-1] == custo
     else:
@@ -100,10 +102,10 @@ def test_cli_fonte_consumivel_preserva_exportacoes_padrao(tmp_path):
     saida = tmp_path / "out"
     argumentos = ["--mapa", str(mapa), "--out", str(saida)]
     assert main(argumentos) == 0
-    antes = {p.name: p.read_bytes() for p in saida.iterdir()}
+    antes = {p.relative_to(saida): p.read_bytes() for p in saida.rglob("*") if p.is_file()}
     assert main(argumentos + ["--fonte-consumivel"]) == 0
     assert all((saida / nome).read_bytes() == conteudo for nome, conteudo in antes.items())
-    resultados = linhas_csv(saida / "fonte_consumivel" / "solucoes.csv")
+    resultados = linhas_csv(saida / "fonte_consumivel" / "csv" / "solucoes.csv")
     bf = next(r for r in resultados if r["algoritmo"] == "BELLMAN_FORD")
     assert bf["status"] == "OK" and float(bf["custo"]) == -1
 
@@ -114,9 +116,9 @@ def test_cli_lote_inclui_grupo_e_ignora_pasta_de_solucoes(tmp_path, monkeypatch)
     mapa_em(tmp_path / "data" / "solucoes_mapas_grupo", "gabarito", "texto invalido")
     monkeypatch.chdir(tmp_path)
     assert main(["--todos-mapas", "--out", "out", "--interactive"]) == 0
-    assert set(json.loads(Path("out/metricas_global.json").read_text())) == {"m01", "grupo"}
-    assert len(linhas_csv(Path("out/solucoes.csv"))) == 6
-    assert set(dados_html(Path("out/labirinto_interativo.html"))) == {"m01_terreno", "grupo"}
+    assert set(json.loads(Path("out/json/metricas_global.json").read_text())) == {"m01", "grupo"}
+    assert len(linhas_csv(Path("out/csv/solucoes.csv"))) == 6
+    assert set(dados_html(Path("out/html/labirinto_interativo.html"))) == {"m01_terreno", "grupo"}
 
 
 @pytest.mark.parametrize("tipo", ["csv", "png", "html"])
@@ -139,9 +141,9 @@ def test_cli_informa_falha_e_preserva_outros_arquivos(tmp_path, monkeypatch, cap
     assert main(["--mapa", str(mapa), "--out", str(saida), "--interactive"]) == 1
     capturado = capsys.readouterr()
     assert destino in capturado.err and "falha simulada" in capturado.err
-    assert not (saida / destino).exists()
-    assert (saida / "metricas_global.json").is_file()
-    assert str(saida / destino) not in capturado.out
+    assert not (saida / {"csv": "csv", "png": "figuras", "html": "html"}[tipo] / destino).exists()
+    assert (saida / "json" / "metricas_global.json").is_file()
+    assert str(saida / {"csv": "csv", "png": "figuras", "html": "html"}[tipo] / destino) not in capturado.out
 
 
 def test_cli_entrada_invalida_tem_mensagem_sem_traceback(tmp_path, capsys):
@@ -159,7 +161,7 @@ def test_cli_rejeita_json_de_armadilhas_invalido(tmp_path, capsys, conteudo):
     assert main(["--mapa", str(mapa), "--out", str(tmp_path / "out"),
                  "--arquivo-armadilhas", str(arquivo)]) == 2
     assert "Traceback" not in capsys.readouterr().err
-    assert not (tmp_path / "out" / "solucoes.csv").exists()
+    assert not (tmp_path / "out" / "csv" / "solucoes.csv").exists()
 
 
 def test_cli_lote_rejeita_identificadores_repetidos(tmp_path, capsys):

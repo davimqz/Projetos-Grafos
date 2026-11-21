@@ -58,8 +58,11 @@ def test_exportar_arestas_vazias_escreve_cabecalho(vazio, tmp_path):
 
 
 def test_exportar_arestas_propaga_erro_de_escrita(vazio, tmp_path):
-    with pytest.raises(FileNotFoundError):
-        exportacao.exportar_arestas(vazio, tmp_path / "ausente" / "arestas.csv")
+    # [IA] Codex - o exportador cria pastas, mas propaga conflitos com arquivos.
+    bloqueado = tmp_path / "bloqueado"
+    bloqueado.write_text("arquivo no lugar da pasta", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        exportacao.exportar_arestas(vazio, bloqueado / "arestas.csv")
 
 
 @pytest.mark.parametrize("tipo_caminho", [str, Path])

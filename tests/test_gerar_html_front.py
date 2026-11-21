@@ -1,5 +1,6 @@
 """Verifica a geração de HTML solicitada pelo front local."""
 # [IA] Codex – testes de integração do gerador usado pelo front.
+# [IA] Codex - verificação da nova pasta de HTML dos geradores.
 import json
 import pytest
 
@@ -8,6 +9,7 @@ from scripts.gerar_html_front import ALGORITMOS, RAIZ, gerar_html, gerar_html_co
 
 def test_gera_html_com_resultado_do_mapa_selecionado(tmp_path):
     arquivo = gerar_html("m02_uma_chave", "BFS", tmp_path)
+    assert arquivo.parent == tmp_path / "html"
     html = arquivo.read_text(encoding="utf-8")
     assert arquivo.name == "labirinto_m02_uma_chave.html"
     assert '"m02_uma_chave"' in html
