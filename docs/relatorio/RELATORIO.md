@@ -658,30 +658,6 @@ Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os 
 
 Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
 
-#### Outliers
-
-Os limites do IQR foram calculados com todas as 14.182 carteiras juntas, e não separadamente por classe. Depois, contamos quantas carteiras de cada classe ficaram fora desses limites e dividimos pelo total da classe: 4.261 lícitas, 5.208 ilícitas e 4.713 desconhecidas.
-
-A regra do IQR marca muitas carteiras porque algumas distribuições estão concentradas em poucos valores. No grau de saída, 70,4% das carteiras enviam para apenas uma outra carteira. Por isso, o 1º e o 3º quartis são iguais a 1 e o IQR é 0. Pela fórmula, o limite inferior (Q1 − 1,5 × IQR) e o limite superior (Q3 + 1,5 × IQR) também valem 1. Com esses limites, as 2.089 carteiras com grau 0, que não enviam para nenhuma carteira do recorte, ficariam abaixo do limite inferior. Decidimos não contar essas carteiras e considerar apenas o limite superior. Assim, os outliers de grau de saída são as 2.115 carteiras que enviam para 2 ou mais carteiras. No saldo, os quartis vão de −0,0047 a 0 BTC. Como o intervalo entre eles é pequeno, a regra marca 3.667 carteiras. Nos dois casos, ser marcado como outlier indica que o valor ficou fora dos limites do IQR. A interpretação depende de como os dados estão distribuídos.
-
-Por classe, o que mais se destaca são as taxas. Das 1.097 carteiras que estão acima do limite, 1.022 são ilícitas, o que representa 93%; apenas 25 são lícitas. Além disso, 19,6% das carteiras ilícitas pagam mais de 0,0945 BTC em taxas. Os extremos absolutos aparecem em outras classes: o menor saldo é de −12.586 BTC e pertence a uma carteira lícita; os três maiores volumes recebidos também são de carteiras lícitas, com 6.610, 3.659 e 2.740 BTC; e a carteira com mais transações é desconhecida, com 639 transações. No saldo, as lícitas têm a maior proporção de outliers: 41,9% (1.784 de 4.261), contra 28,7% das desconhecidas e 10,2% das ilícitas. No grau de saída, as desconhecidas têm a maior proporção: 22,4% (1.058 de 4.713), contra 20,4% das lícitas e 3,6% das ilícitas.
-
-Proporção de carteiras de cada classe fora dos limites do IQR (entre parênteses, a quantidade de carteiras):
-
-| Atributo | Limites (inferior a superior) | Lícitas | Ilícitas | Desconhecidas | Maior proporção |
-|---|---|---:|---:|---:|---|
-| BTC recebido | −0,0243 a 0,0405 | 23,1% (986) | 7,0% (362) | 23,0% (1.084) | Lícitas (quase igual às desconhecidas) |
-| BTC enviado | −0,0311 a 0,0572 | 17,6% (748) | 5,5% (288) | 26,7% (1.257) | Desconhecidas |
-| Nº de transações | −0,5 a 3,5 | 3,1% (131) | 1,2% (61) | 6,7% (317) | Desconhecidas |
-| Taxas | −0,0528 a 0,0945 | 0,6% (25) | 19,6% (1.022) | 1,1% (50) | Ilícitas |
-| Tempo de vida (blocos) | −4,5 a 7,5 | 7,7% (329) | 3,6% (190) | 13,7% (646) | Desconhecidas |
-| Intervalos em que aparece | 1 a 1 | 6,5% (276) | 2,4% (124) | 8,2% (387) | Desconhecidas |
-| Saldo | −0,0118 a 0,0071 | 41,9% (1.784) | 10,2% (531) | 28,7% (1.352) | Lícitas |
-| Grau de saída | só acima de 1 (grau 2 ou mais) | 20,4% (871) | 3,6% (186) | 22,4% (1.058) | Desconhecidas |
-| Grau de entrada | −1,5 a 2,5 | 14,0% (597) | 10,0% (519) | 6,2% (294) | Lícitas |
-
-Nenhum outlier foi removido, porque essas carteiras são reais e fazem parte do fenômeno estudado. Além disso, removê-las poderia eliminar arestas e quebrar caminhos importantes do grafo. Para evitar que os valores extremos distorçam a análise, os gráficos usam principalmente medianas e proporções em vez de médias.
-
 ### 6.2 Dados faltantes e outliers
 
 #### Dados faltantes
