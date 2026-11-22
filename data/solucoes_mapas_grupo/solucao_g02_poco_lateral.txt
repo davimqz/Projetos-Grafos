@@ -1,0 +1,69 @@
+Poco lateral (proposta 4)
+=========================
+Mapa: data/mapas_grupo/g02_poco_lateral.txt
+Origem dos valores: funcoes existentes do grupo em src.solve.
+[IA] Codex - sugestao do mapa e transcricao dos resultados do codigo do grupo.
+Nao foi feita contagem manual; a conferencia autoral cabe ao grupo.
+
+CONVENCOES
+Coordenadas comecam em zero e desconsideram os comentarios do mapa.
+Estados e arcos abaixo excluem o no ALVO e o arco virtual de custo zero.
+Passos contam apenas movimentos fisicos. Os caminhos incluem ALVO ao final.
+Custos sao a soma dos pesos das casas de destino, conforme as regras do projeto.
+
+METRICAS
+Dimensoes: 9 linhas x 21 colunas
+Estados alcancaveis (G_est): 94
+Arcos fisicos (G_est): 230
+Nos incluindo ALVO: 95
+Arcos incluindo os virtuais: 231
+Estados-armadilha: 75
+Fracao de armadilhas: 75/94
+Percentual de armadilhas: 79.787234%
+
+RESULTADOS POR ALGORITMO
+BFS:
+  Status: OK
+  Passos: 18
+  Custo: 18.0
+DIJKSTRA:
+  Status: OK
+  Passos: 18
+  Custo: 18
+BELLMAN_FORD:
+  Status: OK
+  Passos: 18
+  Custo: 18
+
+DADOS DO PERCURSO DE MENOR CUSTO (BELLMAN_FORD)
+Chaves existentes no mapa: nenhuma
+Chaves no estado final: nenhuma
+Bonus consumidos no estado final (IDs): []
+Posicoes de esteiras visitadas: []
+
+CAMINHOS DEVOLVIDOS PELO CODIGO
+BFS:
+  00: (1,1)|-|{}
+  01: (1,2)|-|{}
+  02: (1,3)|-|{}
+  03: (1,4)|-|{}
+  04: (1,5)|-|{}
+  05: (1,6)|-|{}
+  06: (1,7)|-|{}
+  07: (1,8)|-|{}
+  08: (1,9)|-|{}
+  09: (1,10)|-|{}
+  10: (1,11)|-|{}
+  11: (1,12)|-|{}
+  12: (1,13)|-|{}
+  13: (1,14)|-|{}
+  14: (1,15)|-|{}
+  15: (1,16)|-|{}
+  16: (1,17)|-|{}
+  17: (1,18)|-|{}
+  18: (1,19)|-|{}
+  19: ALVO
+
+DIJKSTRA: mesma sequencia de estados de BFS.
+
+BELLMAN_FORD: mesma sequencia de estados de BFS.

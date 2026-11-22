@@ -60,39 +60,97 @@ Variantes suportadas: portas como chão, portas como parede, `+` fixo em −4 e 
 ### Como executar
 
 ```bash
+# mapa surpresa: análises completas, figuras e resumo final
+python -m src.cli --mapa ./data/mapas_treino/t01_duas_portas.txt --out ./out/surpresa/ --interactive
+
+# todos os mapas fornecidos e do grupo, com HTML conjunto
+python -m src.cli --todos-mapas --out ./out/parte1/ --interactive
+
 # percurso de um algoritmo em um mapa
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg DIJKSTRA --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m05_bonus.txt --alg BELLMAN_FORD --out ./out/parte1/
 python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
 
-# labirinto interativo de um mapa (gera out/parte1/labirinto_<mapa>.html)
+# labirinto interativo de um mapa (gera out/parte1/html/labirinto_<mapa>.html)
 python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./out/parte1/
 
-# estados-armadilha a partir de um JSON com a lista de rótulos
-python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --interactive --out ./out/parte1/
+# calcular, listar e realçar os estados-armadilha automaticamente
+python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --interactive --out ./out/parte1/
 
-# figuras do P5a e o HTML conjunto (m02, m03 e m08)
+# benchmark dos dez mapas: cinco medições de tempo por algoritmo
+python -m src.cli --todos-mapas --benchmark --out ./out/parte1/
+
+# benchmark separado do m06 com fonte consumível
+python -m src.cli --mapa ./data/mapas/m06_fonte.txt --benchmark --fonte-consumivel --out ./out/parte1/
+
+# figuras do P5a e o HTML conjunto (mapas fornecidos e mapas do grupo)
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
 
-Sem `--alg`, a CLI usa Dijkstra. Se o algoritmo não se aplica ao mapa (por exemplo, Dijkstra com peso negativo) ou não
-existe percurso até a saída, o motivo aparece no terminal e no HTML.
+Sem `--alg`, o resumo e o HTML apresentam os quatro algoritmos. `--alg` seleciona o algoritmo mostrado no resumo
+e na visualização; os CSVs/JSONs mantêm as análises completas. Se um algoritmo não se aplica ao mapa ou não existe
+percurso até a saída, o motivo aparece no terminal e no HTML. A DFS apresenta o caminho da árvore de busca,
+a classificação dos arcos e a indicação de ciclo; seu caminho não é necessariamente mínimo.
+
+`--mapas <arquivo1> <arquivo2> ...` executa uma lista de mapas na mesma chamada, preservando todos nos agregados.
+Executar chamadas separadas na mesma pasta substitui os agregados pelos resultados da última chamada.
+Com `--fonte-consumivel`, os arquivos vão para a subpasta `fonte_consumivel/` da saída solicitada,
+com a mesma separação por tipo de arquivo.
+O JSON de `--arquivo-armadilhas` permanece opcional para compatibilidade e só pode ser usado com um mapa.
+
+O resumo é impresso após as exportações, com passos, custos, status, caminhos e os arquivos concluídos.
+O código de saída é 0 para execução concluída (inclusive recusa ou mapa sem solução), 1 para falha de exportação
+e 2 para entrada ou processamento inválidos. Uma exportação que falha é informada no resumo sem impedir as demais.
+
+Com `--benchmark`, a CLI gera somente `csv/benchmark.csv` e `json/benchmark.json`. Aceita `--mapa`, `--mapas`
+ou `--todos-mapas`; `--alg` limita a medição a um algoritmo e `--repeticoes N` muda o padrão de cinco repetições.
+Não combina com as opções de HTML ou armadilhas. Os arquivos do benchmark são substituídos a cada execução
+na mesma pasta; as outras saídas permanecem intactas. A variante consumível usa `fonte_consumivel/`.
+
+O grafo é preparado uma vez por mapa, antes das medições. Cada algoritmo parte de S no G_est completo,
+incluindo ALVO, com um aquecimento, cinco execuções de tempo sem `tracemalloc` e uma execução separada de memória.
+O tempo usa `timeit`, que desativa temporariamente o coletor de lixo. O pico mede alocações Python da chamada
+e seu retorno, excluindo o grafo pronto; não representa a memória total do processo. O JSON guarda as amostras,
+o ambiente, o hash dos mapas e o método. A preparação, as análises e as exportações ficam fora da medição.
+
+O status do benchmark é o retorno global da busca: `OK`, `RECUSA` ou `CICLO_NEGATIVO`, acompanhado de
+`alvo_alcancavel`. O tempo de recusa do Dijkstra não equivale a uma busca concluída. Um ciclo negativo preso
+em uma armadilha também aparece aqui, mesmo quando a solução normalizada até ALVO tem custo finito.
 
 ### Saídas em `out/parte1/`
 
+`--out` continua indicando a pasta da execução. Os geradores organizam os arquivos automaticamente:
+
+```text
+out/parte1/
+├─ csv/                   # arestas, graus, soluções, DFS, comparações e armadilhas
+├─ json/                  # métricas, camadas, percursos, ciclos e armadilhas
+├─ figuras/               # percursos, camadas, árvore BFS e heatmap em PNG
+├─ html/                  # labirintos interativos
+└─ fonte_consumivel/      # variante: csv/, json/, figuras/ e html/
+```
+
 | Arquivo | Conteúdo |
 |---|---|
-| `percurso_m03.png`, `percurso_m08.png` | percurso de menor custo (Dijkstra); a cor muda a cada chave pega |
-| `camadas_m02.png` | G_est do m02 por conjunto de chaves, com os arcos entre camadas em destaque |
-| `arvore_bfs_m02.png` | árvore da BFS no m02, com os níveis |
-| `heatmap_m08.png` | quantos estados existem em cada casa do m08 |
-| `labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
+| `figuras/percurso_m03.png`, `figuras/percurso_m08.png` | percurso de menor custo (Dijkstra); a cor muda a cada chave pega |
+| `figuras/camadas_m02.png` | G_est do m02 por conjunto de chaves, com os arcos entre camadas em destaque |
+| `figuras/arvore_bfs_m02.png` | árvore da BFS no m02, com os níveis |
+| `figuras/heatmap_m08.png` | quantos estados existem em cada casa do m08 |
+| `html/labirinto_interativo.html` | mapa + algoritmo, passo a passo, estado atual, custo acumulado, camadas e armadilhas, com controle de velocidade |
+| `csv/benchmark.csv`, `json/benchmark.json` | resumo de tempo e pico de memória por mapa/algoritmo; JSON com amostras e ambiente |
 
 As análises do P3 (`metricas_global.json`, `camadas.json`, `graus_<mapa>.csv`, `arestas_<mapa>.csv`,
-`comparacao_modelagem.csv`, `solucoes.csv`, armadilhas do m04 e do m07 e comparações do m05) estão implementadas em
+`comparacao_modelagem.csv`, `solucoes.csv`, armadilhas de cada mapa e comparações do m05) estão implementadas em
 `src/parte1/`, com orquestração por `src.solve.executar_parte1` para os mapas informados, inclusive os do grupo.
-A integração dessa orquestração com a CLI permanece pendente.
+A CLI usa essa orquestração e compartilha os resultados com as figuras e o HTML, sem repetir as buscas para desenhá-los.
+Os CSVs ficam em `csv/` e os JSONs em `json/`, dentro da pasta indicada por `--out`.
+
+Os mapas do grupo são `g01_tres_depositos.txt` e `g02_poco_lateral.txt`. Seus gabaritos, calculados pelo código do
+grupo, ficam em [`data/solucoes_mapas_grupo/`](data/solucoes_mapas_grupo/), separados dos labirintos.
+O gerador de visualizações inclui automaticamente os arquivos de `data/mapas_grupo/` no HTML conjunto;
+use `--mapas-grupo <pasta>` para mudar esse diretório. Para atualizar a seleção de mapas no React,
+execute `python -m scripts.exportar_front` novamente.
 
 ## Parte 2 — Elliptic++ (rede de carteiras Bitcoin)
 
@@ -204,6 +262,7 @@ caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando
 ├─ data/
 │  ├─ mapas/                   # mapas fornecidos (m01 a m08)
 │  ├─ mapas_grupo/             # 2 mapas criados pelo grupo
+│  ├─ solucoes_mapas_grupo/     # gabaritos em TXT, fora da seleção de labirintos
 │  └─ dataset_parte2/          # recorte (nos.csv, arestas.csv); o bruto fica em raw/, fora do git
 ├─ notebooks/avd/              # análise exploratória (AVD)
 ├─ scripts/                    # download e recorte do dataset, exportação para o front
@@ -219,7 +278,9 @@ caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando
 │  │  ├─ carga.py              # preparo dos mapas
 │  │  ├─ analises.py           # métricas, camadas, graus e armadilhas
 │  │  ├─ buscas.py             # normalização das buscas e comparações
-│  │  └─ exportacao.py         # escrita de CSV e JSON
+│  │  ├─ exportacao.py         # escrita de CSV e JSON
+│  │  ├─ interface_cli.py      # exportações visuais e resumo final da Parte 1
+│  │  └─ saidas.py             # arquivos concluídos e falhas de exportação
 │  ├─ viz.py                   # figuras e HTML interativo
 │  ├─ visualizar_parte1.py     # gera as figuras do P5a
 │  ├─ carga_parte2.py          # carrega o recorte como grafo

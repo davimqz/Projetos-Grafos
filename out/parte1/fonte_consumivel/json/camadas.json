@@ -1,0 +1,14 @@
+{
+  "m06": {
+    "camadas": [
+      {
+        "camada": "-",
+        "ordem": 40,
+        "tamanho": 76,
+        "densidade": 0.04871794871794872
+      }
+    ],
+    "arcos_entre_camadas": 0,
+    "casas_geradoras": []
+  }
+}

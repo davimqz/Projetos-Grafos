@@ -1,0 +1,12 @@
+{
+  "mapa": "m06",
+  "fonte_consumivel": false,
+  "status": "CICLO_NEGATIVO",
+  "tem_ciclo_negativo": true,
+  "ciclo_negativo": [
+    "(3,6)|-|{}",
+    "(3,5)|-|{}",
+    "(3,6)|-|{}"
+  ],
+  "custo_ciclo": -1
+}

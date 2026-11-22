@@ -1,4 +1,5 @@
 # [IA] Claude Code – testes da contagem de commits por pacote
+# [IA] Codex - compatibilidade da classificação com as saídas organizadas.
 import pytest
 
 from scripts.matriz_contribuicao import contar, pacote_do_arquivo, tabela_markdown
@@ -11,6 +12,11 @@ from scripts.matriz_contribuicao import contar, pacote_do_arquivo, tabela_markdo
     ("src/parte1/analises.py", "P3"),
     ("data/mapas_grupo/g1.txt", "P3"),
     ("out/parte1/solucoes.csv", "P3"),
+    ("out/parte1/csv/solucoes.csv", "P3"),
+    ("out/parte1/json/metricas_global.json", "P3"),
+    ("out/parte1/fonte_consumivel/json/ciclo_negativo_m06.json", "P3"),
+    ("out/parte1/figuras/percurso_m03.png", "P5a"),
+    ("out/parte1/html/labirinto_interativo.html", "P5a"),
     ("out/parte1/percurso_m03.png", "P5a"),
     ("out/parte2/parte2_report.json", "P4b"),
     ("out/parte2/benchmark_escalabilidade.png", "P4b"),

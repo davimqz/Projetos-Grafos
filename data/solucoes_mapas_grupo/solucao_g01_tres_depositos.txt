@@ -1,0 +1,100 @@
+Tres depositos (proposta 2)
+===========================
+Mapa: data/mapas_grupo/g01_tres_depositos.txt
+Origem dos valores: funcoes existentes do grupo em src.solve.
+[IA] Codex - sugestao do mapa e transcricao dos resultados do codigo do grupo.
+Nao foi feita contagem manual; a conferencia autoral cabe ao grupo.
+
+CONVENCOES
+Coordenadas comecam em zero e desconsideram os comentarios do mapa.
+Estados e arcos abaixo excluem o no ALVO e o arco virtual de custo zero.
+Passos contam apenas movimentos fisicos. Os caminhos incluem ALVO ao final.
+Custos sao a soma dos pesos das casas de destino, conforme as regras do projeto.
+
+METRICAS
+Dimensoes: 5 linhas x 21 colunas
+Estados alcancaveis (G_est): 104
+Arcos fisicos (G_est): 194
+Nos incluindo ALVO: 105
+Arcos incluindo os virtuais: 195
+Estados-armadilha: 3
+Fracao de armadilhas: 3/104
+Percentual de armadilhas: 2.884615%
+
+RESULTADOS POR ALGORITMO
+BFS:
+  Status: OK
+  Passos: 48
+  Custo: 38.0
+DIJKSTRA:
+  Status: RECUSA
+  Passos: nao se aplica
+  Custo: nao se aplica
+  Motivo: o grafo possui peso negativo; Dijkstra recusa essa entrada.
+BELLMAN_FORD:
+  Status: OK
+  Passos: 48
+  Custo: 38
+
+DADOS DO PERCURSO DE MENOR CUSTO (BELLMAN_FORD)
+Chaves existentes no mapa: a, b, c
+Chaves no estado final: abc
+Bonus consumidos no estado final (IDs): [0, 1]
+Posicoes de esteiras visitadas: [(1, 5), (1, 11), (1, 17)]
+
+CAMINHOS DEVOLVIDOS PELO CODIGO
+BFS:
+  00: (1,1)|-|{}
+  01: (2,1)|-|{}
+  02: (3,1)|-|{}
+  03: (3,2)|-|{}
+  04: (3,3)|-|{}
+  05: (3,4)|a|{}
+  06: (3,3)|a|{}
+  07: (3,2)|a|{}
+  08: (3,1)|a|{}
+  09: (2,1)|a|{}
+  10: (1,1)|a|{}
+  11: (1,2)|a|{}
+  12: (1,3)|a|{}
+  13: (1,4)|a|{}
+  14: (1,5)|a|{}
+  15: (1,6)|a|{}
+  16: (1,7)|a|{}
+  17: (2,7)|a|{}
+  18: (3,7)|a|{}
+  19: (3,8)|a|{}
+  20: (3,9)|a|{}
+  21: (3,10)|ab|{}
+  22: (3,9)|ab|{}
+  23: (3,8)|ab|{}
+  24: (3,7)|ab|{}
+  25: (2,7)|ab|{}
+  26: (1,7)|ab|{}
+  27: (1,8)|ab|{0}
+  28: (1,9)|ab|{0}
+  29: (1,10)|ab|{0}
+  30: (1,11)|ab|{0}
+  31: (1,12)|ab|{0}
+  32: (1,13)|ab|{0}
+  33: (2,13)|ab|{0}
+  34: (3,13)|ab|{0}
+  35: (3,14)|ab|{0}
+  36: (3,15)|ab|{0}
+  37: (3,16)|abc|{0}
+  38: (3,15)|abc|{0}
+  39: (3,14)|abc|{0}
+  40: (3,13)|abc|{0}
+  41: (2,13)|abc|{0}
+  42: (1,13)|abc|{0}
+  43: (1,14)|abc|{0,1}
+  44: (1,15)|abc|{0,1}
+  45: (1,16)|abc|{0,1}
+  46: (1,17)|abc|{0,1}
+  47: (1,18)|abc|{0,1}
+  48: (1,19)|abc|{0,1}
+  49: ALVO
+
+DIJKSTRA: sem caminho registrado (RECUSA).
+
+BELLMAN_FORD: mesma sequencia de estados de BFS.

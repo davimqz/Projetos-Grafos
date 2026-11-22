@@ -3,12 +3,17 @@
 Exemplos (do enunciado):
     python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --alg BFS --out ./out/parte1/
     python -m src.cli --mapa ./data/mapas/m06_fonte.txt --alg BELLMAN_FORD --fonte-consumivel --out ./out/parte1/
-    python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/armadilhas_m04.json --out ./out/parte1/
+    python -m src.cli --mapa ./data/mapas/m04_esteiras.txt --armadilhas --arquivo-armadilhas ./out/parte1/json/armadilhas_m04.json --out ./out/parte1/
     python -m src.cli --dataset ./data/dataset_parte2/ --alg DIJKSTRA --source A --target Z --out ./out/parte2/
     python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte2/
 """
 # [IA] Claude Code – esqueleto do argparse com as flags do enunciado
+# [IA] Codex - orquestração da Parte 1, execução em lote e resumo final.
+# [IA] Codex - atualização do exemplo para a pasta organizada de JSON.
+# [IA] Codex - seleção do benchmark da Parte 1 e número de repetições.
 import argparse
+import sys
+from pathlib import Path
 
 ALGORITMOS = ["BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD"]
 
@@ -17,6 +22,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="src.cli", description="Projeto Final de Grafos 2026.2")
     entrada = p.add_mutually_exclusive_group(required=True)
     entrada.add_argument("--mapa", help="arquivo .txt do labirinto (Parte 1)")
+    entrada.add_argument("--mapas", nargs="+", help="arquivos .txt para executar em lote (Parte 1)")
+    entrada.add_argument("--todos-mapas", action="store_true", help="executa data/mapas e data/mapas_grupo")
     entrada.add_argument("--dataset", help="pasta do dataset da Parte 2")
     p.add_argument("--alg", choices=ALGORITMOS, help="algoritmo a executar")
     p.add_argument("--out", required=True, help="pasta de saída")
@@ -26,35 +33,39 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--interactive", action="store_true", help="gera o labirinto interativo")
     p.add_argument("--source", help="nó de origem (Parte 2)")
     p.add_argument("--target", help="nó de destino (Parte 2)")
-    p.add_argument("--benchmark", action="store_true", help="tempos e escalabilidade (Parte 2)")
+    p.add_argument("--benchmark", action="store_true", help="tempo e memória (Parte 1); escalabilidade (Parte 2)")
+    p.add_argument("--repeticoes", type=int, help="execuções de tempo no benchmark da Parte 1 (padrão: 5)")
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if callable(getattr(stream, "reconfigure", None)):
+            stream.reconfigure(encoding="utf-8")
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.mapa:
-        from src.visualizar_parte1 import gerar_mapa
-        try:
-            # P3: integrar aqui o cálculo de armadilhas à orquestração de --mapa.
-            armadilhas = None
-            if args.arquivo_armadilhas:
-                import json
-                from pathlib import Path
-                armadilhas = json.loads(Path(args.arquivo_armadilhas).read_text(encoding="utf-8"))
-            if args.armadilhas and armadilhas is None:
-                parser.error("--armadilhas exige --arquivo-armadilhas com os estados calculados pelo grupo")
-            status = gerar_mapa(args.mapa, args.out, algoritmo=args.alg or "DIJKSTRA",
-                                interactive=args.interactive, fonte_consumivel=args.fonte_consumivel,
-                                armadilhas_estados=armadilhas)
-            if args.armadilhas:
-                print("Estados-armadilha:")
-                for estado in armadilhas:
-                    print(estado)
-        except (ValueError, OSError) as erro:
-            parser.error(str(erro))
-        print(status)
-        return 0
+    parte1 = args.mapa or args.mapas or args.todos_mapas
+    if args.repeticoes is not None and not (parte1 and args.benchmark):
+        parser.error("--repeticoes exige --benchmark com mapas da Parte 1")
+    if args.mapa or args.mapas or args.todos_mapas:
+        mapas = [args.mapa] if args.mapa else args.mapas
+        if args.todos_mapas:
+            mapas = [arquivo for pasta in ("data/mapas", "data/mapas_grupo")
+                     for arquivo in sorted(Path(pasta).glob("*.txt"))]
+        if args.benchmark:
+            if args.interactive or args.armadilhas or args.arquivo_armadilhas:
+                parser.error("--benchmark gera apenas medições; remova as opções de HTML e armadilhas")
+            from src.parte1.benchmark import executar_interface as executar_benchmark
+            return executar_benchmark(
+                mapas, args.out, fonte_consumivel=args.fonte_consumivel, algoritmo=args.alg,
+                repeticoes=args.repeticoes if args.repeticoes is not None else 5,
+            )
+        from src.parte1.interface_cli import executar_interface
+        return executar_interface(
+            mapas, args.out, algoritmo=args.alg, interactive=args.interactive,
+            fonte_consumivel=args.fonte_consumivel, mostrar_armadilhas=args.armadilhas,
+            arquivo_armadilhas=args.arquivo_armadilhas, lote=not bool(args.mapa),
+        )
     if args.dataset and args.benchmark:
         # chamada do benchmark da Parte 2 (P4b)
         from src.benchmark import executar_benchmark

@@ -1,6 +1,7 @@
 """Integração da orquestração com mapas sintéticos, sem usar as entregas reais."""
 
 # [IA] Codex - testes de integração das chamadas e dos arquivos exportados.
+# [IA] Codex - verificação das exportações em subpastas por tipo de arquivo.
 import csv
 import json
 
@@ -12,6 +13,7 @@ from src.solve import executar_parte1
 
 
 def ler_csv(caminho):
+    caminho = caminho.parent / "csv" / caminho.name
     with caminho.open(encoding="utf-8", newline="") as arquivo:
         leitor = csv.DictReader(arquivo)
         linhas = list(leitor)
@@ -19,6 +21,7 @@ def ler_csv(caminho):
 
 
 def ler_json(caminho):
+    caminho = caminho.parent / "json" / caminho.name
     return json.loads(caminho.read_text(encoding="utf-8"))
 
 
@@ -46,6 +49,7 @@ def test_executar_parte1_exporta_entregas_e_mapas_do_grupo(tmp_path):
     saida = tmp_path / "saida" / "parte1"
 
     assert executar_parte1((str(mapa) for mapa in mapas), str(saida)) is None
+    assert {p.name for p in saida.iterdir()} == {"csv", "json"}
 
     nomes = {f"m{i:02}" for i in range(1, 9)} | {"m03_grupo"}
     metricas = ler_json(saida / "metricas_global.json")
@@ -111,11 +115,11 @@ def test_executar_parte1_separa_fonte_consumivel_da_execucao_padrao(tmp_path):
     padrao = tmp_path / "padrao"
     corrigido = tmp_path / "consumivel"
     executar_parte1([mapa], padrao)
-    antes = {arquivo.name: arquivo.read_bytes() for arquivo in padrao.iterdir()}
+    antes = {arquivo.relative_to(padrao): arquivo.read_bytes() for arquivo in padrao.rglob("*") if arquivo.is_file()}
 
     executar_parte1([mapa], corrigido, fonte_consumivel=True)
 
-    assert {arquivo.name: arquivo.read_bytes() for arquivo in padrao.iterdir()} == antes
+    assert {arquivo.relative_to(padrao): arquivo.read_bytes() for arquivo in padrao.rglob("*") if arquivo.is_file()} == antes
     assert ler_json(padrao / "ciclo_negativo_m06.json")["tem_ciclo_negativo"] is True
     ciclo = ler_json(corrigido / "ciclo_negativo_m06.json")
     assert ciclo["tem_ciclo_negativo"] is False and ciclo["ciclo_negativo"] == []
@@ -156,7 +160,7 @@ def test_executar_parte1_entrada_vazia_exporta_agregados_vazios(tmp_path):
     assert ler_json(saida / "camadas.json") == {}
     for nome in ("solucoes", "dfs_classificacao", "comparacao_modelagem"):
         assert ler_csv(saida / f"{nome}.csv")[1] == []
-    assert len(list(saida.iterdir())) == 5
+    assert len([arquivo for arquivo in saida.rglob("*") if arquivo.is_file()]) == 5
 
 
 def test_executar_parte1_propaga_erro_de_leitura(tmp_path):
@@ -198,8 +202,9 @@ def test_executar_parte1_nao_repete_buscas_nem_graus(tmp_path, monkeypatch, cons
         assert sum(item is dados for item in chamadas["calcular_graus"]) == 1
         for nome in ("bfs", "bellman_ford"):
             assert sum(item is dados.grafo_estados for item in chamadas[nome]) == 1
-    for arquivo in (tmp_path / "saida0").iterdir():
-        assert arquivo.read_bytes() == (tmp_path / "saida1" / arquivo.name).read_bytes()
+    for arquivo in (tmp_path / "saida0").rglob("*"):
+        if arquivo.is_file():
+            assert arquivo.read_bytes() == (tmp_path / "saida1" / arquivo.relative_to(tmp_path / "saida0")).read_bytes()
 
 
 # [IA] Codex - regressão da solução finita e da evidência global de ciclo negativo.

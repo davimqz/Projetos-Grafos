@@ -20,10 +20,10 @@ npm run dev
 Para gerar a versão final: `npm run build` (sai em `front-react/dist/`).
 
 No labirinto, **Gerar HTML deste mapa** usa o mapa e o algoritmo selecionados e grava
-`out/parte1/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.
+`out/parte1/html/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.
 **Gerar HTML conjunto** reúne todos os mapas de `data/mapas/` e
 `data/mapas_grupo/` com os quatro algoritmos em
-`out/parte1/labirinto_interativo.html`. Gerar novamente substitui o arquivo
+`out/parte1/html/labirinto_interativo.html`. Gerar novamente substitui o arquivo
 correspondente. O arquivo é independente
 e pode ser aberto fora do servidor. A geração é oferecida pelos comandos locais
 `npm run dev` e `npm run preview`: ela precisa do Python e das dependências do

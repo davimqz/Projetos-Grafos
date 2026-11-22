@@ -1,0 +1,20 @@
+{
+  "mapa": "m05",
+  "grafo_posicoes": {
+    "status": "CICLO_NEGATIVO",
+    "tem_ciclo_negativo": true,
+    "ciclo_negativo": [
+      "(5,3)",
+      "(5,4)",
+      "(5,3)"
+    ],
+    "custo_ciclo": -3
+  },
+  "grafo_estados": {
+    "status": "OK",
+    "tem_ciclo_negativo": false,
+    "ciclo_negativo": [],
+    "custo_ciclo": null,
+    "custo_ate_alvo": 5
+  }
+}

@@ -19,6 +19,9 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 
 ## Situação em 21/11
 
+- `pytest`: 553 testes passando na última execução local desta branch em 21/11/2026.
+- PRs mergeados até aqui: 37. Aberto: #38 (roteiro e dados da Parte 2 para o front).
+- Branches `matheus`, `thomaz` e `vagner-front` não têm nada além da `main`.
 - `pytest`: 515 testes passando na `main`.
 - PRs mergeados até aqui: 38 (o #38 trouxe o roteiro e o `parte2.json` do front). Aberto: **#39 do Vagner**
   (exploratória 2 refeita, explanatórias 1 e 2, tabela de outliers por classe na 6.2), esperando revisão do Davi.
@@ -28,6 +31,13 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
   implementação (2.2, 2.4, 2.5, 3), 2 na AVD (6.5 e 6.6), 5 de fechamento (7, 8, 9, 10.2, 11) e a nota do topo. O #39
   já preenche boa parte da 6.6, mas o marcador continua lá.
 - `python -m scripts.gerar_pdf` já gera o PDF e lista os marcadores que faltam.
+- Nesta branch, os dois mapas do grupo, seus gabaritos TXT e a integração ao HTML/React estão no commit
+  `5b1eba5`. Foram verificados com 157 testes selecionados, build do React e geração das cinco figuras P5a.
+  Revisão por Thomaz e integração na `main` permanecem pendentes; ainda não há número de PR registrado aqui.
+- CLI R1 implementada nesta branch: exportações completas, armadilhas automáticas, figuras/HTML compartilhando
+  resultados e resumo ao final. Fluxo conferido nos dez mapas e nos cinco mapas de treino, incluindo o inválido.
+  Falta a revisão por Davi em outra máquina. As saídas geradas pelo usuário foram organizadas por tipo em
+  `out/parte1/csv/`, `json/`, `figuras/` e `html/`, com a mesma estrutura em `fonte_consumivel/`.
 - Conferido de novo no repositório na tarde de 21/11:
   - `out/parte1/` só tem as 5 figuras e o HTML. Nenhum CSV ou JSON da Parte 1 está commitado.
   - `data/mapas_grupo/` continua só com o `.gitkeep`.
@@ -59,7 +69,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 | Item | Consequência se faltar | Situação | Responsável |
 |---|---|---|---|
 | `docs/DECLARACAO_IA.pdf` no modelo da professora, **assinada pelos 4** (manuscrita ou gov.br), também postada no Classroom | Nota **zero** no projeto | **Não existe.** Falta o modelo da professora | Davi consegue o modelo; os 4 assinam |
-| Todo uso de IA declarado, com `# [IA]` no código e linha no `REGISTRO_IA.md` | Nota **zero** no projeto | Em dia até o PR #38. Cada PR novo precisa trazer a sua linha | Cada autor |
+| Todo uso de IA declarado, com `# [IA]` no código e linha no `REGISTRO_IA.md` | Nota **zero** no projeto | Registros até o PR #38 e desta sessão da Parte 1, incluindo a feature dos mapas (`5b1eba5`). Cada PR novo precisa trazer a sua linha | Cada autor |
 | Todo integrante sabe explicar qualquer código, inclusive o feito com IA | Nota **zero** no projeto | Depende do ensaio | Todos |
 | Entregar as duas partes | Apresentação (2,0) **zerada** | As duas partes existem | — |
 | Os 4 postam todo o material no Classroom em 26/11 | Desconto ou falta de entrega individual | — | Cada um |
@@ -70,14 +80,15 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 
 **Construção do grafo de estados (0,8)**
 - [x] Leitura e validação dos mapas, G_pos, G_est por exploração, rótulo `(l,c)|chaves|{bônus}`, nó ALVO.
-- [ ] `out/parte1/arestas_<mapa>.csv` de m01 a m08 e dos 2 mapas do grupo **commitados**. Hoje são gerados por
-      `executar_parte1`, mas não estão no repositório.
-  - Pronto quando: `git ls-files out/parte1/arestas_*.csv` lista 10 arquivos, inclusive o do m08.
+- [x] `out/parte1/csv/arestas_<mapa>.csv` de m01 a m08 e dos 2 mapas do grupo versionados nesta branch,
+      gerados pelo usuário e organizados por tipo de arquivo.
+  - Pronto quando: `git ls-files out/parte1/csv/arestas_*.csv` lista 10 arquivos, inclusive o do m08.
   - Responsável: Matheus. Prazo: 22/11.
 
 **Métricas, camadas e graus (0,4)**
 - [x] Cálculo em `src/parte1/analises.py`.
-- [ ] `metricas_global.json`, `camadas.json` e `graus_<mapa>.csv` commitados em `out/parte1/`.
+- [x] `metricas_global.json` e `camadas.json` em `out/parte1/json/`, e `graus_<mapa>.csv` em
+      `out/parte1/csv/`, versionados nesta branch.
 - [ ] Relatório 4.4 e 4.5: tabela por mapa (ordem, tamanho, densidade, teto, ocupação), métricas por camada, arcos
       entre camadas e **por que são essas casas**, maior grau de entrada e de saída, multiplicidade máxima no m08,
       becos.
@@ -93,18 +104,24 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 **Caminhos com os 4 algoritmos (0,8)**
 - [x] BFS, Dijkstra com recusa, Bellman-Ford (m05 e ciclo do m06), DFS com classificação, armadilhas e
       `--fonte-consumivel` no código.
-- [ ] `solucoes.csv`, `percurso_m03.json`, `ciclo_negativo_m06.json`, `dfs_classificacao.csv`, `armadilhas_m04.csv`
-      e `armadilhas_m07.csv` commitados em `out/parte1/`.
+- [x] `solucoes.csv`, `dfs_classificacao.csv` e `armadilhas_<mapa>.csv` em `out/parte1/csv/`; percursos,
+      ciclo do m06 e comparação de bônus do m05 em `out/parte1/json/`, versionados nesta branch.
 - [ ] Relatório 4.8: discussão do m01 (BFS × Dijkstra), do m06 (correção da regra e resposta finita) e do m07 (prova
       pela busca e quantos estados são alcançáveis).
 - [ ] Relatório 4.9: método das armadilhas (busca a partir de ALVO no transposto) e quantos estados são armadilha.
   - Responsável: Matheus (4.8 com Thomaz). Prazo: 23/11.
 
 **Mapas do grupo (0,2)**
-- [ ] `data/mapas_grupo/` com 2 mapas (hoje está **vazio**):
-  1. pelo menos 3 chaves, esteiras e bônus, com o caminho de menor custo coletando um bônus e passando por uma esteira;
-  2. pelo menos 20% dos estados alcançáveis sendo armadilha.
-- [ ] Os dois rodados pelo código, com saídas em `out/parte1/`.
+- [x] Dois mapas em `data/mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes):
+  1. `g01_tres_depositos.txt`: 3 chaves; o percurso de menor custo retornado pelo código coleta 2 bônus e passa
+     por 3 esteiras. G_est: 104 estados e 194 arcos físicos; BFS: 48 passos; Bellman-Ford: custo 38.
+  2. `g02_poco_lateral.txt`: 75 de 94 estados são armadilha (79,79%). G_est: 94 estados e 230 arcos físicos;
+     BFS: 18 passos; menor custo: 18.
+- [x] Execução pelo agente das funções existentes do grupo e gabaritos com métricas, status e caminhos em
+      `data/solucoes_mapas_grupo/solucao_<mapa>.txt` (commit `5b1eba5`; uso descrito em `REGISTRO_IA.md`).
+- [ ] Conferência final dos mapas e gabaritos pelo grupo, incluindo originalidade em relação aos outros grupos.
+- [x] CSVs/JSONs definitivos dos dois mapas em `out/parte1/csv/` e `out/parte1/json/`, junto das saídas
+      obrigatórias dos mapas fornecidos, versionados nesta branch.
 - [ ] Relatório 4.10: desenho de cada mapa e gabarito (estados, arcos, passos BFS e custo).
   - Não podem ser os mapas de `data/mapas_treino/`, nem parecidos com os de outro grupo.
   - Responsável: Matheus. Prazo: 22/11.
@@ -113,10 +130,10 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [x] `percurso_m03.png`, `percurso_m08.png`, `camadas_m02.png`, `arvore_bfs_m02.png` e `heatmap_m08.png`.
 - [x] `labirinto_interativo.html` com escolha de mapa e algoritmo, passo a passo, controle de velocidade e troca de
       camada.
-- [ ] **Realce dos estados-armadilha no HTML (R2).** Hoje o HTML mostra "Não fornecidas" porque `gerar_figuras` não
-      passa as armadilhas.
+- [ ] **Realce dos estados-armadilha no HTML (R2).** Os geradores já recebem as armadilhas calculadas pelo código.
+      O HTML da entrega já contém esses dados; falta conferir o realce visual com Thomaz.
   - Pronto quando: abrir m04 e m07 no HTML e ver as armadilhas marcadas.
-- [ ] Mapas do grupo incluídos no HTML.
+- [x] Mapas do grupo incluídos no HTML e na seleção do React (commit `5b1eba5`, revisão/PR pendentes).
 - [ ] Relatório 4.11: as figuras com legenda e uma frase sobre o que cada uma mostra.
   - Responsável: Thomaz. Prazo: 23/11.
 
@@ -163,7 +180,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 | Participação nos acompanhamentos | 0,5 | Ir ao de 24/11 com progresso real. Cada um precisa saber reportar qualquer pacote | Todos | 24/11 |
 | Clareza da apresentação | 0,3 | Slides a partir do roteiro, preencher os blocos `[A PREENCHER]` do `APRESENTACAO.md` e ensaiar com cronômetro (15 a 20 min) | Davi (slides), dono de cada bloco | 24/11 |
 | Domínio conceitual | 0,5 | Cada um estuda as partes que não fez e responde por escrito as perguntas previstas no roteiro | Todos | 25/11 |
-| Demonstração ao vivo (mapa surpresa) | 0,4 | **R1**: a CLI tem que rodar um mapa qualquer de ponta a ponta (ver abaixo). Ensaiar com `data/mapas_treino/` | Matheus | 22/11 |
+| Demonstração ao vivo (mapa surpresa) | 0,4 | **R1** implementado e verificado localmente com os mapas de treino. Falta revisão por Davi em outra máquina e ensaio do grupo | Matheus | 22/11 |
 | Participação equilibrada | 0,3 | Todos já têm commits em 2 ou mais pacotes. Atualizar a matriz da seção 10.2 na véspera | Davi | 25/11 |
 
 Regras da professora: falas divididas ("cada um fala da sua parte") ou leitura mecânica têm redução severa de nota. Se
@@ -174,7 +191,7 @@ alguém parar de contribuir, o grupo tem que avisar a professora por e-mail **an
 | Item | Peso | O que falta | Responsável | Prazo |
 |---|---|---|---|---|
 | Organização do repositório | 0,3 | Pronto. Conferir no fim se `out/parte1/` tem todas as saídas | Davi | 25/11 |
-| Qualidade do código | 0,4 | Pronto. Corrigir os acentos quebrados no terminal do Windows junto com o R1 | Matheus | 22/11 |
+| Qualidade do código | 0,4 | Pronto. CLI com UTF-8 no Windows e teste em subprocesso com ambiente ASCII | Matheus | 22/11 |
 | Testes obrigatórios | 0,4 | Pronto (BFS, DFS, Dijkstra, Bellman-Ford, estados com mapa mínimo, IO). Atualizar a contagem na seção 7 | Davi | 25/11 |
 | README | 0,2 | Comando do mapa surpresa em destaque (depende do R1) e revisão geral | Davi | 25/11 |
 | PDF técnico | 0,4 | Fechar os 23 marcadores, gerar o PDF e conferir figuras e tabelas | Davi junta; cada dono escreve | 25/11 |
@@ -193,18 +210,20 @@ Pedidos da reunião que contam aqui. Não são obrigatórios, mas a professora p
 
 ## R1: o que a CLI precisa fazer
 
-É o item mais arriscado, porque a demonstração ao vivo depende dele. Hoje `--mapa` só gera o PNG e uma linha de
-status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_parte1`.
+Implementação concluída nesta branch e verificada com 533 testes e execuções reais em pastas temporárias.
+Os resultados das buscas são compartilhados entre as exportações e o resumo é apresentado ao final. O aceite
+do R1 depende ainda da revisão por Davi em outra máquina.
 
-- [ ] `python -m src.cli --mapa <arquivo> --out <pasta>` gera todas as saídas daquele mapa: arestas, métricas, graus,
+- [x] `python -m src.cli --mapa <arquivo> --out <pasta>` gera todas as saídas daquele mapa: arestas, métricas, graus,
       soluções dos 4 algoritmos, DFS, armadilhas e figura. Sem `--alg`, roda os quatro.
-- [ ] `--alg BFS|DFS|DIJKSTRA|BELLMAN_FORD` imprime no terminal passos, custo, status e caminho.
-- [ ] `--armadilhas` calcula as armadilhas sozinho, sem `--arquivo-armadilhas`, para qualquer mapa (não só m04/m07).
-- [ ] `--fonte-consumivel` e `--interactive` continuam funcionando.
-- [ ] Mapa inválido dá mensagem clara, sem traceback.
-- [ ] Acentos corretos no terminal do Windows (`sys.stdout.reconfigure(encoding="utf-8")`).
-- [ ] Um comando que gera tudo de `data/mapas/` e `data/mapas_grupo/` em `out/parte1/`.
-- [ ] Testado com os mapas de `data/mapas_treino/`. As respostas têm que bater com o gabarito do README da pasta.
+- [x] `--alg BFS|DFS|DIJKSTRA|BELLMAN_FORD` seleciona o resumo e a visualização; CSVs/JSONs mantêm as análises completas.
+- [x] `--armadilhas` calcula as armadilhas sozinho, sem `--arquivo-armadilhas`, para qualquer mapa (não só m04/m07).
+- [x] `--fonte-consumivel` e `--interactive` continuam funcionando; a variante grava em `fonte_consumivel/`.
+- [x] Mapa inválido dá mensagem clara, sem traceback.
+- [x] Acentos corretos no terminal do Windows (`sys.stdout.reconfigure(encoding="utf-8")`).
+- [x] `--todos-mapas` gera tudo de `data/mapas/` e `data/mapas_grupo/`; `--mapas` aceita uma lista de arquivos.
+- [x] Testado com os mapas de `data/mapas_treino/`: estados, arcos, armadilhas, passos BFS e custo/status do BF
+      conferidos com o gabarito do README da pasta.
 - [ ] Revisado por Davi rodando a CLI numa máquina diferente da do Matheus.
 
 ## Marcadores do relatório
@@ -249,16 +268,21 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 ## Checklist por pessoa
 
 ### Matheus (P1 + P3, revisor: Thomaz)
-- [ ] R1 completo (lista acima) — 22/11
-- [ ] 2 mapas do grupo com gabarito — 22/11
-- [ ] Todas as saídas de `out/parte1/` commitadas — 22/11
-- [ ] R7 da Parte 1: tempo e memória por algoritmo e mapa (pode reaproveitar `src/benchmark.py`) — 23/11
+- [x] Implementação do R1 e verificação local dos oito critérios técnicos — 21/11
+- [ ] R1: revisão por Davi em outra máquina e integração na `main` — 22/11
+- [x] 2 mapas do grupo com gabaritos TXT — commit `5b1eba5` (revisão/PR pendentes).
+- [ ] Conferência final dos mapas/gabaritos pelo grupo e revisão por Thomaz — 22/11
+- [x] Saídas de `out/parte1/` versionadas nesta branch, organizadas por tipo, incluindo a variante consumível.
+- [x] R7 da Parte 1: benchmark integrado à CLI, com aquecimento, tempo e memória separados e CSV/JSON.
+- [ ] R7: gerar e versionar as medições finais na máquina da apresentação; confirmar o escopo da memória
+      na Parte 1 com a professora, conforme dúvida da ata de 19/11 — 23/11
 - [ ] Seções 2.2 e 4.1 a 4.10, com o G_est do m02 desenhado à mão e a prova do m05 — 23/11
 - [ ] Blocos 2 a 5 e 9 (Parte 1) do `APRESENTACAO.md` — 24/11
 - [ ] Limitações da Parte 1 (seção 8) — 25/11
 
 ### Thomaz (P2 + P5a, revisor: Matheus)
-- [ ] R2: armadilhas e mapas do grupo no `labirinto_interativo.html` — 22/11
+- [x] Mapas do grupo no `labirinto_interativo.html` — commit `5b1eba5` (revisão/PR pendentes).
+- [ ] R2: realce das armadilhas no `labirinto_interativo.html` — 22/11
 - [ ] Seções 2.4, 3, 4.8 (com Matheus) e 4.11 — 23/11
 - [ ] R3 e R4 no front — 23/11
 - [ ] Bloco 6 do `APRESENTACAO.md`, com plano B se o front falhar — 24/11

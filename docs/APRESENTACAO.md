@@ -19,8 +19,8 @@ Blocos marcados com **[A PREENCHER]** dependem de seções que ainda não foram 
 |---|---|---:|---|---|
 | 1 | Abertura e roteiro | 0,5 | Davi | slide de título |
 | 2 | Estrutura comum: grafo e algoritmos | 1 | Matheus | `src/graphs/` |
-| 3 | Parte 1: modelagem (G_pos e G_est) | 2,5 | Matheus | m02 desenhado à mão, `out/parte1/arvore_bfs_m02.png`, `out/parte1/camadas_m02.png` |
-| 4 | Parte 1: solução dos mapas | 2,5 | Matheus | `out/parte1/percurso_m03.png`, `out/parte1/percurso_m08.png`, `out/parte1/heatmap_m08.png` |
+| 3 | Parte 1: modelagem (G_pos e G_est) | 2,5 | Matheus | m02 desenhado à mão, `out/parte1/figuras/arvore_bfs_m02.png`, `out/parte1/figuras/camadas_m02.png` |
+| 4 | Parte 1: solução dos mapas | 2,5 | Matheus | `out/parte1/figuras/percurso_m03.png`, `out/parte1/figuras/percurso_m08.png`, `out/parte1/figuras/heatmap_m08.png` |
 | 5 | Demonstração no terminal (mapa surpresa) | 1,5 | Matheus | CLI (R1), mapas de treino |
 | 6 | Demonstração no front | 2,5 | Thomaz | `front-react/` (R2 a R6) |
 | 7 | Parte 2: dados e modelagem | 2 | Davi | `out/parte2/graus_histograma.png`, `out/parte2/graus_ccdf.png` |
@@ -61,10 +61,10 @@ Pedido da professora: G_pos e G_est desenhados, de preferência o m02 feito à m
 
 ### 4. Parte 1: solução dos mapas (2,5 min) **[A PREENCHER — Matheus]**
 
-- Tabela com estado final, custo e status dos algoritmos em cada mapa, tirada de `out/parte1/` (ainda não commitado).
+- Tabela com estado final, custo e status dos algoritmos em cada mapa, tirada de `out/parte1/csv/solucoes.csv`.
 - m05: pesos negativos e a prova (seção 4.7).
 - Estados-armadilha de m04 e m07 (seção 4.9).
-- Mapas do grupo (seção 4.10, `data/mapas_grupo/` ainda vazio).
+- Mapas do grupo (seção 4.10): arquivos em `data/mapas_grupo/` e gabaritos TXT em `data/solucoes_mapas_grupo/`.
 - Uma figura com o insight dela dito em uma frase.
 
 ### 5. Demonstração no terminal (1,5 min) **[A PREENCHER — Matheus]**

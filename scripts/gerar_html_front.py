@@ -1,8 +1,10 @@
 """Gera o HTML de um mapa solicitado pela interface local."""
 # [IA] Codex – integra a interface ao gerador HTML existente.
+# [IA] Codex - geração dos arquivos na subpasta html da saída solicitada.
 import argparse
 from pathlib import Path
 
+from src.parte1.caminhos import caminho_saida
 from src.visualizar_parte1 import preparar_mapa
 from src.viz import gerar_html_interativo
 
@@ -18,7 +20,7 @@ def gerar_html(mapa: str, algoritmo: str, saida: Path | None = None) -> Path:
     if len(arquivos) != 1:
         raise ValueError("Mapa não encontrado ou ambíguo")
     dados, _, _, _ = preparar_mapa(arquivos[0], (algoritmo,))
-    destino = (saida if saida is not None else RAIZ / "out" / "parte1") / f"labirinto_{mapa}.html"
+    destino = caminho_saida(saida if saida is not None else RAIZ / "out" / "parte1", f"labirinto_{mapa}.html")
     return gerar_html_interativo({mapa: dados}, destino)
 
 
@@ -28,7 +30,7 @@ def gerar_html_conjunto(saida: Path | None = None) -> Path:
     if len({arquivo.stem for arquivo in arquivos}) != len(arquivos):
         raise ValueError("Há mapas com o mesmo nome nas pastas de entrada")
     mapas = {arquivo.stem: preparar_mapa(arquivo, ALGORITMOS)[0] for arquivo in arquivos}
-    destino = (saida if saida is not None else RAIZ / "out" / "parte1") / "labirinto_interativo.html"
+    destino = caminho_saida(saida if saida is not None else RAIZ / "out" / "parte1", "labirinto_interativo.html")
     return gerar_html_interativo(mapas, destino)
 
 

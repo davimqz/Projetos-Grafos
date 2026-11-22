@@ -7,6 +7,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 // [IA] Codex – geração local pelo mesmo Python que produz os arquivos em out.
+// [IA] Codex - leitura e identificação dos HTML na nova subpasta de saída.
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const pythonLocal = process.platform === 'win32' ? join(raiz, '.venv', 'Scripts', 'python.exe') : join(raiz, '.venv', 'bin', 'python')
 const python = existsSync(pythonLocal) ? pythonLocal : (process.platform === 'win32' ? 'python' : 'python3')
@@ -24,7 +25,7 @@ function gerarHtmlLocal() {
       if (!nomeValido(nome)) return responder(400, 'Mapa inválido.')
       const arquivo = nome === 'conjunto' ? 'labirinto_interativo.html' : `labirinto_${nome}.html`
       if (req.method === 'GET') {
-        return readFile(join(raiz, 'out', 'parte1', arquivo), (erro, html) => {
+        return readFile(join(raiz, 'out', 'parte1', 'html', arquivo), (erro, html) => {
           if (erro) return responder(404, 'Gere o HTML antes de abri-lo.')
           res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.end(html)
         })
@@ -45,7 +46,7 @@ function gerarHtmlLocal() {
           if (res.writableEnded) return
           if (codigo !== 0) return responder(500, erro.trim() || 'Não foi possível gerar o HTML.')
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
-          res.end(JSON.stringify({ arquivo: `out/parte1/${arquivo}`, url: `${prefixo}${nome}` }))
+          res.end(JSON.stringify({ arquivo: `out/parte1/html/${arquivo}`, url: `${prefixo}${nome}` }))
         })
       })
     })

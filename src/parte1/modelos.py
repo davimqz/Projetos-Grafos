@@ -1,6 +1,7 @@
 """Tipos compartilhados pelas entregas da Parte 1."""
 
 # [IA] Codex - contratos originais e separação por responsabilidade.
+# [IA] Codex - resultado compartilhado entre exportações e apresentação da CLI.
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -59,3 +60,14 @@ class Solucao(TypedDict):
     custo: float | None
     status: StatusSolucao
     caminho: list[str]
+
+
+@dataclass
+class ExecucaoMapa:
+    """Resultados existentes de um mapa, sem refazer grafos ou buscas."""
+
+    dados: DadosMapa
+    solucoes: dict[str, Solucao]
+    classificacao: dict
+    buscas: dict[str, dict]
+    armadilhas: list[str]
