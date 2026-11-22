@@ -19,12 +19,38 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 
 ## Situação em 21/11
 
-- `pytest`: 515 testes passando (507 na `main` + 8 do PR #38).
-- PRs mergeados até aqui: 37. Aberto: #38 (roteiro e dados da Parte 2 para o front).
-- Branches `matheus`, `thomaz` e `vagner-front` não têm nada além da `main`.
+- `pytest`: 515 testes passando na `main`.
+- PRs mergeados até aqui: 38 (o #38 trouxe o roteiro e o `parte2.json` do front). Aberto: **#39 do Vagner**
+  (exploratória 2 refeita, explanatórias 1 e 2, tabela de outliers por classe na 6.2), esperando revisão do Davi.
+- Branches `matheus`, `thomaz`, `vagner-front` e `vagner-labirinto` não têm nada além da `main`. Matheus e Thomaz
+  ainda não subiram nada desde a reunião de 19/11.
 - O relatório tem **23 marcadores** `[A ESCREVER]`/`[COMPLETAR]`: 11 na Parte 1 (seção 4), 4 no manual e na
-  implementação (2.2, 2.4, 2.5, 3), 2 na AVD, 5 de fechamento (7, 8, 9, 10.2, 11) e a nota do topo.
+  implementação (2.2, 2.4, 2.5, 3), 2 na AVD (6.5 e 6.6), 5 de fechamento (7, 8, 9, 10.2, 11) e a nota do topo. O #39
+  já preenche boa parte da 6.6, mas o marcador continua lá.
 - `python -m scripts.gerar_pdf` já gera o PDF e lista os marcadores que faltam.
+- Conferido de novo no repositório na tarde de 21/11:
+  - `out/parte1/` só tem as 5 figuras e o HTML. Nenhum CSV ou JSON da Parte 1 está commitado.
+  - `data/mapas_grupo/` continua só com o `.gitkeep`.
+  - `src/cli.py` não mudou: `--mapa` chama só `gerar_mapa`, `--armadilhas` ainda exige `--arquivo-armadilhas` e
+    nada chama `executar_parte1`.
+  - O front não tem tela da Parte 2 (nenhum componente lê `parte2.json`), nem upload de `.txt`, nem os 4 algoritmos
+    lado a lado.
+  - `docs/DECLARACAO_IA.pdf` não existe.
+  - `APRESENTACAO.md` tem 7 blocos `[A PREENCHER]`: 2, 3, 4, 5 e 9 (Matheus), 6 (Thomaz) e 10 (Vagner).
+
+## Riscos agora
+
+1. **Matheus concentra o caminho crítico.** R1, mapas do grupo, saídas da Parte 1 e 11 dos 23 marcadores do relatório
+   dependem dele, inclusive a demonstração ao vivo, que vale 0,4 e é o momento de maior risco da apresentação. Nada
+   dele entrou desde 19/11. Precisa dizer hoje (21/11) no grupo o que consegue entregar até 22/11 à noite. Se o R1 não
+   estiver na `main` até lá, o grupo divide o R1 no dia 23 (por exemplo: Davi faz as armadilhas automáticas e os
+   acentos, Matheus faz a orquestração com `executar_parte1`).
+2. **Thomaz sem entrega desde 18/11.** O R2 (armadilhas no HTML) é obrigatório. R3 e R4 são bônus e saem antes do R2
+   se faltar tempo.
+3. **Declaração de IA.** Sem ela o projeto leva zero, e ainda falta o modelo da professora. Pedir hoje por e-mail ou
+   Classroom, sem esperar o dia 24.
+4. **Conflitos de merge.** O #39 e o #40 mexem no fim do `REGISTRO_IA.md`. Mergear o #39 primeiro e atualizar o #40
+   em seguida.
 
 ## O que zera nota se faltar
 
@@ -109,15 +135,25 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 ### AVD (0,4 em Grafos + nota inteira de AVD)
 
 - [x] 4 exploratórias em `out/parte2/avd/` e seções 6.1 a 6.4 (4 pilares, faltantes e mecanismo de ausência,
-      outliers, multivariada com Spearman).
-- [ ] **2 explanatórias** em `out/parte2/avd/`, nascidas de algo visto nas exploratórias. Pelo menos uma responde
-      à pergunta de pesquisa.
+      outliers, multivariada com Spearman). No #39 a exploratória 2 virou "transações por quantidade de arestas
+      geradas", a 6.2 ganhou a tabela de outliers por classe (só limite superior no grau de saída) e a 6.4 explica o
+      peso como saldo da carteira de destino.
+- [ ] **2 explanatórias** em `out/parte2/avd/` (PR #39, falta mergear):
+  1. `explanatoria_arestas_por_transacao.png`: 84,5% das transações geram de 1 a 10 arestas, mas os 15,5% restantes
+     respondem por 84,4% das arestas. Vem da exploratória 2. Tem nota analítica e justificativa.
+  2. `explanatoria_2.png`: dot plot da proporção de arestas com peso positivo por classe do destino, lícitas em
+     verde. Vem da exploratória 4. Tem só a justificativa do gráfico.
+- [ ] Explanatória 2: escrever o que o gráfico mostra, com as porcentagens de cada classe, e o insight. Hoje a 6.6 só
+      diz por que é um dot plot.
+- [ ] Dizer na 6.6 qual das duas responde à pergunta de pesquisa e ligar isso à Parte 2 (pesos e caminhos).
+- [ ] Revisar o último parágrafo da explanatória 1 ("é uma forma de utlizar barras no eixo x,y..."), que está confuso
+      e com erro de digitação, e citar os atributos pré-atentivos pelo nome (cor, comprimento, posição).
+- [ ] Apagar o marcador `[A ESCREVER — Vagner]` da 6.6 quando fechar os itens acima.
+- [ ] Renomear `explanatoria_arestas_por_transacao.png` para `explanatoria_1.png`, para ficar no mesmo padrão.
 - [ ] Relatório 6.5: o que foi encontrado na exploração, qual história contar, por que é a mais relevante e qual
-      técnica de destaque foi usada.
-- [ ] Relatório 6.6: nota analítica autoral de cada explanatória (o que mostra, insight, por que esse gráfico) e
-      justificativa dos atributos pré-atentivos.
+      técnica de destaque foi usada. **Ainda não começada.**
 - [ ] Conferir título, legenda e eixos nas 6 figuras. Pizza e radar só com justificativa forte.
-  - Responsável: Vagner. Prazo: 23/11.
+  - Responsável: Vagner (revisor: Davi). Prazo: 23/11.
   - A IA não pode escolher o gráfico, os destaques ou a história, nem interpretar os gráficos.
 
 ### Apresentação e participação (2,0)
@@ -191,8 +227,8 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 | 4.9 | Matheus | Método e contagem das armadilhas |
 | 4.10 | Matheus | Desenho e gabarito dos mapas do grupo |
 | 4.11 | Thomaz | Figuras com legenda e uma frase cada |
-| 6.5 | Vagner | Da exploratória à explanatória |
-| 6.6 | Vagner | Explanatórias 1 e 2 com nota analítica |
+| 6.5 | Vagner | Da exploratória à explanatória (não começada) |
+| 6.6 | Vagner | Quase pronta no #39. Falta o insight da explanatória 2, a pergunta de pesquisa e apagar o marcador |
 | 7 | Davi | Contagem de testes na véspera |
 | 8 | Todos | Limitações da Parte 1 (a da Parte 2 já está escrita) |
 | 9 | Todos | Conclusões |
@@ -203,8 +239,9 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 
 | Até | Entrega |
 |---|---|
+| **21/11 (sáb)** | Pedir o modelo da declaração; Matheus e Thomaz dizem no grupo o que entregam até 22/11; mergear #39 e #40 |
 | **22/11 (dom)** | R1 na `main`; mapas do grupo; saídas de `out/parte1/` commitadas; R2 |
-| **23/11 (seg)** | Seções 4.1 a 4.11, 2.4, 3, 6.5 e 6.6 escritas; 2 explanatórias; R3 a R6 se der tempo; modelo da declaração em mãos |
+| **23/11 (seg)** | Plano B do R1 se ele não tiver entrado; seções 4.1 a 4.11, 2.4, 3, 6.5 e 6.6 escritas; R3 a R6 se der tempo; modelo da declaração em mãos |
 | **24/11 (ter)** | Acompanhamento. Antes: ensaio cronometrado. Na aula: cada um roda um mapa de treino no terminal |
 | **25/11 (qua)** | Seções 8, 9 e 11; relatório congelado e PDF gerado; declaração assinada pelos 4; README final; matriz e testes atualizados |
 | **26/11 (qui)** | Os 4 postam no Classroom e apresentam |
@@ -227,14 +264,18 @@ status, `--armadilhas` exige um JSON pronto e nenhum comando chama `executar_par
 - [ ] Bloco 6 do `APRESENTACAO.md`, com plano B se o front falhar — 24/11
 
 ### Vagner (P4b + P5b, revisor: Davi)
-- [ ] 2 explanatórias e seções 6.5 e 6.6 — 23/11
+- [x] 2 explanatórias geradas (PR #39)
+- [ ] Ajustes da 6.6 pedidos acima (insight da explanatória 2, pergunta de pesquisa, texto da explanatória 1) — 22/11
+- [ ] Seção 6.5 — 23/11
 - [ ] Seção 2.5 (frase e captura do front) — 23/11
 - [ ] R5 e R6 lendo `front-react/src/parte2.json` — 23/11
 - [ ] Bloco 10 do `APRESENTACAO.md` — 24/11
 
 ### Davi (P4a + P5c)
-- [ ] Mergear o PR #38 depois da aprovação
-- [ ] Conseguir com a professora o modelo da declaração de IA — 23/11
+- [x] Mergear o PR #38
+- [ ] Revisar o PR #39 do Vagner (conferir as porcentagens da 6.2 e da 6.6 com o notebook) — 22/11
+- [ ] Pedir à professora o modelo da declaração de IA — hoje (21/11)
+- [ ] Cobrar no grupo o que Matheus e Thomaz entregam até 22/11 e combinar o plano B do R1 — hoje (21/11)
 - [ ] Revisar o R1 rodando os mapas de treino — 22/11
 - [ ] Slides a partir do roteiro — 24/11
 - [ ] Revisar os PRs de Vagner (P4b/P5b)
