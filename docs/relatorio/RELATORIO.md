@@ -752,7 +752,7 @@ Para destacar essa mensagem, usamos a cor como atributo pré-atentivo: as faixas
 
 Essa é a explanatória que responde à pergunta de pesquisa: carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas? Com esses dois gráficos, conseguimos perceber que, no recorte analisado, a resposta é não. As carteiras ilícitas não participam de nenhum ciclo, e por isso também não participam de ciclos negativos, enquanto as carteiras lícitas participam de ciclos e também de ciclos negativos.
 
-Para destacar essa mensagem, usamos a cor como atributo pré-atentivo: cinza para as carteiras em pelo menos um ciclo de qualquer tipo e verde para as que estão em pelo menos um ciclo negativo de duas carteiras. O comprimento das barras mostra a diferença entre 0 ilícitas e 83 lícitas em ciclos. O título, em letra maior, traz a mensagem principal, e o subtítulo destaca que 8 das 83 carteiras lícitas em ciclos participam de ciclos negativos.
+Para destacar essa mensagem, usamos a cor como atributo pré-atentivo: cada classe tem uma cor, com tom claro para as carteiras em pelo menos um ciclo de qualquer tipo e tom cheio para as que estão em pelo menos um ciclo negativo de duas carteiras. O comprimento das barras mostra a diferença entre 0 ilícitas e 83 lícitas em ciclos. O título, em letra maior, traz a mensagem principal, e o subtítulo destaca que 8 das 83 carteiras lícitas em ciclos participam de ciclos negativos.
 
 ### 6.6 Visualizações explanatórias
 
@@ -774,7 +774,7 @@ As faixas foram escolhidas porque assim é possível pegar de forma espaçada os
 
 ![Nenhuma carteira ilícita aparece nos ciclos observados. Há carteiras lícitas em ciclos negativos.](../../out/parte2/avd/explanatoria_2.png)
 
-O gráfico mostra dois fatos tirados das análises exploratórias 3 e 4. O título, em letra maior, traz a mensagem principal: nenhuma carteira ilícita aparece nos ciclos observados, e há carteiras lícitas em ciclos negativos. Para cada classe, a barra cinza mostra quantas carteiras estão em pelo menos um ciclo de qualquer tipo (83 lícitas, 33 desconhecidas e 0 ilícitas), e a barra verde mostra quantas delas estão em pelo menos um ciclo negativo de duas carteiras (8 lícitas, 2 desconhecidas e 0 ilícitas). O subtítulo destaca que, das 83 carteiras lícitas em ciclos, 8 participam de pelo menos um ciclo negativo de duas carteiras.
+O gráfico mostra dois fatos tirados das análises exploratórias 3 e 4. O título, em letra maior, traz a mensagem principal: nenhuma carteira ilícita aparece nos ciclos observados, e há carteiras lícitas em ciclos negativos. Cada classe tem uma cor. A barra em tom claro mostra quantas carteiras estão em pelo menos um ciclo de qualquer tipo (83 lícitas, 33 desconhecidas e 0 ilícitas), e a barra em tom cheio mostra quantas delas estão em pelo menos um ciclo negativo de duas carteiras (8 lícitas, 2 desconhecidas e 0 ilícitas). O subtítulo destaca que, das 83 carteiras lícitas em ciclos, 8 participam de pelo menos um ciclo negativo de duas carteiras.
 
 Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos distintos: o primeiro é estar em pelo menos um ciclo de qualquer tipo, e o segundo é estar em um ciclo negativo entre duas carteiras. Com isso, mostramos que nenhuma carteira ilícita aparece nos ciclos observados e que há carteiras lícitas em ciclos negativos. O insight extraído é que as carteiras lícitas participam de ciclos, e alguns deles são negativos, enquanto as ilícitas não participam de ciclo algum.
 
