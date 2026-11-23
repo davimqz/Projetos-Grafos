@@ -109,8 +109,13 @@ function GrafoCaminho({ caminho, arcos, ciclo }) {
   const H = ciclo ? 300 : 220
   const pos = {}
   if (ciclo) {
+    // Ciclo [v0, v1, ..., v0]: carteiras distintas num círculo, a partir da esquerda.
     const unicos = caminho.slice(0, -1)
-    unicos.forEach((no, i) => { pos[no] = [W / 2 + (i === 0 ? -170 : 170), H / 2] })
+    const raio = unicos.length === 2 ? 170 : Math.min(W, H) / 2 - 50
+    unicos.forEach((no, i) => {
+      const a = Math.PI + (2 * Math.PI * i) / unicos.length
+      pos[no] = [W / 2 + raio * Math.cos(a), H / 2 + raio * Math.sin(a)]
+    })
   } else {
     caminho.forEach((no, i) => { pos[no] = [70 + (i * (W - 140)) / Math.max(n - 1, 1), H / 2] })
   }
@@ -119,7 +124,8 @@ function GrafoCaminho({ caminho, arcos, ciclo }) {
       <defs><Seta id="seta-caminho" /></defs>
       {arcos.map(([u, v, w], i) => {
         const [x1, y1, x2, y2] = aparar(pos[u], pos[v], 18)
-        const curva = ciclo ? (i === 0 ? -80 : 80) : 0
+        // Com 2 carteiras os arcos de ida e volta se sobrepõem; a curva os separa
+        const curva = ciclo && arcos.length === 2 ? (i === 0 ? -80 : 80) : 0
         const mx = (x1 + x2) / 2
         const my = (y1 + y2) / 2 + curva
         return (
@@ -220,7 +226,7 @@ function BellmanFord({ c }) {
       <div className="p2-corpo">
         <div className="mapa-area">
           <div className="grafo-frame"><GrafoCaminho caminho={c.ciclo} arcos={c.arcos} ciclo /></div>
-          <p className="note" style={{ marginTop: 10 }}>Ciclo negativo alcançável a partir da origem: percorrer os dois arcos soma custo negativo, então o caminho mínimo não é definido.</p>
+          <p className="note" style={{ marginTop: 10 }}>Ciclo negativo alcançável a partir da origem: dar uma volta no ciclo soma custo negativo, então o caminho mínimo não é definido.</p>
         </div>
         <aside className="reproducao">
           <h3>Resultado</h3>
