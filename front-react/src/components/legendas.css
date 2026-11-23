@@ -1,18 +1,40 @@
 /* [IA] Codex – apresentação responsiva da legenda do mapa */
+/* [IA] Claude Code – legenda no design system brutalista (bordas pretas, rótulos mono) */
 .map-key {
   width: 100%;
-  padding: 20px;
-  margin-top: 8px;
-  border: 1px solid #405a7e;
-  border-radius: 10px;
-  background: #162744;
-  color: #f1f5ff;
+  margin-top: var(--s2);
+  border: var(--borda);
+  background: var(--surface);
 }
-.map-key__title { margin: 0 0 16px; font-size: .95rem; line-height: 1.3; }
-.map-key__groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.map-key__group h4 { margin: 0 0 10px; color: #b9cbe4; font-size: .8rem; }
-.map-key__group ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
-.map-key__group li { display: flex; align-items: center; gap: 10px; min-height: 26px; font-size: .875rem; line-height: 1.35; }
-.map-key__symbol { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 26px; width: 26px; height: 26px; border: 1px solid #e0e8f4; border-radius: 4px; color: #142138; font: 700 14px/1 ui-monospace, monospace; }
-@media (max-width: 700px) { .map-key__groups { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } }
-@media (max-width: 390px) { .map-key__groups { grid-template-columns: 1fr; } }
+.map-key__title {
+  margin: 0;
+  padding: var(--s3) var(--s4);
+  background: var(--ink);
+  color: #FFFFFF;
+  font: 700 11px/1.2 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.map-key__groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.map-key__group { padding: var(--s4); }
+.map-key__group + .map-key__group { border-left: var(--borda); }
+.map-key__group h4 { margin: 0 0 var(--s3); font: 400 18px/1 var(--display); text-transform: uppercase; }
+.map-key__group ul { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
+.map-key__group li { display: flex; align-items: center; gap: var(--s3); min-height: 26px; font-size: 13px; line-height: 1.35; }
+.map-key__symbol {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 26px; width: 26px; height: 26px;
+  border: 1px solid var(--ink);
+  color: var(--cell-ink);
+  font: 700 14px/1 var(--mono);
+}
+@media (max-width: 700px) {
+  .map-key__groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .map-key__group + .map-key__group { border-left: 0; }
+  .map-key__group:nth-child(2) { border-left: var(--borda); }
+  .map-key__group:nth-child(3) { grid-column: 1 / -1; border-top: var(--borda); }
+}
+@media (max-width: 390px) {
+  .map-key__groups { grid-template-columns: 1fr; }
+  .map-key__group:nth-child(2) { border-left: 0; border-top: var(--borda); }
+}

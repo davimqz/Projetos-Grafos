@@ -4,6 +4,8 @@
 import { useEffect, useState } from 'react'
 import { ALGORITMOS, MAPAS, NOME_ALG, fmtInt, lerRotulo } from '../util.js'
 import { Grade, LegendaCasas } from './Grade.jsx'
+// [IA] Claude Code – ícones e estado de carregamento nos botões (design system brutalista)
+import { Icone } from './Icone.jsx'
 
 const NOMES_MAPAS = {
   m01_terreno: 'M01 · Terreno',
@@ -112,7 +114,7 @@ export function Labirinto() {
           {/* [IA] Claude Code – upload em botão próprio e mensagens na largura toda, sem deslocar os campos */}
           {COM_PYTHON && <div className="field">Carregar mapa .txt
             <label className={`btn btn-arquivo${enviando ? ' desativado' : ''}`}>
-              {enviando ? 'Processando…' : 'Escolher arquivo'}
+              {!enviando && <Icone nome="enviar" />}{enviando ? 'Processando…' : 'Escolher arquivo'}
               <input type="file" className="input-arquivo" accept=".txt,text/plain" disabled={enviando} onChange={enviarMapa} />
             </label>
           </div>}
@@ -125,11 +127,11 @@ export function Labirinto() {
           <h3>Acompanhar percurso</h3>
           <div className="btns">
             <button className="btn" disabled={!temCaminho || passo === 0}
-              onClick={() => { setTocando(false); setPasso((p) => Math.max(0, p - 1)) }}>Anterior</button>
+              onClick={() => { setTocando(false); setPasso((p) => Math.max(0, p - 1)) }}><Icone nome="anterior" />Anterior</button>
             <button className="btn primary" disabled={!temCaminho}
-              onClick={() => { if (passo >= fim) setPasso(0); setTocando(!tocando) }}>{rotuloBotao}</button>
+              onClick={() => { if (passo >= fim) setPasso(0); setTocando(!tocando) }}><Icone nome={tocando ? 'pause' : passo >= fim && passo > 0 ? 'reiniciar' : 'play'} />{rotuloBotao}</button>
             <button className="btn" disabled={!temCaminho || passo === fim}
-              onClick={() => { setTocando(false); setPasso((p) => Math.min(fim, p + 1)) }}>Próximo</button>
+              onClick={() => { setTocando(false); setPasso((p) => Math.min(fim, p + 1)) }}>Próximo<Icone nome="proximo" /></button>
           </div>
           <label className="field">Posição no percurso: {temCaminho ? `${passo} de ${fim}` : 'indisponível'}
             <input className="controle-faixa" type="range" min="0" max={Math.max(0, fim)} value={Math.min(passo, Math.max(0, fim))} disabled={!temCaminho} style={{ '--progresso': `${fim > 0 ? (passo / fim) * 100 : 0}%` }} onChange={(ev) => { setTocando(false); setPasso(Number(ev.target.value)) }} />
@@ -160,7 +162,7 @@ export function Labirinto() {
         const custosAlg = M.custos?.[nome] || []
         return <article key={nome}><h3>{NOME_ALG[nome]}</h3><p>{M.status[nome]}</p><p>{percurso.length ? `${percurso.length - 1} passos · custo ${custosAlg.at(-1) ?? '—'}` : 'Sem percurso disponível'}</p><Grade grade={M.grade} caminho={percurso} /></article>
       })}</div>}
-      {COM_PYTHON && <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando || mapa === '__enviado'}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>}
+      {COM_PYTHON && <div className="exportar-html"><button type="button" className="btn primary" aria-busy={gerando} onClick={() => gerarHtml(false)} disabled={gerando || mapa === '__enviado'}>{!gerando && <Icone nome="baixar" />}Gerar HTML deste mapa</button><button type="button" className="btn" aria-busy={gerando} onClick={() => gerarHtml(true)} disabled={gerando}>{!gerando && <Icone nome="baixar" />}Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>}
     </section>
   )
 }

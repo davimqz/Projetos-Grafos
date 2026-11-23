@@ -1,8 +1,10 @@
 // [IA] Claude Code – tela da Parte 2 (pedidos R5/R6 da reunião de 19/11): fontes e pares com os resultados já
 // calculados pelo código do grupo (parte2.json) e desenho do subgrafo de cada caso com a cor da classe da carteira
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { BarraZoom, Cy } from './CyGrafo.jsx'
 import P2 from '../parte2.json'
 import { NOME_CLASSE, corClasse, fmt, fmtInt } from '../util.js'
+// [IA] Claude Code – cores dos grafos no design system brutalista (fundo claro, contornos pretos)
 
 const CASOS = [
   ['buscas', 'BFS e DFS', '3 fontes'],
@@ -19,126 +21,104 @@ function rotuloCaso(tipo, c) {
   return `${curto(c.origem)} (${NOME_CLASSE[classe(c.origem)]})`
 }
 
-/* Posições: origem no centro e as demais carteiras em anéis pela profundidade no recorte.
-   Cada anel segue a ordem angular dos predecessores, para os arcos não se cruzarem. */
-function layoutRadial(nos, nivel, W, H, arcos = []) {
-  const pai = {}
-  arcos.forEach(([u, v]) => { if (!(v in pai)) pai[v] = u })
-  const porNivel = {}
-  nos.forEach((n) => { (porNivel[nivel[n] ?? 1] ||= []).push(n) })
-  const niveis = Object.keys(porNivel).map(Number).sort((a, b) => a - b)
-  const maxNivel = Math.max(...niveis, 1)
-  const raioMax = Math.min(W, H) / 2 - 46
-  const pos = {}
-  const angulo = {}
-  niveis.forEach((nv) => {
-    let lista = porNivel[nv]
-    if (nv > 1) lista = [...lista].sort((a, b) => (angulo[pai[a]] ?? 0) - (angulo[pai[b]] ?? 0))
-    const r = nv === 0 ? 0 : raioMax * Math.sqrt(nv / maxNivel)
-    lista.forEach((n, i) => {
-      const a = (2 * Math.PI * i) / lista.length - Math.PI / 2
-      angulo[n] = a
-      pos[n] = [W / 2 + r * Math.cos(a), H / 2 + r * Math.sin(a)]
-    })
-  })
-  return pos
+// [IA] Claude Code – grafos da Parte 2 com Cytoscape.js: amostra da rede em várias camadas, caminhos e ciclos interativos
+const corHex = (c) => getComputedStyle(document.documentElement).getPropertyValue(`--${c}`).trim() || '#A3A29C'
+const FONTE_MONO = 'IBM Plex Mono, ui-monospace, monospace'
+
+const ESTILO_P2 = [
+  { selector: 'node', style: {
+    width: 16, height: 16, 'background-color': 'data(cor)', 'border-width': 1.5, 'border-color': '#080808',
+    label: 'data(rotulo)', 'font-family': FONTE_MONO, 'font-size': 8, 'font-weight': 600, color: '#080808',
+    'text-valign': 'bottom', 'text-margin-y': 4, 'min-zoomed-font-size': 11,
+    'text-background-color': '#FFFFFF', 'text-background-opacity': 0.9, 'text-background-padding': 2,
+  } },
+  { selector: 'node.origem', style: { width: 32, height: 32, shape: 'diamond', 'border-width': 3, 'font-size': 10, 'min-zoomed-font-size': 0 } },
+  { selector: 'node.extremo', style: { width: 26, height: 26, 'border-width': 3, 'font-size': 10, 'min-zoomed-font-size': 0 } },
+  { selector: 'edge', style: {
+    width: 1.5, 'line-color': '#353535', 'curve-style': 'bezier', 'target-arrow-shape': 'triangle',
+    'target-arrow-color': '#353535', 'arrow-scale': 0.8, opacity: 0.85,
+  } },
+  { selector: 'edge.outro', style: { 'line-style': 'dashed', 'line-color': '#9A9993', 'target-arrow-color': '#9A9993', width: 1.2 } },
+  { selector: 'edge.peso', style: {
+    width: 3, 'line-color': '#080808', 'target-arrow-color': '#080808', opacity: 1, label: 'data(peso)',
+    'font-family': FONTE_MONO, 'font-size': 11, 'font-weight': 700, 'text-background-color': '#FFFFFF',
+    'text-background-opacity': 1, 'text-background-padding': 3, 'text-border-width': 1, 'text-border-color': '#080808', 'text-border-opacity': 1,
+  } },
+  { selector: 'edge.negativo', style: { 'line-color': '#E0412F', 'target-arrow-color': '#E0412F' } },
+  { selector: '.apagado', style: { opacity: 0.15 } },
+  { selector: 'node.foco', style: { 'overlay-color': '#D4F500', 'overlay-opacity': 0.6, 'overlay-padding': 7, 'min-zoomed-font-size': 0, 'z-index': 20 } },
+  { selector: 'edge.foco', style: { width: 3, 'line-color': '#080808', 'target-arrow-color': '#080808', opacity: 1, 'z-index': 19 } },
+]
+
+function noCy(no, classes = '') {
+  return { group: 'nodes', data: { id: no, rotulo: curto(no), cor: corHex(classe(no)) }, classes }
 }
 
-/* Profundidade de cada nó numa lista de arcos pai → filho (árvore de predecessores já calculada). */
-function profundidades(origem, arcos) {
-  const pai = {}
-  arcos.forEach(([u, v]) => { pai[v] = u })
-  const prof = { [origem]: 0 }
-  const medir = (n, guarda = 0) => {
-    if (prof[n] !== undefined) return prof[n]
-    if (!(n in pai) || guarda > arcos.length) return 1
-    prof[n] = medir(pai[n], guarda + 1) + 1
-    return prof[n]
-  }
-  arcos.forEach(([, v]) => medir(v))
-  return prof
+/* Destaca o nó em foco e seus arcos; o resto do grafo fica apagado. */
+function useFoco(cyRef, deps, onFoco) {
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy || !onFoco) return undefined
+    const limpar = () => cy.elements().removeClass('foco apagado')
+    const focar = (e) => {
+      limpar()
+      const no = e.target
+      cy.elements().addClass('apagado')
+      no.closedNeighborhood().removeClass('apagado')
+      no.addClass('foco'); no.connectedEdges().addClass('foco')
+      onFoco(no.id())
+    }
+    cy.on('mouseover tap', 'node', focar)
+    cy.on('mouseout', 'node', limpar)
+    cy.on('tap', (e) => { if (e.target === cy) { limpar(); onFoco(null) } })
+    return () => cy.removeListener('mouseover tap mouseout tap')
+  }, deps) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-function Seta({ id }) {
+function GrafoRede({ origem, nos, arvore, outros = [], onFoco, layoutInicial = 'forca' }) {
+  const cyRef = useRef(null)
+  const [modo, setModo] = useState(layoutInicial)
+  const elementos = useMemo(() => [
+    ...nos.map((n) => noCy(n, n === origem ? 'origem' : '')),
+    ...arvore.map(([u, v], i) => ({ group: 'edges', data: { id: `a${i}`, source: u, target: v } })),
+    ...outros.map(([u, v], i) => ({ group: 'edges', data: { id: `o${i}`, source: u, target: v }, classes: 'outro' })),
+  ], [nos, arvore, outros, origem])
+  const layout = useMemo(() => (modo === 'arvore'
+    ? { name: 'breadthfirst', directed: true, roots: [origem], spacingFactor: 1.1, fit: true, padding: 30, animate: false }
+    : { name: 'cose', animate: !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, animationDuration: 600, nodeRepulsion: () => 12000, idealEdgeLength: () => 60, fit: true, padding: 30 }), [modo, origem])
+  useFoco(cyRef, [elementos, layout], onFoco)
   return (
-    <marker id={id} viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0 10 5 0 10z" fill="#9db4d6" />
-    </marker>
-  )
-}
-
-function aparar([x1, y1], [x2, y2], r) {
-  const dx = x2 - x1
-  const dy = y2 - y1
-  const d = Math.hypot(dx, dy) || 1
-  return [x1 + (dx / d) * r, y1 + (dy / d) * r, x2 - (dx / d) * r, y2 - (dy / d) * r]
-}
-
-function No({ no, x, y, destaque, rotulo, onFoco }) {
-  const r = destaque ? 13 : 8
-  return (
-    <g onMouseEnter={() => onFoco?.(no)} onFocus={() => onFoco?.(no)} tabIndex={0} style={{ cursor: 'default' }}>
-      <title>{`${no} · ${NOME_CLASSE[classe(no)]}`}</title>
-      {destaque && <circle cx={x} cy={y} r={r + 5} fill="none" stroke="#ffffff" strokeWidth="2" />}
-      <circle cx={x} cy={y} r={r} fill={corClasse(classe(no))} stroke="#0b192f" strokeWidth="1.5" />
-      {rotulo && <text x={x} y={y + r + 15} textAnchor="middle" fontSize="11" fontWeight="600">{curto(no)}</text>}
-    </g>
-  )
-}
-
-function GrafoRecorte({ origem, nos, nivel, arcos, onFoco }) {
-  const W = 620
-  const H = 520
-  const pos = useMemo(() => layoutRadial(nos, nivel, W, H, arcos), [nos, nivel, arcos])
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Subgrafo a partir de ${origem}`}>
-      <defs><Seta id="seta-recorte" /></defs>
-      {arcos.map(([u, v], i) => {
-        if (!pos[u] || !pos[v]) return null
-        const [x1, y1, x2, y2] = aparar(pos[u], pos[v], u === origem ? 15 : 10)
-        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#5d7aa3" strokeWidth="1.2" markerEnd="url(#seta-recorte)" />
-      })}
-      {nos.map((n) => <No key={n} no={n} x={pos[n][0]} y={pos[n][1]} destaque={n === origem} rotulo={n === origem} onFoco={onFoco} />)}
-    </svg>
+    <div className="cy-palco">
+      <BarraZoom cyRef={cyRef} />
+      <div className="cy-modos" role="group" aria-label="Disposição do grafo">
+        {[['forca', 'Força'], ['arvore', 'Árvore']].map(([id, nome]) => (
+          <button key={id} type="button" className="btn zoom-btn" aria-pressed={modo === id} onClick={() => setModo(id)}>{nome}</button>
+        ))}
+      </div>
+      <Cy cyRef={cyRef} elementos={elementos} layout={layout} estilo={ESTILO_P2} altura={540} rotulo={`Rede de carteiras a partir de ${origem}`} />
+    </div>
   )
 }
 
 function GrafoCaminho({ caminho, arcos, ciclo }) {
-  const n = caminho.length
-  const W = Math.max(620, 150 * n)
-  const H = ciclo ? 300 : 220
-  const pos = {}
-  if (ciclo) {
-    // Ciclo [v0, v1, ..., v0]: carteiras distintas num círculo, a partir da esquerda.
-    const unicos = caminho.slice(0, -1)
-    const raio = unicos.length === 2 ? 170 : Math.min(W, H) / 2 - 50
-    unicos.forEach((no, i) => {
-      const a = Math.PI + (2 * Math.PI * i) / unicos.length
-      pos[no] = [W / 2 + raio * Math.cos(a), H / 2 + raio * Math.sin(a)]
-    })
-  } else {
-    caminho.forEach((no, i) => { pos[no] = [70 + (i * (W - 140)) / Math.max(n - 1, 1), H / 2] })
-  }
+  const cyRef = useRef(null)
+  const elementos = useMemo(() => {
+    const unicos = [...new Set(caminho)]
+    const els = unicos.map((no, i) => ({
+      ...noCy(no, ciclo ? '' : (i === 0 ? 'origem' : i === unicos.length - 1 ? 'extremo' : '')),
+      position: ciclo
+        ? { x: 200 * Math.cos(Math.PI + (2 * Math.PI * i) / unicos.length), y: 200 * Math.sin(Math.PI + (2 * Math.PI * i) / unicos.length) }
+        : { x: i * 170, y: 0 },
+    }))
+    arcos.forEach(([u, v, w], i) => els.push({ group: 'edges', data: { id: `c${i}`, source: u, target: v, peso: fmtBtc(w) }, classes: `peso${w < 0 ? ' negativo' : ''}` }))
+    return els
+  }, [caminho, arcos, ciclo])
+  const layout = useMemo(() => ({ name: 'preset', fit: true, padding: 60 }), [])
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ciclo ? 'Ciclo negativo' : 'Caminho mínimo'}>
-      <defs><Seta id="seta-caminho" /></defs>
-      {arcos.map(([u, v, w], i) => {
-        const [x1, y1, x2, y2] = aparar(pos[u], pos[v], 18)
-        // Com 2 carteiras os arcos de ida e volta se sobrepõem; a curva os separa
-        const curva = ciclo && arcos.length === 2 ? (i === 0 ? -80 : 80) : 0
-        const mx = (x1 + x2) / 2
-        const my = (y1 + y2) / 2 + curva
-        return (
-          <g key={i}>
-            <path d={`M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`} fill="none" stroke={w < 0 ? '#f0837a' : '#81acfa'} strokeWidth="2.5" markerEnd="url(#seta-caminho)" />
-            <text x={mx} y={(y1 + y2) / 2 + curva / 2 - 8} textAnchor="middle" fontSize="12" fontWeight="700">{fmtBtc(w)}</text>
-          </g>
-        )
-      })}
-      {Object.entries(pos).map(([no, [x, y]], i) => (
-        <No key={no} no={no} x={x} y={y} destaque={i === 0 || i === Object.keys(pos).length - 1} rotulo />
-      ))}
-    </svg>
+    <div className="cy-palco">
+      <BarraZoom cyRef={cyRef} />
+      <Cy cyRef={cyRef} elementos={elementos} layout={layout} estilo={ESTILO_P2} altura={ciclo ? 420 : 300} rotulo={ciclo ? 'Ciclo negativo' : 'Caminho mínimo'} />
+    </div>
   )
 }
 
@@ -149,7 +129,9 @@ function Legenda() {
       {['ilicito', 'licito', 'desconhecido'].map((c) => (
         <span key={c}><i style={{ background: corClasse(c) }} />{NOME_CLASSE[c]}</span>
       ))}
-      <span><i style={{ background: 'transparent', borderColor: '#fff', borderRadius: '50%' }} />origem / extremos</span>
+      <span><i className="leg-inicio" />origem</span>
+      <span><i className="leg-arco" />arco da árvore / caminho</span>
+      <span><i className="leg-arco tracejado" />outro arco do dataset</span>
     </div>
   )
 }
@@ -167,13 +149,18 @@ function Dados({ itens }) {
 function Busca({ c }) {
   const [foco, setFoco] = useState(null)
   const arcosDfs = c.dfs.contagem_arcos
+  const rede = c.rede
   return (
     <div className="p2-corpo">
       <div className="mapa-area">
-        <div className="grafo-frame"><GrafoRecorte origem={c.origem} nos={c.recorte.nos} nivel={c.recorte.nivel} arcos={c.recorte.arcos} onFoco={setFoco} /></div>
-        <p className="note" style={{ marginTop: 10 }}>
-          Recorte com a origem e {fmtInt(c.recorte.nos.length - 1)} das {fmtInt(c.tamanho_camadas[1] ?? 0)} carteiras da camada 1 da BFS
-          {c.recorte.completo ? '.' : ' (o grafo alcançado inteiro não cabe na tela).'} Passe o mouse sobre um nó para ver o endereço.
+        {rede
+          ? <GrafoRede key={c.origem} origem={c.origem} nos={rede.nos} arvore={rede.arvore} outros={rede.outros} onFoco={setFoco} />
+          : <GrafoRede key={c.origem} origem={c.origem} nos={c.recorte.nos} arvore={c.recorte.arcos} onFoco={setFoco} />}
+        <p className="note" style={{ marginTop: 14 }}>
+          {rede
+            ? <>Amostra da árvore BFS com {fmtInt(rede.nos.length)} das {fmtInt(c.alcancados)} carteiras alcançadas, em {fmtInt(Math.max(...Object.values(rede.nivel)))} camadas: linha cheia são arcos da árvore BFS e tracejado são os outros {fmtInt(rede.outros.length)} arcos do dataset entre essas carteiras. </>
+            : <>Recorte com a origem e {fmtInt(c.recorte.nos.length - 1)} carteiras da camada 1 da BFS. </>}
+          Passe o mouse ou toque num nó para ver o endereço e as conexões.
         </p>
       </div>
       <aside className="reproducao">
@@ -204,7 +191,7 @@ function Dijkstra({ c }) {
   return (
     <div className="p2-corpo">
       <div className="mapa-area">
-        <div className="grafo-frame"><GrafoCaminho caminho={c.caminho} arcos={c.arcos} /></div>
+        <GrafoCaminho caminho={c.caminho} arcos={c.arcos} />
         <p className="note" style={{ marginTop: 10 }}>Peso de cada arco: valor em BTC transferido entre as carteiras (sempre ≥ 0, por isso o Dijkstra se aplica).</p>
       </div>
       <aside className="reproducao">
@@ -225,7 +212,7 @@ function BellmanFord({ c }) {
     return (
       <div className="p2-corpo">
         <div className="mapa-area">
-          <div className="grafo-frame"><GrafoCaminho caminho={c.ciclo} arcos={c.arcos} ciclo /></div>
+          <GrafoCaminho caminho={c.ciclo} arcos={c.arcos} ciclo />
           <p className="note" style={{ marginTop: 10 }}>Ciclo negativo alcançável a partir da origem: dar uma volta no ciclo soma custo negativo, então o caminho mínimo não é definido.</p>
         </div>
         <aside className="reproducao">
@@ -240,13 +227,12 @@ function BellmanFord({ c }) {
       </div>
     )
   }
-  const prof = profundidades(c.origem, c.arcos)
-  const nos = Object.keys(prof)
+  const nos = [...new Set([c.origem, ...c.arcos.flat()])]
   const negativas = Object.entries(c.distancia).filter(([, d]) => d < 0).sort((a, b) => a[1] - b[1])
   return (
     <div className="p2-corpo">
       <div className="mapa-area">
-        <div className="grafo-frame"><GrafoRecorte origem={c.origem} nos={nos} nivel={prof} arcos={c.arcos} /></div>
+        <GrafoRede key={c.origem} origem={c.origem} nos={nos} arvore={c.arcos} layoutInicial="arvore" />
         <p className="note" style={{ marginTop: 10 }}>Árvore de caminhos mínimos devolvida pelo Bellman-Ford: cada carteira aparece ligada ao seu predecessor.</p>
       </div>
       <aside className="reproducao">

@@ -46,7 +46,8 @@ sem depender de instalação da fonte ou acesso à rede.
 - `src/util.js`: leitura dos rótulos de estado e formatação
 - `src/components/Grade.jsx`: grade do labirinto, percurso e heatmap
 - `src/components/Labirinto.jsx`: labirinto interativo com animação
-- `src/components/Parte1.jsx`: percursos, camadas do m02, árvore BFS e heatmap do m08
+- `src/components/Parte1.jsx`: percursos, grafo de estados interativo, árvore BFS e heatmap do m08
+- `src/components/GrafoEstados.jsx`: grafo de estados e árvore BFS com [Cytoscape.js](https://js.cytoscape.org/) (zoom, arrastar, layouts e destaque do percurso)
 - `src/components/Avd.jsx`: os 4 gráficos exploratórios
 - `src/App.jsx`: cabeçalho e abas
 

@@ -21,8 +21,11 @@ import pandas as pd
 RAIZ = Path(__file__).resolve().parents[1]
 RESULTADOS = RAIZ / "out" / "parte2"
 NOS = RAIZ / "data" / "dataset_parte2" / "nos.csv"
+ARESTAS = RAIZ / "data" / "dataset_parte2" / "arestas.csv"
 SAIDA = RAIZ / "front-react" / "src" / "parte2.json"
 LIMITE_NOS = 40  # máximo de carteiras desenhadas por caso de BFS/DFS
+LIMITE_REDE = 150  # carteiras na amostra em várias camadas (grafo interativo)
+FILHOS_POR_CAMADA = (8, 4, 3, 2)  # filhos escolhidos por carteira, da origem para as camadas seguintes
 
 
 def _ler(caminho: Path) -> dict:
@@ -41,6 +44,46 @@ def recorte_bfs(resultado: dict, limite: int = LIMITE_NOS) -> dict:
     arcos = [[u, v] for u, v in resultado["arvore"] if u in dentro and v in dentro]
     nivel = {no: resultado["distancia"][no] for no in nos}
     return {"nos": nos, "nivel": nivel, "arcos": arcos, "completo": len(nos) == resultado["alcancados"]}
+
+
+# [IA] Claude Code – amostra da árvore BFS em várias camadas e arcos do dataset entre as carteiras escolhidas
+def rede_bfs(resultado: dict, limite: int = LIMITE_REDE, por_pai: tuple[int, ...] = FILHOS_POR_CAMADA) -> dict:
+    """Amostra da árvore BFS que desce várias camadas: cada carteira escolhida leva poucos filhos,
+    primeiro os que também têm filhos, para o desenho mostrar a profundidade da rede e não só a camada 1."""
+    filhos: dict[str, list[str]] = {}
+    for u, v in resultado["arvore"]:
+        filhos.setdefault(u, []).append(v)
+    nos = [resultado["origem"]]
+    fronteira = list(nos)
+    camada = 0
+    while fronteira and len(nos) < limite:
+        k = por_pai[min(camada, len(por_pai) - 1)]
+        proxima = []
+        for pai in fronteira:
+            candidatos = sorted(filhos.get(pai, []), key=lambda n: -len(filhos.get(n, [])))
+            for filho in candidatos[:k]:
+                if len(nos) == limite:
+                    break
+                nos.append(filho)
+                proxima.append(filho)
+        fronteira = proxima
+        camada += 1
+    dentro = set(nos)
+    arvore = [[u, v] for u, v in resultado["arvore"] if u in dentro and v in dentro]
+    return {"nos": nos, "nivel": {no: resultado["distancia"][no] for no in nos}, "arvore": arvore}
+
+
+def arcos_entre(nos: list[str], arestas: pd.DataFrame, arvore: list[list[str]]) -> list[list[str]]:
+    """Arcos do dataset entre as carteiras da amostra que não são arcos da árvore BFS (sem repetir pares)."""
+    dentro = set(nos)
+    ja = {tuple(a) for a in arvore}
+    sel = arestas[arestas["origem"].isin(dentro) & arestas["destino"].isin(dentro)]
+    outros = []
+    for u, v in zip(sel["origem"], sel["destino"]):
+        if u != v and (u, v) not in ja:
+            ja.add((u, v))
+            outros.append([u, v])
+    return outros
 
 
 def caso_busca(bfs: dict, dfs: dict, limite: int = LIMITE_NOS) -> dict:
@@ -87,6 +130,7 @@ def carteiras_usadas(dados: dict) -> set[str]:
     nos: set[str] = set()
     for caso in dados["buscas"]:
         nos.update(caso["recorte"]["nos"])
+        nos.update(caso.get("rede", {}).get("nos", []))
     for caso in dados["dijkstra"]:
         nos.update(caso["caminho"])
     for caso in dados["bellman_ford"]:
@@ -103,7 +147,8 @@ def tempos(relatorio: list[dict]) -> list[dict]:
     return [{c: linha.get(c) for c in campos} for linha in relatorio if linha.get("fracao") == 1.0]
 
 
-def montar(pasta: Path = RESULTADOS, nos_csv: Path = NOS, limite: int = LIMITE_NOS) -> dict:
+def montar(pasta: Path = RESULTADOS, nos_csv: Path = NOS, limite: int = LIMITE_NOS,
+           arestas_csv: Path | None = ARESTAS) -> dict:
     bfs = {r["origem"]: r for r in map(_ler, sorted(pasta.glob("bfs_*.json")))}
     dfs = {r["origem"]: r for r in map(_ler, sorted(pasta.glob("dfs_*.json")))}
     if not bfs:
@@ -116,6 +161,11 @@ def montar(pasta: Path = RESULTADOS, nos_csv: Path = NOS, limite: int = LIMITE_N
         "dijkstra": [caso_dijkstra(_ler(c)) for c in sorted(pasta.glob("dijkstra_*.json"))],
         "bellman_ford": [caso_bellman_ford(_ler(c)) for c in sorted(pasta.glob("bellman_ford_*.json"))],
     }
+    if arestas_csv is not None and Path(arestas_csv).is_file():
+        arestas = pd.read_csv(arestas_csv, usecols=["origem", "destino"], dtype=str)
+        for caso in dados["buscas"]:
+            rede = rede_bfs(bfs[caso["origem"]])
+            caso["rede"] = {**rede, "outros": arcos_entre(rede["nos"], arestas, rede["arvore"])}
     relatorio = pasta / "parte2_report.json"
     dados["tempos"] = tempos(_ler(relatorio)) if relatorio.is_file() else []
 

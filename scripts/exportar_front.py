@@ -17,6 +17,7 @@ from src.viz import ler_rotulo
 RAIZ = Path(__file__).resolve().parent.parent
 ALGORITMOS = ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD")
 ORDEM = ["ilicito", "desconhecido", "licito"]
+LIMITE_GRAFO_FRONT = 600
 
 
 def dados_parte1():
@@ -40,11 +41,14 @@ def dados_parte1():
                     chave = f"{rotulo[0]},{rotulo[1]}"
                     contagem[chave] = contagem.get(chave, 0) + 1
             mapa["multiplicidade"] = contagem
-        if arquivo.stem.startswith("m02"):
+        # [IA] Claude Code – nós e arcos do grafo de estados para o visualizador interativo (Cytoscape);
+        # o m08 fica de fora por tamanho (quase 3 mil estados deixariam o JSON e o desenho pesados demais)
+        if mapa["n_estados"] <= LIMITE_GRAFO_FRONT:
             mapa["grafo"] = {
                 "nos": [no for no in grafo.nos() if no != "ALVO"],
                 "arcos": [[u, v, p] for u, v, p in grafo.arestas() if "ALVO" not in (u, v)],
             }
+        if arquivo.stem.startswith("m02"):
             bfs = resultados["BFS"]
             mapa["arvore_bfs"] = {
                 "camadas": {str(k): [n for n in v if n != "ALVO"] for k, v in bfs["camadas"].items()},

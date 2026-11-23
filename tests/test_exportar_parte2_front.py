@@ -3,7 +3,9 @@ import json
 
 import pytest
 
-from scripts.exportar_parte2_front import caso_bellman_ford, caso_busca, montar, recorte_bfs
+import pandas as pd
+
+from scripts.exportar_parte2_front import arcos_entre, caso_bellman_ford, caso_busca, montar, recorte_bfs, rede_bfs
 
 BFS = {
     "algoritmo": "BFS", "origem": "a", "total_nos": 6, "alcancados": 5,
@@ -91,3 +93,20 @@ def test_montar_com_pasta_de_exemplo(tmp_path):
 def test_montar_sem_resultados_gera_erro_claro(tmp_path):
     with pytest.raises(FileNotFoundError, match="casos_parte2"):
         montar(tmp_path, tmp_path / "nos.csv")
+
+
+# [IA] Claude Code – amostra em várias camadas e arcos extras para o grafo interativo
+def test_rede_desce_camadas_com_poucos_filhos_por_carteira():
+    rede = rede_bfs(BFS, limite=10, por_pai=(1,))
+    assert rede["nos"] == ["a", "b", "d"]
+    assert rede["arvore"] == [["a", "b"], ["b", "d"]]
+    assert rede["nivel"] == {"a": 0, "b": 1, "d": 2}
+
+
+def test_rede_respeita_o_limite():
+    assert len(rede_bfs(BFS, limite=3, por_pai=(2,))["nos"]) == 3
+
+
+def test_arcos_entre_ignora_arvore_lacos_e_repeticoes():
+    arestas = pd.DataFrame({"origem": ["a", "b", "b", "b", "d", "x"], "destino": ["b", "c", "c", "b", "a", "a"]})
+    assert arcos_entre(["a", "b", "c", "d"], arestas, [["a", "b"]]) == [["b", "c"], ["d", "a"]]
