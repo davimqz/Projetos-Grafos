@@ -151,24 +151,17 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 
 ### AVD (0,4 em Grafos + nota inteira de AVD)
 
-- [x] 4 exploratórias em `out/parte2/avd/` e seções 6.1 a 6.4 (4 pilares, faltantes e mecanismo de ausência,
-      outliers, multivariada com Spearman). No #39 a exploratória 2 virou "transações por quantidade de arestas
-      geradas", a 6.2 ganhou a tabela de outliers por classe (só limite superior no grau de saída) e a 6.4 explica o
-      peso como saldo da carteira de destino.
-- [ ] **2 explanatórias** em `out/parte2/avd/` (PR #39, falta mergear):
-  1. `explanatoria_arestas_por_transacao.png`: 84,5% das transações geram de 1 a 10 arestas, mas os 15,5% restantes
-     respondem por 84,4% das arestas. Vem da exploratória 2. Tem nota analítica e justificativa.
-  2. `explanatoria_2.png`: dot plot da proporção de arestas com peso positivo por classe do destino, lícitas em
-     verde. Vem da exploratória 4. Tem só a justificativa do gráfico.
-- [ ] Explanatória 2: escrever o que o gráfico mostra, com as porcentagens de cada classe, e o insight. Hoje a 6.6 só
-      diz por que é um dot plot.
-- [ ] Dizer na 6.6 qual das duas responde à pergunta de pesquisa e ligar isso à Parte 2 (pesos e caminhos).
-- [ ] Revisar o último parágrafo da explanatória 1 ("é uma forma de utlizar barras no eixo x,y..."), que está confuso
-      e com erro de digitação, e citar os atributos pré-atentivos pelo nome (cor, comprimento, posição).
-- [ ] Apagar o marcador `[A ESCREVER — Vagner]` da 6.6 quando fechar os itens acima.
-- [ ] Renomear `explanatoria_arestas_por_transacao.png` para `explanatoria_1.png`, para ficar no mesmo padrão.
-- [ ] Relatório 6.5: o que foi encontrado na exploração, qual história contar, por que é a mais relevante e qual
-      técnica de destaque foi usada. **Ainda não começada.**
+- [x] 4 exploratórias em `out/parte2/avd/` e seções 6.1 a 6.4. No PR #42 as exploratórias 3 e 4 viraram "carteiras
+      em algum ciclo, por classe" (116 carteiras, marcação pela BFS do grupo) e "classe das carteiras nos ciclos
+      negativos de 2 carteiras" (8 ciclos, 10 carteiras distintas).
+- [x] 2 explanatórias em `out/parte2/avd/` (PR #42): `explanatoria_1.png` (transações por quantidade de arestas,
+      renomeada) e `explanatoria_2.png` (carteiras em ciclo por classe, ligada à pergunta de pesquisa), com nota
+      analítica e justificativa na 6.6.
+- [x] Seção 6.5 escrita (da exploratória à explanatória, atributos pré-atentivos pelo nome). Marcadores
+      `[A ESCREVER — Vagner]` removidos da 6.5 e da 6.6.
+- [x] Notebook reexecutado do zero na revisão do #42: números iguais aos do relatório e figuras idênticas às
+      commitadas. Ciclos conferidos também pelas componentes fortemente conexas do scipy (mesmas 116 carteiras).
+- [ ] Ajustes de texto apontados no #42 (título da explanatória 2, pessoa verbal da 6.5). Responsável: Vagner.
 - [ ] Conferir título, legenda e eixos nas 6 figuras. Pizza e radar só com justificativa forte.
   - Responsável: Vagner (revisor: Davi). Prazo: 23/11.
   - A IA não pode escolher o gráfico, os destaques ou a história, nem interpretar os gráficos.
