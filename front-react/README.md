@@ -19,6 +19,15 @@ npm run dev
 
 Para gerar a versão final: `npm run build` (sai em `front-react/dist/`).
 
+No labirinto, **Comparar os quatro algoritmos** mostra os percursos e resultados lado a lado;
+DFS mostra o caminho da árvore de busca, não necessariamente o mínimo. **Carregar mapa .txt**
+valida o arquivo com o Python do projeto e calcula os quatro resultados. São aceitos até 16 KiB,
+2.500 casas e 8 bônus; o cálculo tem limite de 30 segundos. O mapa enviado fica apenas na
+sessão e não integra o HTML conjunto. Estas funções de envio exigem `npm run dev` ou
+`npm run preview` com Python e dependências instalados; não funcionam em hospedagem estática.
+Para publicar o site estático (Vercel), gere com `VITE_SITE_ESTATICO=1 npm run build`: o upload e os
+botões de gerar HTML somem da tela.
+
 No labirinto, **Gerar HTML deste mapa** usa o mapa e o algoritmo selecionados e grava
 `out/parte1/html/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.
 **Gerar HTML conjunto** reúne todos os mapas de `data/mapas/` e

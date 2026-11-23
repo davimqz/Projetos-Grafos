@@ -101,3 +101,12 @@ input.controle-faixa:disabled{opacity:.45;cursor:not-allowed}
 .grade-container::-webkit-scrollbar,.grafo-frame::-webkit-scrollbar,.scroll::-webkit-scrollbar{width:10px;height:10px}
 .grade-container::-webkit-scrollbar-track,.grafo-frame::-webkit-scrollbar-track,.scroll::-webkit-scrollbar-track{background:#12223a;border-radius:8px}
 .grade-container::-webkit-scrollbar-thumb,.grafo-frame::-webkit-scrollbar-thumb,.scroll::-webkit-scrollbar-thumb{background:#7897c5;border:2px solid #12223a;border-radius:8px}
+/* [IA] Codex – comparação responsiva dos percursos. */
+.comparacao-algoritmos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 20px; margin-top: 24px; }
+.comparacao-algoritmos article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 6px; }
+/* [IA] Claude Code – botão de upload no tema do site e checkbox alinhado à grade. */
+.btn-arquivo { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 42px; cursor: pointer; }
+.btn-arquivo.desativado { opacity: .6; cursor: progress; }
+.btn-arquivo:focus-within { outline: 2px solid #89aaff; outline-offset: 2px; }
+.input-arquivo { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.check-comparar { display: flex; align-items: center; gap: 8px; min-height: 42px; color: #d6e1f3; }
