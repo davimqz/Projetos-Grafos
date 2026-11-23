@@ -3,6 +3,7 @@ pandas>=2.1
 numpy>=1.26
 matplotlib>=3.8
 seaborn>=0.13
+scipy>=1.11         # correlação de Spearman no notebook da AVD (pandas corrwith)
 plotly>=5.18
 gdown>=5.1          # download do dataset Elliptic++ (Google Drive)
 pytest>=8.0
