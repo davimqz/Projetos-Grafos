@@ -25,6 +25,8 @@ valida o arquivo com o Python do projeto e calcula os quatro resultados. São ac
 2.500 casas e 8 bônus; o cálculo tem limite de 30 segundos. O mapa enviado fica apenas na
 sessão e não integra o HTML conjunto. Estas funções de envio exigem `npm run dev` ou
 `npm run preview` com Python e dependências instalados; não funcionam em hospedagem estática.
+Para publicar o site estático (Vercel), gere com `VITE_SITE_ESTATICO=1 npm run build`: o upload e os
+botões de gerar HTML somem da tela.
 
 No labirinto, **Gerar HTML deste mapa** usa o mapa e o algoritmo selecionados e grava
 `out/parte1/html/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.

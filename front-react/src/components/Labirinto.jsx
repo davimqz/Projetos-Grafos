@@ -18,6 +18,9 @@ const NOMES_MAPAS = {
   g02_poco_lateral: 'G02 · Poço lateral',
 }
 
+// [IA] Claude Code – no site estático não há Python; upload e geração de HTML ficam só no ambiente local.
+const COM_PYTHON = import.meta.env.VITE_SITE_ESTATICO !== '1'
+
 export function Labirinto() {
   const nomes = Object.keys(MAPAS)
   const [mapa, setMapa] = useState(nomes.includes('m03_tres_chaves') ? 'm03_tres_chaves' : nomes[0])
@@ -101,17 +104,21 @@ export function Labirinto() {
               {mapaEnviado && <option value="__enviado">Mapa enviado</option>}
             </select>
           </label>
-          <label className="field">Carregar mapa .txt
-            <input type="file" accept=".txt,text/plain" disabled={enviando} onChange={enviarMapa} />
-          </label>
-          {enviando && <p role="status">Processando mapa…</p>}
-          {erroMapa && <p role="alert">{erroMapa}</p>}
-          <label><input type="checkbox" checked={comparar} onChange={(ev) => setComparar(ev.target.checked)} /> Comparar os quatro algoritmos</label>
           <label className="field">Algoritmo
             <select id="sel-alg" value={alg} disabled={gerando} onChange={(ev) => setAlg(ev.target.value)}>
               {ALGORITMOS.map((a) => <option key={a} value={a}>{NOME_ALG[a]}</option>)}
             </select>
           </label>
+          {/* [IA] Claude Code – upload em botão próprio e mensagens na largura toda, sem deslocar os campos */}
+          {COM_PYTHON && <div className="field">Carregar mapa .txt
+            <label className={`btn btn-arquivo${enviando ? ' desativado' : ''}`}>
+              {enviando ? 'Processando…' : 'Escolher arquivo'}
+              <input type="file" className="input-arquivo" accept=".txt,text/plain" disabled={enviando} onChange={enviarMapa} />
+            </label>
+          </div>}
+          <label className="check-comparar"><input type="checkbox" checked={comparar} onChange={(ev) => setComparar(ev.target.checked)} /> Comparar os quatro algoritmos</label>
+          {enviando && <p className="status" role="status">Processando mapa…</p>}
+          {erroMapa && <p className="status alerta" role="alert">{erroMapa}</p>}
           <p className={temCaminho ? 'status' : 'status alerta'}>{M.status[alg]}</p>
           </div>
           <div className="reproducao">
@@ -153,7 +160,7 @@ export function Labirinto() {
         const custosAlg = M.custos?.[nome] || []
         return <article key={nome}><h3>{NOME_ALG[nome]}</h3><p>{M.status[nome]}</p><p>{percurso.length ? `${percurso.length - 1} passos · custo ${custosAlg.at(-1) ?? '—'}` : 'Sem percurso disponível'}</p><Grade grade={M.grade} caminho={percurso} /></article>
       })}</div>}
-      <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando || mapa === '__enviado'}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>
+      {COM_PYTHON && <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando || mapa === '__enviado'}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>}
     </section>
   )
 }
