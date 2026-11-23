@@ -19,6 +19,33 @@ function gerarHtmlLocal() {
   function instalar(server) {
     server.middlewares.use((req, res, next) => {
       const caminho = new URL(req.url, 'http://localhost').pathname
+      // [IA] Codex – recebe o conteúdo do mapa e usa a validação Python do projeto.
+      if (caminho === '/__grafos__/mapa') {
+        const responder = (status, mensagem) => { if (!res.writableEnded) { res.statusCode = status; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify({ erro: mensagem })) } }
+        if (req.method !== 'POST') return responder(405, 'Método não permitido.')
+        if (!req.headers.origin || req.headers.origin !== `http://${req.headers.host}` || !(req.headers['content-type'] || '').startsWith('text/plain')) return responder(403, 'Origem não autorizada.')
+        let partes = [], tamanho = 0, excedeu = false
+        req.on('data', (parte) => { tamanho += parte.length; if (tamanho > 16384) excedeu = true; else partes.push(parte) })
+        req.on('end', () => {
+          if (excedeu) return responder(413, 'O arquivo deve ter no máximo 16 KiB.')
+          const processo = spawn(python, ['-X', 'utf8', '-m', 'scripts.mapa_front'], { cwd: raiz, windowsHide: true, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } })
+          let saida = '', erro = '', expirou = false
+          const limite = setTimeout(() => { expirou = true; processo.kill() }, 30000)
+          processo.stdout.setEncoding('utf8'); processo.stderr.setEncoding('utf8')
+          processo.stdout.on('data', (p) => { saida += p })
+          processo.stderr.on('data', (p) => { erro += p.slice(0, 4000) })
+          processo.on('error', () => { clearTimeout(limite); responder(500, 'Não foi possível iniciar o Python.') })
+          processo.on('close', (codigo) => {
+            clearTimeout(limite)
+            if (expirou) return responder(408, 'O cálculo excedeu 30 segundos; tente um mapa menor.')
+            if (codigo !== 0) return responder(400, erro.trim() || 'Não foi possível processar o mapa.')
+            res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(saida)
+          })
+          processo.stdin.on('error', () => {})
+          processo.stdin.end(Buffer.concat(partes))
+        })
+        return
+      }
       if (!caminho.startsWith(prefixo)) return next()
       const nome = caminho.slice(prefixo.length)
       const responder = (status, mensagem) => { res.statusCode = status; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify({ erro: mensagem })) }

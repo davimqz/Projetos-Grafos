@@ -28,8 +28,12 @@ export function Labirinto() {
   const [gerando, setGerando] = useState(false)
   const [htmlGerado, setHtmlGerado] = useState(null)
   const [erroHtml, setErroHtml] = useState('')
+  const [mapaEnviado, setMapaEnviado] = useState(null)
+  const [enviando, setEnviando] = useState(false)
+  const [erroMapa, setErroMapa] = useState('')
+  const [comparar, setComparar] = useState(false)
 
-  const M = MAPAS[mapa]
+  const M = mapa === '__enviado' ? mapaEnviado : MAPAS[mapa]
   const caminho = M.percursos[alg] || []
   const custos = (M.custos || {})[alg] || []
   const temCaminho = caminho.length > 0
@@ -49,6 +53,22 @@ export function Labirinto() {
 
   const e = temCaminho ? lerRotulo(caminho[Math.min(passo, fim)]) : null
   const rotuloBotao = tocando ? 'Pausar' : passo >= fim && passo > 0 ? 'Recomeçar' : 'Animar'
+
+  // [IA] Codex – carrega resultados dos algoritmos existentes para um mapa escolhido.
+  async function enviarMapa(evento) {
+    const arquivo = evento.target.files?.[0]
+    evento.target.value = ''
+    if (!arquivo) return
+    if (!arquivo.name.toLowerCase().endsWith('.txt') || arquivo.size > 16384) { setErroMapa('Escolha um arquivo .txt de até 16 KiB.'); return }
+    setEnviando(true); setErroMapa('')
+    try {
+      const resposta = await fetch('/__grafos__/mapa', { method: 'POST', headers: { 'Content-Type': 'text/plain; charset=utf-8' }, body: await arquivo.text() })
+      const dados = await resposta.json()
+      if (!resposta.ok) throw new Error(dados.erro || 'Não foi possível processar o mapa.')
+      setMapaEnviado(dados); setMapa('__enviado')
+    } catch (erro) { setErroMapa(erro.message || 'Não foi possível conectar ao servidor local.') }
+    finally { setEnviando(false) }
+  }
 
   async function gerarHtml(conjunto = false) {
     setGerando(true)
@@ -78,8 +98,15 @@ export function Labirinto() {
           <label className="field">Mapa
             <select id="sel-mapa" value={mapa} disabled={gerando} onChange={(ev) => setMapa(ev.target.value)}>
               {nomes.map((n) => <option key={n} value={n}>{NOMES_MAPAS[n] || n}</option>)}
+              {mapaEnviado && <option value="__enviado">Mapa enviado</option>}
             </select>
           </label>
+          <label className="field">Carregar mapa .txt
+            <input type="file" accept=".txt,text/plain" disabled={enviando} onChange={enviarMapa} />
+          </label>
+          {enviando && <p role="status">Processando mapa…</p>}
+          {erroMapa && <p role="alert">{erroMapa}</p>}
+          <label><input type="checkbox" checked={comparar} onChange={(ev) => setComparar(ev.target.checked)} /> Comparar os quatro algoritmos</label>
           <label className="field">Algoritmo
             <select id="sel-alg" value={alg} disabled={gerando} onChange={(ev) => setAlg(ev.target.value)}>
               {ALGORITMOS.map((a) => <option key={a} value={a}>{NOME_ALG[a]}</option>)}
@@ -121,7 +148,12 @@ export function Labirinto() {
           <LegendaCasas />
         </div>
       </div>
-      <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne todos os mapas disponíveis; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>
+      {comparar && <div className="comparacao-algoritmos">{ALGORITMOS.map((nome) => {
+        const percurso = M.percursos[nome] || []
+        const custosAlg = M.custos?.[nome] || []
+        return <article key={nome}><h3>{NOME_ALG[nome]}</h3><p>{M.status[nome]}</p><p>{percurso.length ? `${percurso.length - 1} passos · custo ${custosAlg.at(-1) ?? '—'}` : 'Sem percurso disponível'}</p><Grade grade={M.grade} caminho={percurso} /></article>
+      })}</div>}
+      <div className="exportar-html"><button type="button" className="btn" onClick={() => gerarHtml(false)} disabled={gerando || mapa === '__enviado'}>Gerar HTML deste mapa</button><button type="button" className="btn" onClick={() => gerarHtml(true)} disabled={gerando}>Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>
     </section>
   )
 }

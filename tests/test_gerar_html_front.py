@@ -5,6 +5,7 @@ import json
 import pytest
 
 from scripts.gerar_html_front import ALGORITMOS, RAIZ, gerar_html, gerar_html_conjunto
+from src.solve import carregar_mapa, encontrar_armadilhas
 
 
 def test_gera_html_com_resultado_do_mapa_selecionado(tmp_path):
@@ -32,6 +33,18 @@ def test_conjunto_reune_todos_os_mapas_e_algoritmos(tmp_path):
                  for p in (RAIZ / "data" / pasta).glob("*.txt")}
     assert set(dados) == esperados
     assert all(set(mapa["algoritmos"]) == set(ALGORITMOS) for mapa in dados.values())
+
+
+# [IA] Codex – confere que o HTML recebe as armadilhas da análise da Parte 1.
+@pytest.mark.parametrize("nome", ["m04_esteiras", "m07_impossivel"])
+def test_html_inclui_armadilhas_calculadas_pelo_solve(nome, tmp_path):
+    html = gerar_html(nome, "BFS", tmp_path).read_text(encoding="utf-8")
+    dados = json.loads(html.split("const MAPAS = ", 1)[1].split(";\n", 1)[0])[nome]
+    esperado = encontrar_armadilhas(carregar_mapa(RAIZ / "data" / "mapas" / f"{nome}.txt"))
+    assert esperado
+    assert set(dados["armadilhas_estados"]) == set(esperado)
+    assert 'id="mostrarArmadilhas" checked' in html
+    assert "classes.push('trap')" in html
 
 
 @pytest.mark.parametrize("mapa, algoritmo", [("../m02_uma_chave", "BFS"), ("inexistente", "BFS"), ("m02_uma_chave", "outro")])

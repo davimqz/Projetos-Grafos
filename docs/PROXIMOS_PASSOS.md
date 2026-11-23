@@ -203,8 +203,8 @@ Pedidos da reunião que contam aqui. Não são obrigatórios, mas a professora p
 
 | # | Pedido | Situação | Responsável |
 |---|---|---|---|
-| R3 | Os 4 algoritmos ao mesmo tempo no mesmo mapa | Não começado | Thomaz |
-| R4 | Upload de `.txt` pelo front (rota do Vite que já existe, validação pelo `io.py`, erro claro) | Não começado | Thomaz |
+| R3 | Os 4 algoritmos ao mesmo tempo no mesmo mapa | Implementado no front; build e testes passaram, falta conferência visual pelo grupo | Thomaz |
+| R4 | Upload de `.txt` pelo front (rota do Vite que já existe, validação pelo `io.py`, erro claro) | Implementado no servidor local; validação e integração HTTP testadas, falta conferência visual pelo grupo | Thomaz |
 | R5 | Parte 2 no front: fontes e pares com caminho, custo, camadas e tempo | Dados prontos em `front-react/src/parte2.json` (PR #38). Falta a tela | Vagner |
 | R6 | View do grafo da Parte 2, colorida por classe | Recortes prontos no mesmo JSON. Falta a tela | Vagner |
 
@@ -284,7 +284,7 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 - [x] Mapas do grupo no `labirinto_interativo.html` — commit `5b1eba5` (revisão/PR pendentes).
 - [ ] R2: realce das armadilhas no `labirinto_interativo.html` — 22/11
 - [ ] Seções 2.4, 3, 4.8 (com Matheus) e 4.11 — 23/11
-- [ ] R3 e R4 no front — 23/11
+- [x] R3 e R4 no front — 23/11; build e testes automatizados passaram. Conferência visual pelo grupo pendente.
 - [ ] Bloco 6 do `APRESENTACAO.md`, com plano B se o front falhar — 24/11
 
 ### Vagner (P4b + P5b, revisor: Davi)
