@@ -164,14 +164,16 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
       em algum ciclo, por classe" (116 carteiras, marcação pela BFS do grupo) e "classe das carteiras nos ciclos
       negativos de 2 carteiras" (8 ciclos, 10 carteiras distintas).
 - [x] 2 explanatórias em `out/parte2/avd/` (PR #42): `explanatoria_1.png` (transações por quantidade de arestas,
-      renomeada) e `explanatoria_2.png` (carteiras em ciclo por classe, ligada à pergunta de pesquisa), com nota
+      renomeada) e `explanatoria_2.png` (carteiras em algum ciclo e em ciclo negativo de duas carteiras, por classe, com uma cor por classe; ligada à pergunta de pesquisa), com nota
       analítica e justificativa na 6.6.
 - [x] Seção 6.5 escrita (da exploratória à explanatória, atributos pré-atentivos pelo nome). Marcadores
       `[A ESCREVER — Vagner]` removidos da 6.5 e da 6.6.
 - [x] Notebook reexecutado do zero na revisão do #42: números iguais aos do relatório e figuras idênticas às
       commitadas. Ciclos conferidos também pelas componentes fortemente conexas do scipy (mesmas 116 carteiras).
-- [ ] Ajustes de texto apontados no #42 (título da explanatória 2, pessoa verbal da 6.5). Responsável: Vagner.
-- [ ] Conferir título, legenda e eixos nas 6 figuras. Pizza e radar só com justificativa forte.
+- [x] Ajustes de texto apontados no #42: explanatória 2 refeita (título, barras e nota), 6.5 e 6.6 na primeira pessoa do
+      plural, 6.1 e 6.3 sem repetição e 5.7 com a resposta "não" no recorte, igual à 6.5. Branch `Vagner`, PR a abrir.
+- [x] Conferir título, legenda e eixos nas 6 figuras (eixo vertical da explanatória 2 nomeado em 23/11). Nenhuma
+      pizza ou radar.
   - Responsável: Vagner (revisor: Davi). Prazo: 23/11.
   - A IA não pode escolher o gráfico, os destaques ou a história, nem interpretar os gráficos.
 
@@ -207,7 +209,7 @@ Pedidos da reunião que contam aqui. Não são obrigatórios, mas a professora p
 |---|---|---|---|
 | R3 | Os 4 algoritmos ao mesmo tempo no mesmo mapa | Na `main` (#43), conferido visualmente na revisão | Thomaz |
 | R4 | Upload de `.txt` pelo front (rota do Vite que já existe, validação pelo `io.py`, erro claro) | Na `main` (#43), conferido visualmente na revisão | Thomaz |
-| R5 | Parte 2 no front: fontes e pares com caminho, custo, camadas e tempo | Aba "Rede de carteiras" na branch `davi-entrega`, falta revisão do Vagner | Davi (revisor: Vagner) |
+| R5 | Parte 2 no front: fontes e pares com caminho, custo, camadas e tempo | Aba "Rede de carteiras" na `main` (#44), revisada pelo Vagner | Davi (revisor: Vagner) |
 | R6 | View do grafo da Parte 2, colorida por classe | Na mesma aba: subgrafo de cada caso colorido por classe | Davi (revisor: Vagner) |
 
 ## R1: o que a CLI precisa fazer
@@ -248,8 +250,6 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 | 4.9 | Matheus | Método e contagem das armadilhas |
 | 4.10 | Matheus | Desenho e gabarito dos mapas do grupo |
 | 4.11 | Thomaz | Figuras com legenda e uma frase cada |
-| 6.5 | Vagner | Da exploratória à explanatória (não começada) |
-| 6.6 | Vagner | Quase pronta no #39. Falta o insight da explanatória 2, a pergunta de pesquisa e apagar o marcador |
 | 7 | Davi | Contagem de testes na véspera |
 | 8 | Todos | Limitações da Parte 1 (a da Parte 2 já está escrita) |
 | 9 | Todos | Conclusões |
@@ -293,10 +293,10 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 
 ### Vagner (P4b + P5b, revisor: Davi)
 - [x] 2 explanatórias geradas (PR #39)
-- [ ] Ajustes da 6.6 pedidos acima (insight da explanatória 2, pergunta de pesquisa, texto da explanatória 1) — 22/11
-- [ ] Seção 6.5 — 23/11
+- [x] Ajustes da 6.6 pedidos acima (insight da explanatória 2, pergunta de pesquisa, texto da explanatória 1)
+- [x] Seção 6.5
 - [ ] Seção 2.5 (frase e captura do front) — 23/11
-- [ ] Revisar a aba "Rede de carteiras" (R5/R6) feita pelo Davi na branch `davi-entrega` — 24/11
+- [x] Revisar a aba "Rede de carteiras" (R5/R6) feita pelo Davi (#44, mergeado)
 - [ ] Bloco 10 do `APRESENTACAO.md` — 24/11
 
 ### Davi (P4a + P5c)

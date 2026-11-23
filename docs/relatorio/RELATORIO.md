@@ -600,13 +600,13 @@ O Bellman-Ford acrescentou uma dimensão importante à investigação ao permiti
 
 A análise desse ciclo revelou que uma de suas integrantes é classificada como lícita, embora apresente saldo fortemente negativo. Além disso, o custo acumulado da estrutura é dominado por um valor extremo, o que exige cautela na interpretação de sua magnitude. Esse resultado demonstra que comportamentos identificados pela métrica de saldo não são exclusivos de carteiras classificadas como ilícitas.
 
-Considerando a pergunta de pesquisa, os resultados não permitem afirmar que carteiras ilícitas participam mais frequentemente de ciclos de repasse do que carteiras lícitas. A identificação de um único ciclo negativo, alcançável por origens de diferentes classificações, não é suficiente para estabelecer essa relação. Também é necessário distinguir entre alcançar uma estrutura cíclica e participar diretamente dela, uma vez que as origens utilizadas nas execuções não integram o ciclo identificado.
+Considerando a pergunta de pesquisa, no recorte analisado a resposta é não. O Bellman-Ford só encontra os ciclos negativos alcançáveis a partir da origem escolhida, e por isso as execuções mostraram um único ciclo. Ao procurar ciclos no grafo inteiro (seção 6.4), encontramos 116 carteiras em algum ciclo, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita, e 8 ciclos negativos de duas carteiras, também sem nenhuma carteira ilícita. Como nenhuma carteira ilícita participa de ciclo algum, nenhuma pode participar de um ciclo negativo, enquanto carteiras lícitas participam dos dois.
 
 Por fim, devem ser consideradas as limitações metodológicas da investigação. O recorte utilizado apresenta viés de seleção, pois foi construído a partir de carteiras previamente identificadas, não representando necessariamente a distribuição real das classes na rede completa. Além disso, a quantidade reduzida de pares analisados pelo Dijkstra e de origens utilizadas pelo Bellman-Ford limita a generalização dos resultados.
 
 Outra limitação está relacionada aos pesos empregados nos algoritmos. No Dijkstra, o valor integral das transações foi utilizado como peso, não representando necessariamente o montante efetivamente transferido entre cada par de carteiras. No Bellman-Ford, a utilização do saldo das carteiras como peso permite identificar ciclos negativos segundo a definição adotada, mas valores extremos podem influenciar significativamente os custos acumulados.
 
-Portanto, o trabalho contribui para compreender as relações de conectividade, os caminhos de circulação e a existência de estruturas compatíveis com ciclos de repasse entre carteiras. Entretanto, a hipótese de que carteiras ilícitas participam mais frequentemente dessas estruturas do que carteiras lícitas permanece inconclusiva, sendo necessária uma investigação com maior quantidade de origens, destinos e ciclos identificados para sustentar essa afirmação.
+Portanto, o trabalho contribui para compreender as relações de conectividade, os caminhos de circulação e a existência de estruturas compatíveis com ciclos de repasse entre carteiras. No recorte analisado, a hipótese de que carteiras ilícitas participam mais dessas estruturas do que carteiras lícitas não se confirma: as ilícitas não participam de nenhum ciclo. Estender essa resposta para a rede Bitcoin inteira exigiria um recorte que não partisse apenas de carteiras ilícitas e mais origens no Bellman-Ford.
 
 ---
 
@@ -642,17 +642,7 @@ Em resumo, a média sozinha pode dar uma impressão errada sobre esses dados, po
 
 #### Relacional
 
-No BTC recebido, as medianas das carteiras desconhecidas e ilícitas são próximas, 0,0049 e 0,0047 BTC. Nas lícitas, a mediana é 0 BTC. No BTC enviado, as desconhecidas têm mediana de 0,0099 BTC, contra 0,0051 BTC nas outras duas classes, e o intervalo entre o primeiro e o terceiro quartil também é maior entre elas.
-
-O tempo de vida tem mediana de 1 bloco nas ilícitas e desconhecidas e 0 blocos nas lícitas. As janelas de atividade têm mediana de 1 nas três classes, e tanto o primeiro quanto o terceiro quartil também ficam em 1. No grau de saída, a mediana é 1 aresta nas três classes. Nas lícitas, o primeiro quartil é 0 e o terceiro é 1. Nas outras duas classes, ambos são 1.
-
-A mediana da taxa é maior nas ilícitas (0,0321 BTC) do que nas desconhecidas (0,0035 BTC) e lícitas (0,0039 BTC). A mediana de transações é 2 nas ilícitas e desconhecidas e 1 nas lícitas. O saldo mediano é −0,0016 BTC nas lícitas e 0 nas outras classes. O grau de entrada mediano é 1 nas ilícitas e 0 nas desconhecidas e lícitas.
-
 Na matriz de Spearman, BTC recebido e enviado têm correlação de 0,07, e tempo de vida e janelas de atividade têm correlação de 0,42. As taxas têm correlação de −0,03 com BTC recebido, −0,12 com BTC enviado e 0,40 com o número de transações. Comparando com BTC recebido e enviado, nessa ordem, os coeficientes são −0,25 e 0,55 para o grau de saída e 0,48 e −0,33 para o grau de entrada. O saldo tem correlação de −0,49 com o BTC enviado, o que faz sentido porque o valor enviado é subtraído no cálculo do saldo.
-
-Para comparar classe e atributos, usamos 0 para lícita e 1 para ilícita. As carteiras desconhecidas ficam fora desse cálculo. O Spearman mede se valores maiores de um atributo tendem a acompanhar valores maiores ou menores do outro. Pelo valor absoluto, chamamos a associação de fraca abaixo de 0,30, moderada de 0,30 até abaixo de 0,50 e forte a partir de 0,50. A taxa teve associação forte e positiva (0,511). O número de transações (0,487) e o tempo de vida (0,427) tiveram associações moderadas e positivas. As outras seis foram fracas. Entre os nove atributos, só janelas de atividade teve sinal negativo (−0,101).
-
-O Spearman resume a tendência de subir ou descer. Para ver a forma da relação, olhamos as proporções por faixa. Entre as carteiras rotuladas, 55,0% são ilícitas (5.208 de 9.469). No BTC recebido, a proporção vai de 44,8% na faixa mais baixa para 84,5% na intermediária e cai para 45,9% na mais alta. São três faixas porque o mínimo e o primeiro quartil coincidem em zero. No BTC enviado, a proporção chega a 81,7% na penúltima faixa e cai para 47,8% na última. Nos dois casos, as proporções por faixa sobem e depois caem, um padrão que uma reta não descreve bem. Essa leitura vale para as faixas observadas.
 
 Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os totais de BTC e taxas e o tempo de vida vêm do histórico do endereço registrado no Elliptic++.
 
@@ -708,15 +698,9 @@ O tempo de vida tem mediana de 1 bloco nas ilícitas e desconhecidas e 0 blocos 
 
 A mediana da taxa é maior nas ilícitas (0,0321 BTC) do que nas desconhecidas (0,0035 BTC) e lícitas (0,0039 BTC). A mediana de transações é 2 nas ilícitas e desconhecidas e 1 nas lícitas. O saldo mediano é −0,0016 BTC nas lícitas e 0 nas outras classes. O grau de entrada mediano é 1 nas ilícitas e 0 nas desconhecidas e lícitas.
 
-Na matriz de Spearman, BTC recebido e enviado têm correlação de 0,07, e tempo de vida e janelas de atividade têm correlação de 0,42. As taxas têm correlação de −0,03 com BTC recebido, −0,12 com BTC enviado e 0,40 com o número de transações. Comparando com BTC recebido e enviado, nessa ordem, os coeficientes são −0,25 e 0,55 para o grau de saída e 0,48 e −0,33 para o grau de entrada. O saldo tem correlação de −0,49 com o BTC enviado, o que faz sentido porque o valor enviado é subtraído no cálculo do saldo.
-
 Para comparar classe e atributos, usamos 0 para lícita e 1 para ilícita. As carteiras desconhecidas ficam fora desse cálculo. O Spearman mede se valores maiores de um atributo tendem a acompanhar valores maiores ou menores do outro. Pelo valor absoluto, chamamos a associação de fraca abaixo de 0,30, moderada de 0,30 até abaixo de 0,50 e forte a partir de 0,50. A taxa teve associação forte e positiva (0,511). O número de transações (0,487) e o tempo de vida (0,427) tiveram associações moderadas e positivas. As outras seis foram fracas. Entre os nove atributos, só janelas de atividade teve sinal negativo (−0,101).
 
 O Spearman resume a tendência de subir ou descer. Para ver a forma da relação, olhamos as proporções por faixa. Entre as carteiras rotuladas, 55,0% são ilícitas (5.208 de 9.469). No BTC recebido, a proporção vai de 44,8% na faixa mais baixa para 84,5% na intermediária e cai para 45,9% na mais alta. São três faixas porque o mínimo e o primeiro quartil coincidem em zero. No BTC enviado, a proporção chega a 81,7% na penúltima faixa e cai para 47,8% na última. Nos dois casos, as proporções por faixa sobem e depois caem, um padrão que uma reta não descreve bem. Essa leitura vale para as faixas observadas.
-
-Os graus de entrada e saída contam apenas as 25.111 arestas do recorte. Já os totais de BTC e taxas e o tempo de vida vêm do histórico do endereço registrado no Elliptic++.
-
-Das 5.424 arestas que saem de carteiras ilícitas, 5.208 (96,0%) chegam a outras ilícitas. Para as carteiras lícitas e desconhecidas, as arestas se distribuem de forma mais equilibrada entre as três classes de destino.
 
 ### 6.4 Visualizações exploratórias
 
@@ -758,17 +742,17 @@ Escolhemos barras verticais porque é uma forma simples de mostrar as classes da
 
 ### 6.5 Da exploratória à explanatória
 
-**Explanatória 1.** Primeiro, fiz a análise exploratória do gráfico 2, que mostra o número de transações por quantidade de arestas geradas. A partir desse gráfico, decidi fazer uma análise explanatória mais aprofundada. Juntei as faixas de 1 a 10 arestas, que concentram um número alto de transações: 84,5%. Depois, juntei as faixas de 11 a 1000 arestas, que são o resto, com 15,5% das transações, e decidi ver quantas arestas isso representava: 84,4% do total. Então, dá para ver claramente que muitas transações geram poucas arestas, enquanto poucas transações geram a maior parte das arestas.
+**Explanatória 1.** Primeiro, fizemos a análise exploratória do gráfico 2, que mostra o número de transações por quantidade de arestas geradas. A partir desse gráfico, decidimos fazer uma análise explanatória mais aprofundada. Juntamos as faixas de 1 a 10 arestas, que concentram um número alto de transações: 84,5%. Depois, juntamos as faixas de 11 a 1000 arestas, que são o resto, com 15,5% das transações, e decidimos ver quantas arestas isso representava: 84,4% do total. Então, dá para ver claramente que muitas transações geram poucas arestas, enquanto poucas transações geram a maior parte das arestas.
 
 Essa mensagem é importante porque mostra que ter muitas transações não significa, necessariamente, ter um número alto de arestas, que são as ligações entre carteiras. Da mesma forma, ter poucas transações não significa ter poucas arestas. No recorte, a maior parte das transações gera poucas ligações entre carteiras, enquanto uma pequena parte das transações gera a maior parte dessas ligações.
 
-Para destacar essa mensagem, usei a cor como atributo pré-atentivo: as faixas de 1 a 10 arestas ficaram em azul e as de 11 a 1000 em vermelho, para mostrar a discrepância entre os dois grupos. O comprimento das barras mostra a quantidade de transações de cada faixa. A posição também foi usada: ao lado das barras, com a mesma cor delas, ficou a frase que explica o que cada grupo representa. O título traz a mensagem principal: um número alto de transações não quer dizer um alto número de transferências.
+Para destacar essa mensagem, usamos a cor como atributo pré-atentivo: as faixas de 1 a 10 arestas ficaram em azul e as de 11 a 1000 em vermelho, para mostrar a discrepância entre os dois grupos. O comprimento das barras mostra a quantidade de transações de cada faixa. A posição também foi usada: ao lado das barras, com a mesma cor delas, ficou a frase que explica o que cada grupo representa. O título traz a mensagem principal: um número alto de transações não quer dizer um alto número de transferências.
 
-**Explanatória 2.** Nessa segunda análise, juntei dois gráficos exploratórios distintos, o 3 e o 4. No gráfico 3, o principal achado foi quantas carteiras participam de ciclos: 83 lícitas e 0 ilícitas. No gráfico 4, vimos que, entre as carteiras em ciclo, há 8 ciclos negativos de 2 carteiras, com 8 carteiras lícitas participando deles.
+**Explanatória 2.** Nessa segunda análise, juntamos dois gráficos exploratórios distintos, o 3 e o 4. No gráfico 3, o principal achado foi quantas carteiras participam de ciclos: 83 lícitas e 0 ilícitas. No gráfico 4, vimos que, entre as carteiras em ciclo, há 8 ciclos negativos de 2 carteiras, com 8 carteiras lícitas participando deles.
 
 Essa é a explanatória que responde à pergunta de pesquisa: carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas? Com esses dois gráficos, conseguimos perceber que, no recorte analisado, a resposta é não. As carteiras ilícitas não participam de nenhum ciclo, e por isso também não participam de ciclos negativos, enquanto as carteiras lícitas participam de ciclos e também de ciclos negativos.
 
-Para destacar essa mensagem, usei a cor como atributo pré-atentivo, com uma cor diferente para cada classe, para deixar clara a diferença entre elas. A altura das barras mostra a diferença entre 0 ilícitas e 83 lícitas em ciclos. O título, em letra maior, traz a mensagem principal, e o texto em negrito, posicionado acima das barras, destaca que 8 carteiras lícitas participam de ciclos negativos. As carteiras desconhecidas foram retiradas para manter o foco na comparação entre lícitas e ilícitas.
+Para destacar essa mensagem, usamos a cor como atributo pré-atentivo: cada classe tem uma cor, com tom claro para as carteiras em pelo menos um ciclo de qualquer tipo e tom cheio para as que estão em pelo menos um ciclo negativo de duas carteiras. O comprimento das barras mostra a diferença entre 0 ilícitas e 83 lícitas em ciclos. O título, em letra maior, traz a mensagem principal, e o subtítulo destaca que 8 das 83 carteiras lícitas em ciclos participam de ciclos negativos.
 
 ### 6.6 Visualizações explanatórias
 
@@ -784,15 +768,15 @@ Lembrando que uma aresta é a ligação de uma carteira para outra carteira, e u
 
 Esse gráfico foi feito em barras horizontais, uma forma de usar barras nos eixos x e y que consideramos útil para esse dado. As partes principais foram coloridas de azul e vermelho para mostrar a discrepância entre elas. O título foi usado para mostrar que um número alto de transações não quer dizer um alto número de transferências. Ao lado das barras, com a mesma cor delas, foi posta a frase que explica o que cada grupo representa.
 
-As faixas foram escolhidas porque assim é possível pegar de forma espaçada os múltiplos de 10, indo até 10, depois até 100 e depois até 1000, além de separar faixas importantes com muitos valores individuais, que são 1 e 2. Depois, juntamos as faixas de 1 a 10 contra o resto, pois as transações com 1 a 10 arestas são 84,5% do total de transações. Contudo, o resto das transações gera 84,4% do total de arestas. Esse foi o dado que achei importante mostrar, por isso destaquei as faixas de 1 a 10 arestas.
+As faixas foram escolhidas porque assim é possível pegar de forma espaçada os múltiplos de 10, indo até 10, depois até 100 e depois até 1000, além de separar faixas importantes com muitos valores individuais, que são 1 e 2. Depois, juntamos as faixas de 1 a 10 contra o resto, pois as transações com 1 a 10 arestas são 84,5% do total de transações. Contudo, o resto das transações gera 84,4% do total de arestas. Esse foi o dado que achamos importante mostrar, por isso destacamos as faixas de 1 a 10 arestas.
 
-#### Explanatória 2: nenhuma carteira ilícita faz ciclos negativos
+#### Explanatória 2: nenhuma carteira ilícita aparece nos ciclos observados
 
-![Nenhuma carteira ilícita faz ciclos negativos no recorte](../../out/parte2/avd/explanatoria_2.png)
+![Nenhuma carteira ilícita aparece nos ciclos observados. Há carteiras lícitas em ciclos negativos.](../../out/parte2/avd/explanatoria_2.png)
 
-O gráfico mostra dois fatos tirados das análises exploratórias 3 e 4. É um gráfico de barras com cores distintas para cada classe, para deixar clara a diferença entre elas. O título, em letra maior, traz a mensagem principal: nenhuma carteira ilícita faz ciclos negativos no recorte. As barras comparam as carteiras ilícitas (0) com as lícitas (83) que participam de algum ciclo, e o texto em negrito destaca que 8 carteiras lícitas participam de ciclos negativos. As carteiras desconhecidas foram retiradas porque não são o foco da comparação.
+O gráfico mostra dois fatos tirados das análises exploratórias 3 e 4. O título, em letra maior, traz a mensagem principal: nenhuma carteira ilícita aparece nos ciclos observados, e há carteiras lícitas em ciclos negativos. Cada classe tem uma cor. A barra em tom claro mostra quantas carteiras estão em pelo menos um ciclo de qualquer tipo (83 lícitas, 33 desconhecidas e 0 ilícitas), e a barra em tom cheio mostra quantas delas estão em pelo menos um ciclo negativo de duas carteiras (8 lícitas, 2 desconhecidas e 0 ilícitas). O subtítulo destaca que, das 83 carteiras lícitas em ciclos, 8 participam de pelo menos um ciclo negativo de duas carteiras.
 
-Escolhi o gráfico de barras porque é simples de visualizar o 0 em relação ao 83. O insight extraído é que as carteiras lícitas participam de ciclos, e alguns deles são negativos, enquanto as ilícitas não participam de ciclo algum.
+Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos distintos: o primeiro é estar em pelo menos um ciclo de qualquer tipo, e o segundo é estar em um ciclo negativo entre duas carteiras. Com isso, mostramos que nenhuma carteira ilícita aparece nos ciclos observados e que há carteiras lícitas em ciclos negativos. O insight extraído é que as carteiras lícitas participam de ciclos, e alguns deles são negativos, enquanto as ilícitas não participam de ciclo algum.
 
 ---
 
