@@ -1,4 +1,4 @@
-# O que falta para terminar o projeto (atualizado em 21/11/2026)
+# O que falta para terminar o projeto (atualizado em 23/11/2026)
 
 Este arquivo é a lista oficial do que falta. Cada item da rubrica e do enunciado aparece com o que já existe, o que
 falta, o critério para considerar pronto, o responsável e o prazo. Quando um item for concluído, marque `[x]` e
@@ -17,50 +17,59 @@ e [reunião de 19/11](referencias/REUNIAO_2026-11-19.md). Roteiro da apresentaç
 Na apresentação a professora entrega um **mapa surpresa** e o grupo roda o próprio código no terminal e interpreta a
 saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o grupo.
 
-## Situação em 21/11
+## Situação em 23/11
 
-- `pytest`: 553 testes passando na última execução local desta branch em 21/11/2026.
-- PRs mergeados até aqui: 37. Aberto: #38 (roteiro e dados da Parte 2 para o front).
-- Branches `matheus`, `thomaz` e `vagner-front` não têm nada além da `main`.
-- `pytest`: 515 testes passando na `main`.
-- PRs mergeados até aqui: 38 (o #38 trouxe o roteiro e o `parte2.json` do front). Aberto: **#39 do Vagner**
-  (exploratória 2 refeita, explanatórias 1 e 2, tabela de outliers por classe na 6.2), esperando revisão do Davi.
-- Branches `matheus`, `thomaz`, `vagner-front` e `vagner-labirinto` não têm nada além da `main`. Matheus e Thomaz
-  ainda não subiram nada desde a reunião de 19/11.
-- O relatório tem **23 marcadores** `[A ESCREVER]`/`[COMPLETAR]`: 11 na Parte 1 (seção 4), 4 no manual e na
-  implementação (2.2, 2.4, 2.5, 3), 2 na AVD (6.5 e 6.6), 5 de fechamento (7, 8, 9, 10.2, 11) e a nota do topo. O #39
-  já preenche boa parte da 6.6, mas o marcador continua lá.
-- `python -m scripts.gerar_pdf` já gera o PDF e lista os marcadores que faltam.
-- Nesta branch, os dois mapas do grupo, seus gabaritos TXT e a integração ao HTML/React estão no commit
-  `5b1eba5`. Foram verificados com 157 testes selecionados, build do React e geração das cinco figuras P5a.
-  Revisão por Thomaz e integração na `main` permanecem pendentes; ainda não há número de PR registrado aqui.
-- CLI R1 implementada nesta branch: exportações completas, armadilhas automáticas, figuras/HTML compartilhando
-  resultados e resumo ao final. Fluxo conferido nos dez mapas e nos cinco mapas de treino, incluindo o inválido.
-  Falta a revisão por Davi em outra máquina. As saídas geradas pelo usuário foram organizadas por tipo em
-  `out/parte1/csv/`, `json/`, `figuras/` e `html/`, com a mesma estrutura em `fonte_consumivel/`.
-- Conferido de novo no repositório na tarde de 21/11:
-  - `out/parte1/` só tem as 5 figuras e o HTML. Nenhum CSV ou JSON da Parte 1 está commitado.
-  - `data/mapas_grupo/` continua só com o `.gitkeep`.
-  - `src/cli.py` não mudou: `--mapa` chama só `gerar_mapa`, `--armadilhas` ainda exige `--arquivo-armadilhas` e
-    nada chama `executar_parte1`.
-  - O front não tem tela da Parte 2 (nenhum componente lê `parte2.json`), nem upload de `.txt`, nem os 4 algoritmos
-    lado a lado.
-  - `docs/DECLARACAO_IA.pdf` não existe.
-  - `APRESENTACAO.md` tem 7 blocos `[A PREENCHER]`: 2, 3, 4, 5 e 9 (Matheus), 6 (Thomaz) e 10 (Vagner).
+- `pytest`: 572 testes passando e 5 `xfail` na branch `davi-entrega` (os `xfail` são formatos de arquivo que a
+  leitura ainda recusa, ver "Achados" abaixo). Na `main`: 558 passando.
+- PRs mergeados até aqui: 43. Entraram desde 21/11: #41 (R1, mapas do grupo, saídas da Parte 1 e benchmark),
+  #42 (AVD: exploratórias de ciclos, explanatória 2 e seção 6.5) e #43 (R3 e R4 no front).
+- **R1 revisado pelo Davi em 23/11**, em outra máquina: os 4 mapas de treino válidos batem com o gabarito de
+  `data/mapas_treino/README.md` e o inválido dá erro claro. As 57 saídas commitadas em `out/parte1/csv` e `json` são
+  idênticas ao que a CLI gera hoje (a única diferença é a quebra de linha). Os comandos da Parte 2 do enunciado
+  (`--dataset ... --source --target`) funcionam, e o JSON gerado é igual ao commitado.
+- **R2 conferido:** no `labirinto_interativo.html` o m07 mostra as 16 casas-armadilha realçadas e o m04 recebe os
+  4 estados; o checkbox "Mostrar armadilhas" liga e desliga o realce.
+- **R5/R6 feitos na branch `davi-entrega`:** aba "Rede de carteiras" no front, com as 3 fontes de BFS/DFS, os 5 pares do
+  Dijkstra e os 2 casos do Bellman-Ford, o subgrafo de cada caso colorido pela classe da carteira e a tabela de tempo e
+  memória. Build passando.
+- Declaração de IA: rascunho em `docs/declaracao/` (modelo da professora recebido em 23/11). Falta preencher
+  matrículas, grupo, versões das ferramentas, a reflexão e assinar.
+- Relatório: **21 marcadores**. O que cada um precisa escrever, com fontes e critério de pronto, está em
+  [`relatorio/GUIA_RELATORIO.md`](relatorio/GUIA_RELATORIO.md). As tabelas da seção 4 saem prontas de
+  `python -m scripts.tabelas_relatorio_parte1`.
+- `APRESENTACAO.md` continua com os blocos `[A PREENCHER]`; a apresentação fica para depois do acompanhamento de 24/11.
+
+## Achados do teste do mapa surpresa (23/11)
+
+Testes feitos com 37 arquivos novos (formatos de arquivo e casos de borda) e mapas grandes gerados. Nenhum deu
+traceback. Os casos que funcionam viraram testes em `tests/test_mapa_surpresa.py`.
+
+| # | Achado | Impacto amanhã | Dono | O que fazer |
+|---|---|---|---|---|
+| 1 | Arquivo com BOM UTF-8 (Bloco de Notas antigo) é recusado: "Símbolo inválido '﻿'" | Médio | Matheus | Abrir com `encoding="utf-8-sig"` em `io.py` |
+| 2 | Linha em branco no fim ou no meio do arquivo é recusada: "A linha N está vazia" | **Alto**: é comum ao salvar um `.txt` | Matheus | Ignorar linhas vazias em `ler_mapa` |
+| 3 | Espaço ou tab no fim da linha é recusado | Médio | Matheus | Decidir se remove o espaço do fim da linha (`rstrip`) |
+| 4 | Comentário com espaço antes do `;` não é reconhecido | Baixo | Matheus | Testar `linha.lstrip().startswith(";")` |
+| 5 | Arquivo em latin-1 dá erro de codec em inglês | Baixo | Matheus | Capturar `UnicodeDecodeError` com mensagem em português |
+| 6 | **Bellman-Ford com ciclo negativo faz as V−1 passadas completas.** O m08 com uma fonte `*` leva 8 s, mas um mapa 31×71 aberto com 4 chaves e uma `*` (25 mil estados) passou de 10 minutos | Médio: só em mapa grande **com** `*` | Thomaz | Parar quando uma passada inteira não relaxa nada já existe; falta detectar o ciclo antes (por exemplo, checar a cada passada se algum nó entrou em ciclo pelos predecessores). Sem `*`, o mesmo mapa roda inteiro em 4 s |
+| 7 | BFS mostra custo com `.0` (`custo=24.0`) e os outros sem | Cosmético | Matheus | Formatar igual no resumo |
+| 8 | Na Parte 2, a CLI só diz "Resultado gravado em ..." | Baixo | Davi | Imprimir custo e caminho no terminal, se der tempo |
+
+Os itens 1 a 5 ficam em `io.py`, que pela regra da professora a IA não pode escrever, e o 6 fica em `algorithms.py`,
+pelo mesmo motivo. Os testes `xfail` passam a XPASS quando forem corrigidos.
+
+**Plano B para amanhã**, se o arquivo da professora for recusado: abrir no VS Code, apagar linhas em branco do fim,
+salvar como "UTF-8" (sem BOM) e rodar de novo. Se o mapa for grande e tiver `*`, rodar com `--alg BFS` ou
+`--alg DIJKSTRA` primeiro e deixar o Bellman-Ford por último.
 
 ## Riscos agora
 
-1. **Matheus concentra o caminho crítico.** R1, mapas do grupo, saídas da Parte 1 e 11 dos 23 marcadores do relatório
-   dependem dele, inclusive a demonstração ao vivo, que vale 0,4 e é o momento de maior risco da apresentação. Nada
-   dele entrou desde 19/11. Precisa dizer hoje (21/11) no grupo o que consegue entregar até 22/11 à noite. Se o R1 não
-   estiver na `main` até lá, o grupo divide o R1 no dia 23 (por exemplo: Davi faz as armadilhas automáticas e os
-   acentos, Matheus faz a orquestração com `executar_parte1`).
-2. **Thomaz sem entrega desde 18/11.** O R2 (armadilhas no HTML) é obrigatório. R3 e R4 são bônus e saem antes do R2
-   se faltar tempo.
-3. **Declaração de IA.** Sem ela o projeto leva zero, e ainda falta o modelo da professora. Pedir hoje por e-mail ou
-   Classroom, sem esperar o dia 24.
-4. **Conflitos de merge.** O #39 e o #40 mexem no fim do `REGISTRO_IA.md`. Mergear o #39 primeiro e atualizar o #40
-   em seguida.
+1. **Relatório da Parte 1.** 15 dos 21 marcadores são do Matheus e do Thomaz, e o cronograma previa as seções 4.x para
+   hoje. Combinar no grupo quem escreve o quê até 24/11 à noite, usando o guia.
+2. **Declaração.** Sem as 4 assinaturas o projeto leva zero. Matrículas e versões até 24/11; assinatura até 25/11.
+3. **Pontos de IA para decidir** (ver o fim do guia): saídas geradas por agente, que o enunciado proíbe, e mapas do
+   grupo sugeridos pelo Codex. A saída mais simples para as saídas é um de nós rodar os comandos e commitar.
+4. **Leitura do mapa surpresa** (achado 2): uma linha em branco no fim do arquivo derruba a demonstração.
 
 ## O que zera nota se faltar
 
@@ -130,7 +139,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [x] `percurso_m03.png`, `percurso_m08.png`, `camadas_m02.png`, `arvore_bfs_m02.png` e `heatmap_m08.png`.
 - [x] `labirinto_interativo.html` com escolha de mapa e algoritmo, passo a passo, controle de velocidade e troca de
       camada.
-- [ ] **Realce dos estados-armadilha no HTML (R2).** Os geradores já recebem as armadilhas calculadas pelo código.
+- [x] **Realce dos estados-armadilha no HTML (R2).** Conferido em 23/11 (m07 com 16 casas realçadas). Os geradores já recebem as armadilhas calculadas pelo código.
       O HTML da entrega já contém esses dados; falta conferir o realce visual com Thomaz.
   - Pronto quando: abrir m04 e m07 no HTML e ver as armadilhas marcadas.
 - [x] Mapas do grupo incluídos no HTML e na seleção do React (commit `5b1eba5`, revisão/PR pendentes).
@@ -173,7 +182,7 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 | Participação nos acompanhamentos | 0,5 | Ir ao de 24/11 com progresso real. Cada um precisa saber reportar qualquer pacote | Todos | 24/11 |
 | Clareza da apresentação | 0,3 | Slides a partir do roteiro, preencher os blocos `[A PREENCHER]` do `APRESENTACAO.md` e ensaiar com cronômetro (15 a 20 min) | Davi (slides), dono de cada bloco | 24/11 |
 | Domínio conceitual | 0,5 | Cada um estuda as partes que não fez e responde por escrito as perguntas previstas no roteiro | Todos | 25/11 |
-| Demonstração ao vivo (mapa surpresa) | 0,4 | **R1** implementado e verificado localmente com os mapas de treino. Falta revisão por Davi em outra máquina e ensaio do grupo | Matheus | 22/11 |
+| Demonstração ao vivo (mapa surpresa) | 0,4 | **R1** na `main` (#41) e revisado pelo Davi em 23/11. Falta corrigir a leitura (achados 1 a 5) e ensaiar | Matheus | 22/11 |
 | Participação equilibrada | 0,3 | Todos já têm commits em 2 ou mais pacotes. Atualizar a matriz da seção 10.2 na véspera | Davi | 25/11 |
 
 Regras da professora: falas divididas ("cada um fala da sua parte") ou leitura mecânica têm redução severa de nota. Se
@@ -196,10 +205,10 @@ Pedidos da reunião que contam aqui. Não são obrigatórios, mas a professora p
 
 | # | Pedido | Situação | Responsável |
 |---|---|---|---|
-| R3 | Os 4 algoritmos ao mesmo tempo no mesmo mapa | Implementado no front; build e testes passaram, falta conferência visual pelo grupo | Thomaz |
-| R4 | Upload de `.txt` pelo front (rota do Vite que já existe, validação pelo `io.py`, erro claro) | Implementado no servidor local; validação e integração HTTP testadas, falta conferência visual pelo grupo | Thomaz |
-| R5 | Parte 2 no front: fontes e pares com caminho, custo, camadas e tempo | Dados prontos em `front-react/src/parte2.json` (PR #38). Falta a tela | Vagner |
-| R6 | View do grafo da Parte 2, colorida por classe | Recortes prontos no mesmo JSON. Falta a tela | Vagner |
+| R3 | Os 4 algoritmos ao mesmo tempo no mesmo mapa | Na `main` (#43), conferido visualmente na revisão | Thomaz |
+| R4 | Upload de `.txt` pelo front (rota do Vite que já existe, validação pelo `io.py`, erro claro) | Na `main` (#43), conferido visualmente na revisão | Thomaz |
+| R5 | Parte 2 no front: fontes e pares com caminho, custo, camadas e tempo | Aba "Rede de carteiras" na branch `davi-entrega`, falta revisão do Vagner | Davi (revisor: Vagner) |
+| R6 | View do grafo da Parte 2, colorida por classe | Na mesma aba: subgrafo de cada caso colorido por classe | Davi (revisor: Vagner) |
 
 ## R1: o que a CLI precisa fazer
 
@@ -217,7 +226,7 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 - [x] `--todos-mapas` gera tudo de `data/mapas/` e `data/mapas_grupo/`; `--mapas` aceita uma lista de arquivos.
 - [x] Testado com os mapas de `data/mapas_treino/`: estados, arcos, armadilhas, passos BFS e custo/status do BF
       conferidos com o gabarito do README da pasta.
-- [ ] Revisado por Davi rodando a CLI numa máquina diferente da do Matheus.
+- [x] Revisado por Davi rodando a CLI numa máquina diferente da do Matheus (23/11).
 
 ## Marcadores do relatório
 
@@ -262,7 +271,8 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 
 ### Matheus (P1 + P3, revisor: Thomaz)
 - [x] Implementação do R1 e verificação local dos oito critérios técnicos — 21/11
-- [ ] R1: revisão por Davi em outra máquina e integração na `main` — 22/11
+- [x] R1: revisão por Davi em outra máquina e integração na `main` (#41, revisado em 23/11)
+- [ ] Corrigir a leitura de arquivos em `io.py` (achados 1 a 5 de 23/11) — 24/11, antes da aula
 - [x] 2 mapas do grupo com gabaritos TXT — commit `5b1eba5` (revisão/PR pendentes).
 - [ ] Conferência final dos mapas/gabaritos pelo grupo e revisão por Thomaz — 22/11
 - [x] Saídas de `out/parte1/` versionadas nesta branch, organizadas por tipo, incluindo a variante consumível.
@@ -275,7 +285,8 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 
 ### Thomaz (P2 + P5a, revisor: Matheus)
 - [x] Mapas do grupo no `labirinto_interativo.html` — commit `5b1eba5` (revisão/PR pendentes).
-- [ ] R2: realce das armadilhas no `labirinto_interativo.html` — 22/11
+- [x] R2: realce das armadilhas no `labirinto_interativo.html` (conferido em 23/11)
+- [ ] Bellman-Ford parar ao detectar ciclo negativo (achado 6 de 23/11) — 24/11
 - [ ] Seções 2.4, 3, 4.8 (com Matheus) e 4.11 — 23/11
 - [x] R3 e R4 no front — 23/11; build e testes automatizados passaram. Conferência visual pelo grupo pendente.
 - [ ] Bloco 6 do `APRESENTACAO.md`, com plano B se o front falhar — 24/11
@@ -285,15 +296,16 @@ do R1 depende ainda da revisão por Davi em outra máquina.
 - [ ] Ajustes da 6.6 pedidos acima (insight da explanatória 2, pergunta de pesquisa, texto da explanatória 1) — 22/11
 - [ ] Seção 6.5 — 23/11
 - [ ] Seção 2.5 (frase e captura do front) — 23/11
-- [ ] R5 e R6 lendo `front-react/src/parte2.json` — 23/11
+- [ ] Revisar a aba "Rede de carteiras" (R5/R6) feita pelo Davi na branch `davi-entrega` — 24/11
 - [ ] Bloco 10 do `APRESENTACAO.md` — 24/11
 
 ### Davi (P4a + P5c)
 - [x] Mergear o PR #38
-- [ ] Revisar o PR #39 do Vagner (conferir as porcentagens da 6.2 e da 6.6 com o notebook) — 22/11
-- [ ] Pedir à professora o modelo da declaração de IA — hoje (21/11)
-- [ ] Cobrar no grupo o que Matheus e Thomaz entregam até 22/11 e combinar o plano B do R1 — hoje (21/11)
-- [ ] Revisar o R1 rodando os mapas de treino — 22/11
+- [x] Revisar os PRs #39 e #42 do Vagner
+- [x] Modelo da declaração de IA recebido e rascunho preenchido em `docs/declaracao/` (23/11)
+- [ ] Mandar no grupo o guia do relatório e a divisão das seções — 23/11
+- [x] Revisar o R1 rodando os mapas de treino e 37 arquivos novos (23/11)
+- [x] R5/R6: aba da Parte 2 no front (branch `davi-entrega`)
 - [ ] Slides a partir do roteiro — 24/11
 - [ ] Revisar os PRs de Vagner (P4b/P5b)
 - [ ] README final, seções 7 e 10.2, revisão da Parte 2, apagar a nota do esqueleto — 25/11
