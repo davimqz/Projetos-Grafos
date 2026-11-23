@@ -26,9 +26,17 @@ def main():
                           "n_arcos": grafo.tamanho()}, ensure_ascii=False))
 
 
-if __name__ == "__main__":
+# [IA] Claude Code – erro inesperado vira mensagem curta, sem traceback na tela.
+def cli():
     try:
         main()
     except (ValueError, UnicodeError) as erro:
         print(str(erro), file=sys.stderr)
         sys.exit(2)
+    except Exception as erro:  # noqa: BLE001
+        print(f"Erro interno ao processar o mapa ({type(erro).__name__}).", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    cli()
