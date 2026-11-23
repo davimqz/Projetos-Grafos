@@ -222,8 +222,10 @@ jupyter notebook notebooks/avd/01_exploratoria.ipynb
 
 ## Front-end em React (extra)
 
-Versão extra, fora do que o enunciado pede, com o labirinto interativo, as figuras da Parte 1 e os gráficos
-exploratórios da AVD. Precisa do Node.js.
+Versão extra, fora do que o enunciado pede, com o labirinto interativo (os quatro algoritmos lado a lado e upload de
+`.txt`), as figuras da Parte 1, a aba "Rede de carteiras" da Parte 2 (fontes, pares, ciclo negativo e subgrafo colorido
+pela classe da carteira) e os gráficos exploratórios da AVD. Precisa do Node.js. A aba da Parte 2 aceita link direto
+para um caso, como `?p2=dijkstra&caso=1#parte2` ou `?p2=bellman_ford&caso=0#parte2`.
 
 ```bash
 python -m scripts.exportar_front   # gera front-react/src/dados.json com os resultados do código do grupo
@@ -240,6 +242,7 @@ Detalhes em [`front-react/README.md`](front-react/README.md).
 ```bash
 python -m scripts.gerar_pdf                         # docs/relatorio/RELATORIO.md -> docs/relatorio/RELATORIO.pdf
 python -m scripts.matriz_contribuicao --revisoes    # tabelas da seção 10.2 (commits por pacote e PRs revisados)
+python -m scripts.tabelas_relatorio_parte1          # tabelas das seções 4.4 a 4.10, lidas de out/parte1/ (ou: ... 4.8)
 ```
 
 O PDF é impresso pelo Chrome ou pelo Edge em modo headless, com as figuras embutidas. Se nenhum dos dois estiver no

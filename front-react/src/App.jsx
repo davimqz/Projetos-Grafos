@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react'
 import { Labirinto } from './components/Labirinto.jsx'
 import { Parte1 } from './components/Parte1.jsx'
 import { Avd } from './components/Avd.jsx'
+// [IA] Claude Code – aba da Parte 2 (R5/R6)
+import { Parte2 } from './components/Parte2.jsx'
 
-const ABAS = [['labirinto', 'Labirinto', 'Explore os percursos'], ['parte1', 'Grafos e mapas', 'Figuras da Parte 1'], ['avd', 'Análise de dados', 'AVD · Parte 2']]
+const ABAS = [['labirinto', 'Labirinto', 'Explore os percursos'], ['parte1', 'Grafos e mapas', 'Figuras da Parte 1'], ['parte2', 'Rede de carteiras', 'Algoritmos · Parte 2'], ['avd', 'Análise de dados', 'AVD · Parte 2']]
 
 function lerAba() {
   const h = window.location.hash.slice(1)
@@ -37,6 +39,7 @@ export default function App() {
       <main className="wrap">
         {aba === 'labirinto' && <Labirinto />}
         {aba === 'parte1' && <Parte1 />}
+        {aba === 'parte2' && <Parte2 />}
         {aba === 'avd' && <Avd />}
       </main>
     </>
