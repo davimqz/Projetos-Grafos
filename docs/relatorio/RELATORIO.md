@@ -734,55 +734,65 @@ Esse gráfico foi escolhido pois dá para ter uma boa visualização de quão pr
 
 O gráfico mostra quantas arestas cada transação gera, em um total de 2.555 transações. Dessas, 1.569 (61,4%) geram apenas uma aresta e 55 (2,2%) geram de 101 a 1.000 arestas. Além disso, 2.159 transações geram de 1 a 10 arestas, o que dá 84,5% do total.
 
-Esse gráfico é importante, pois é possível perceber quantas arestas há em cada transação, e com as barras horizontais dá para ver isso de forma clara.
+Esse gráfico é importante, pois é possível perceber quantas arestas há em cada transação, e com as barras horizontais dá para ver isso de forma clara. Inclusive, as transações com 1 aresta são mais numerosas do que todas as outras juntas.
 
 Vale ressaltar que transações diferentes podem gerar a mesma aresta de uma carteira A para uma carteira B. Nessa situação, essas arestas são contadas de forma individual em cada transação.
 
-#### Exploratória 3: para qual classe vão as arestas de cada classe
+#### Exploratória 3: carteiras em algum ciclo, por classe
 
-![Para qual classe vão as arestas de cada classe](../../out/parte2/avd/exploratoria_3.png)
+![Carteiras em algum ciclo, por classe](../../out/parte2/avd/exploratoria_3.png)
 
-O gráfico mostra para quais classes vão as arestas que saem de cada tipo de carteira. As carteiras ilícitas se conectam principalmente com outras ilícitas: 96% das suas arestas chegam nessa mesma classe. Já as carteiras desconhecidas e lícitas distribuem suas conexões de forma mais equilibrada entre as três classes, com valores próximos de um terço para cada uma. Isso mostra uma forte concentração das conexões entre carteiras ilícitas.
+O gráfico mostra quantas carteiras de cada classe pertencem a algum ciclo, em um total de 116 carteiras. Com isso, podemos ver que as carteiras lícitas (83) pertencem a mais ciclos do que as desconhecidas (33), e que nenhuma carteira ilícita pertence a algum ciclo.
 
-Esse gráfico foi escolhido pois é de fácil visualização perceber o quanto as outras carteiras vão para distintas carteiras de forma quase igual entre elas, e a carteira ilícita vai praticamente apenas para a carteira ilícita.
+Escolhemos o gráfico de barras verticais porque ele é melhor para ver a diferença entre a quantidade de carteiras de cada classe que pertencem a algum ciclo.
 
-#### Exploratória 4: sinal do peso das arestas, pela classe do destino
+#### Exploratória 4: classe das carteiras nos ciclos negativos de 2 carteiras
 
-![Sinal do peso das arestas, pela classe do destino](../../out/parte2/avd/exploratoria_4.png)
+![Classe das carteiras nos ciclos negativos de 2 carteiras](../../out/parte2/avd/exploratoria_4.png)
 
-O gráfico mostra o sinal do peso das arestas de acordo com a classe da carteira de destino. Nas carteiras ilícitas, predominam os pesos zero, mas também há uma quantidade relevante de pesos positivos e negativos. Nas carteiras desconhecidas, os pesos positivos são maioria, seguidos pelos pesos zero e negativos. Já nas carteiras lícitas, uma grande maioria tem peso positivo, com poucos casos de peso zero ou negativo. Portanto, os pesos positivos aparecem principalmente nas carteiras lícitas, enquanto os pesos negativos são mais comuns nas carteiras ilícitas e desconhecidas.
+O gráfico mostra a classe das carteiras que participam dos 8 ciclos negativos de 2 carteiras. Um ciclo de 2 carteiras é o caso em que A envia para B e B envia de volta para A. Ele é negativo quando a soma dos pesos das duas arestas, ou seja, o saldo de B mais o saldo de A, é menor que zero. É isso que está sendo testado.
 
-É importante ressaltar que o peso de uma aresta é o saldo da carteira de destino, ou seja, o total recebido menos o total enviado. Caso uma carteira receba um total de 30 bitcoins de 5 carteiras e envie 50 bitcoins para outra carteira, o saldo dela é −20, e as 5 arestas que chegam nela ficam com peso negativo.
+Podemos ver que há carteiras em ciclos negativos nas classes lícita (8) e desconhecida (2), e nenhuma na ilícita. Como as carteiras ilícitas não participam de nenhum ciclo, como foi visto na visualização anterior, elas também não podem participar de um ciclo negativo.
 
-Esse gráfico foi escolhido pois é de fácil visualização ver o peso de cada aresta dependendo do tipo: com as barras agrupadas, dá para ver os sinais entre as classes.
+Escolhemos barras verticais porque é uma forma simples de mostrar as classes das carteiras e de dar prioridade à quantidade de carteiras de cada classe que participam de ciclos negativos.
 
 ### 6.5 Da exploratória à explanatória
 
-> **[A ESCREVER — Vagner]** O que foi encontrado na exploração, qual história contar, por que é a mais relevante e
-> qual técnica de destaque foi usada.
+**Explanatória 1.** Primeiro, fiz a análise exploratória do gráfico 2, que mostra o número de transações por quantidade de arestas geradas. A partir desse gráfico, decidi fazer uma análise explanatória mais aprofundada. Juntei as faixas de 1 a 10 arestas, que concentram um número alto de transações: 84,5%. Depois, juntei as faixas de 11 a 1000 arestas, que são o resto, com 15,5% das transações, e decidi ver quantas arestas isso representava: 84,4% do total. Então, dá para ver claramente que muitas transações geram poucas arestas, enquanto poucas transações geram a maior parte das arestas.
+
+Essa mensagem é importante porque mostra que ter muitas transações não significa, necessariamente, ter um número alto de arestas, que são as ligações entre carteiras. Da mesma forma, ter poucas transações não significa ter poucas arestas. No recorte, a maior parte das transações gera poucas ligações entre carteiras, enquanto uma pequena parte das transações gera a maior parte dessas ligações.
+
+Para destacar essa mensagem, usei a cor como atributo pré-atentivo: as faixas de 1 a 10 arestas ficaram em azul e as de 11 a 1000 em vermelho, para mostrar a discrepância entre os dois grupos. O comprimento das barras mostra a quantidade de transações de cada faixa. A posição também foi usada: ao lado das barras, com a mesma cor delas, ficou a frase que explica o que cada grupo representa. O título traz a mensagem principal: um número alto de transações não quer dizer um alto número de transferências.
+
+**Explanatória 2.** Nessa segunda análise, juntei dois gráficos exploratórios distintos, o 3 e o 4. No gráfico 3, o principal achado foi quantas carteiras participam de ciclos: 83 lícitas e 0 ilícitas. No gráfico 4, vimos que, entre as carteiras em ciclo, há 8 ciclos negativos de 2 carteiras, com 8 carteiras lícitas participando deles.
+
+Essa é a explanatória que responde à pergunta de pesquisa: carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas? Com esses dois gráficos, conseguimos perceber que, no recorte analisado, a resposta é não. As carteiras ilícitas não participam de nenhum ciclo, e por isso também não participam de ciclos negativos, enquanto as carteiras lícitas participam de ciclos e também de ciclos negativos.
+
+Para destacar essa mensagem, usei a cor como atributo pré-atentivo, com uma cor diferente para cada classe, para deixar clara a diferença entre elas. A altura das barras mostra a diferença entre 0 ilícitas e 83 lícitas em ciclos. O título, em letra maior, traz a mensagem principal, e o texto em negrito, posicionado acima das barras, destaca que 8 carteiras lícitas participam de ciclos negativos. As carteiras desconhecidas foram retiradas para manter o foco na comparação entre lícitas e ilícitas.
 
 ### 6.6 Visualizações explanatórias
 
 #### Explanatória 1: número de transações por quantidade de arestas geradas
 
-![Número de transações alto não significa um alto número de transferências entre carteiras](../../out/parte2/avd/explanatoria_arestas_por_transacao.png)
+![Número de transações alto não significa um alto número de transferências entre carteiras](../../out/parte2/avd/explanatoria_1.png)
 
-O gráfico mostra que 84,5% das transações geram de 1 a 10 arestas. Contudo, os 15,5% restantes, que geram de 11 a 1000 arestas, respondem por 84,4% do total de arestas (21.520 de 25.487).
+O gráfico que nasce da análise exploratória 2 mostra que 84,5% das transações geram de 1 a 10 arestas. Contudo, os 15,5% restantes, que geram de 11 a 1000 arestas, respondem por 84,4% do total de arestas (21.520 de 25.487).
 
 Dá para perceber pelo gráfico duas coisas. Primeiro, a grande maioria das transações ocorre com poucas arestas saindo dela. Segundo, as transações com maior número de arestas, mesmo sendo poucas, somam a maior parte do total de arestas.
 
 Lembrando que uma aresta é a ligação de uma carteira para outra carteira, e uma transação é composta por várias dessas ligações.
 
-Esse gráfico foi escolhido em barras horizontais, pois é uma forma de utlizar barras no eixo x,y, também foi considerado útil por no eixo x,y esse gráfico, e as partes principais foram coloridas de azul e vermelho para mostrar a discrepância entre elas. O título foi usado para mostrar que um número alto de transações não quer dizer um alto número de transferências. Ao lado das barras, com a mesma cor delas, foi posta a frase que explica o que cada grupo representa.
+Esse gráfico foi feito em barras horizontais, uma forma de usar barras nos eixos x e y que consideramos útil para esse dado. As partes principais foram coloridas de azul e vermelho para mostrar a discrepância entre elas. O título foi usado para mostrar que um número alto de transações não quer dizer um alto número de transferências. Ao lado das barras, com a mesma cor delas, foi posta a frase que explica o que cada grupo representa.
 
-#### Explanatória 2: proporção de arestas com peso positivo por classe do destino
+As faixas foram escolhidas porque assim é possível pegar de forma espaçada os múltiplos de 10, indo até 10, depois até 100 e depois até 1000, além de separar faixas importantes com muitos valores individuais, que são 1 e 2. Depois, juntamos as faixas de 1 a 10 contra o resto, pois as transações com 1 a 10 arestas são 84,5% do total de transações. Contudo, o resto das transações gera 84,4% do total de arestas. Esse foi o dado que achei importante mostrar, por isso destaquei as faixas de 1 a 10 arestas.
 
-![Carteiras lícitas tendem a ser mais positivas do que os outros tipos de carteira](../../out/parte2/avd/explanatoria_2.png)
+#### Explanatória 2: nenhuma carteira ilícita faz ciclos negativos
 
-Escolhi o dot plot porque ele é uma boa forma de apresentar que as carteiras lícitas tendem a ser mais positivas do que as outras. Deixei a bola das lícitas pintada de verde, diferente das outras, para destacar essa classe e deixar claro qual é ela.
+![Nenhuma carteira ilícita faz ciclos negativos no recorte](../../out/parte2/avd/explanatoria_2.png)
 
-> **[A ESCREVER — Vagner]** Explanatórias 1 e 2, com a nota analítica e a justificativa do tipo de gráfico, dos
-> elementos exibidos e dos atributos pré-atentivos. Indicar qual responde à pergunta de pesquisa.
+O gráfico mostra dois fatos tirados das análises exploratórias 3 e 4. É um gráfico de barras com cores distintas para cada classe, para deixar clara a diferença entre elas. O título, em letra maior, traz a mensagem principal: nenhuma carteira ilícita faz ciclos negativos no recorte. As barras comparam as carteiras ilícitas (0) com as lícitas (83) que participam de algum ciclo, e o texto em negrito destaca que 8 carteiras lícitas participam de ciclos negativos. As carteiras desconhecidas foram retiradas porque não são o foco da comparação.
+
+Escolhi o gráfico de barras porque é simples de visualizar o 0 em relação ao 83. O insight extraído é que as carteiras lícitas participam de ciclos, e alguns deles são negativos, enquanto as ilícitas não participam de ciclo algum.
 
 ---
 
