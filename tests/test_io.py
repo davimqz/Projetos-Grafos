@@ -114,7 +114,9 @@ def test_ler_mapa_remove_quebras_e_comentarios(tmp_path, conteudo, esperado):
     [
         pytest.param("", "grade.*vazia", id="arquivo-vazio"),
         pytest.param("; comentário\n", "grade.*vazia", id="apenas-comentarios"),
-        pytest.param("SG\n\n", "linha 1.*vazia", id="linha-em-branco"),
+        pytest.param(
+            "SG\n\nSG\n", "linha vazia antes", id="linha-em-branco-no-meio"
+        ),
         pytest.param(
             "SSG\n", "exatamente um 'S'.*\\(0, 1\\)", id="propaga-validacao"
         ),
@@ -131,12 +133,7 @@ def test_ler_mapa_rejeita_conteudo_invalido(tmp_path, conteudo, mensagem):
     "conteudo, simbolo, posicao",
     [
         pytest.param(" SG\n", " ", "(0, 0)", id="espaco-inicial"),
-        pytest.param("SG \n", " ", "(0, 2)", id="espaco-final"),
         pytest.param("\tSG\n", "\t", "(0, 0)", id="tabulacao-inicial"),
-        pytest.param("SG\t\n", "\t", "(0, 2)", id="tabulacao-final"),
-        pytest.param(
-            " ; comentário\nSG\n", " ", "(0, 0)", id="comentario-indentado"
-        ),
     ],
 )
 def test_ler_mapa_preserva_espacos_e_tabulacoes_para_validacao(
@@ -149,6 +146,25 @@ def test_ler_mapa_preserva_espacos_e_tabulacoes_para_validacao(
 
     assert repr(simbolo) in str(erro.value)
     assert posicao in str(erro.value)
+
+
+# [IA] Claude Code – casos ajustados à leitura atual do io.py (fim de linha, linhas vazias no fim, BOM).
+@pytest.mark.parametrize(
+    "conteudo, esperado",
+    [
+        pytest.param("SG \n", ["SG"], id="espaco-final"),
+        pytest.param("SG\t\n", ["SG"], id="tabulacao-final"),
+        pytest.param("SG\n\n", ["SG"], id="linhas-vazias-no-fim"),
+        pytest.param(" ; comentário\nSG\n", ["SG"], id="comentario-indentado"),
+        pytest.param("﻿SG\n", ["SG"], id="utf8-com-bom"),
+    ],
+)
+def test_ler_mapa_ignora_fim_de_linha_e_linhas_vazias_finais(
+    tmp_path, conteudo, esperado
+):
+    caminho = _escrever_mapa(tmp_path, conteudo)
+
+    assert ler_mapa(caminho) == esperado
 
 
 def test_ler_mapa_desconsidera_comentarios_nas_coordenadas_do_erro(tmp_path):
@@ -182,11 +198,11 @@ def test_ler_mapa_propaga_erro_de_permissao(tmp_path, monkeypatch):
     assert erro.value is falha
 
 
-def test_ler_mapa_propaga_erro_de_utf8(tmp_path):
+def test_ler_mapa_converte_erro_de_utf8_em_mensagem_clara(tmp_path):
     caminho = tmp_path / "mapa.txt"
     caminho.write_bytes(b"; coment\xffrio\nSG\n")
 
-    with pytest.raises(UnicodeDecodeError):
+    with pytest.raises(ValueError, match="UTF-8"):
         ler_mapa(caminho)
 
 
