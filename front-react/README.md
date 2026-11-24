@@ -27,6 +27,8 @@ sessão e não integra o HTML conjunto. Estas funções de envio exigem `npm run
 `npm run preview` com Python e dependências instalados; não funcionam em hospedagem estática.
 Para publicar o site estático (Vercel), gere com `VITE_SITE_ESTATICO=1 npm run build`: o upload e os
 botões de gerar HTML somem da tela.
+Na Vercel isso já está no `vercel.json` da raiz do repositório (instala e compila em `front-react/` e publica
+`front-react/dist`), então não é preciso configurar nada no painel.
 
 No labirinto, **Gerar HTML deste mapa** usa o mapa e o algoritmo selecionados e grava
 `out/parte1/html/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.
