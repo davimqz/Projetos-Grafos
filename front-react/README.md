@@ -19,7 +19,9 @@ npm run dev
 
 Para gerar a versão final: `npm run build` (sai em `front-react/dist/`).
 
-No labirinto, **Comparar os quatro algoritmos** mostra os percursos e resultados lado a lado;
+No labirinto, **Comparar os quatro algoritmos** substitui a visualização individual por quatro
+painéis lado a lado, cada um com anterior/próximo, animação, posição, velocidade e estado próprios.
+Em telas menores, role horizontalmente para ver os quatro painéis. Desmarcar retorna ao modo individual.
 DFS mostra o caminho da árvore de busca, não necessariamente o mínimo. **Adicionar labirinto**
 abre um formulário para colar o conteúdo de um TXT e dar um nome opcional ao mapa.
 **Validar e adicionar** usa a validação Python do projeto e calcula BFS, DFS, Dijkstra e Bellman-Ford;

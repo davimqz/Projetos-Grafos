@@ -2,12 +2,13 @@
 // [IA] Codex – organização dos controles, navegação pelo percurso e apresentação
 // [IA] Codex - indicação da pasta organizada de saída do HTML.
 import { useEffect, useState } from 'react'
-import { ALGORITMOS, MAPAS, NOME_ALG, fmtInt, lerRotulo } from '../util.js'
-import { Grade, LegendaCasas } from './Grade.jsx'
+import { ALGORITMOS, MAPAS, NOME_ALG } from '../util.js'
+import { LegendaCasas } from './Grade.jsx'
 // [IA] Claude Code – ícones e estado de carregamento nos botões (design system brutalista)
 import { Icone } from './Icone.jsx'
 // [IA] Codex – inclusão por texto e coleção persistente de labirintos locais.
 import { AdicionarLabirinto } from './AdicionarLabirinto.jsx'
+import { PercursoLabirinto } from './PercursoLabirinto.jsx'
 import { lerMapasLocais, salvarMapasLocais } from '../mapasLocais.js'
 
 const NOMES_MAPAS = {
@@ -30,9 +31,6 @@ export function Labirinto() {
   const nomes = Object.keys(MAPAS)
   const [mapa, setMapa] = useState(nomes.includes('m03_tres_chaves') ? 'm03_tres_chaves' : nomes[0])
   const [alg, setAlg] = useState('DIJKSTRA')
-  const [passo, setPasso] = useState(0)
-  const [tocando, setTocando] = useState(false)
-  const [vel, setVel] = useState(5)
   const [gerando, setGerando] = useState(false)
   const [htmlGerado, setHtmlGerado] = useState(null)
   const [erroHtml, setErroHtml] = useState('')
@@ -42,25 +40,7 @@ export function Labirinto() {
   const [comparar, setComparar] = useState(false)
 
   const M = mapasAdicionados[mapa] || MAPAS[mapa]
-  const caminho = M.percursos[alg] || []
-  const custos = (M.custos || {})[alg] || []
-  const temCaminho = caminho.length > 0
-  const fim = caminho.length - 1
-
-  useEffect(() => { setPasso(0); setTocando(false); setHtmlGerado(null); setErroHtml('') }, [mapa, alg])
-  useEffect(() => {
-    if (!tocando) return undefined
-    const t = setInterval(() => {
-      setPasso((p) => {
-        if (p >= fim) { setTocando(false); return p }
-        return p + 1
-      })
-    }, 1000 / vel)
-    return () => clearInterval(t)
-  }, [tocando, vel, fim])
-
-  const e = temCaminho ? lerRotulo(caminho[Math.min(passo, fim)]) : null
-  const rotuloBotao = tocando ? 'Pausar' : passo >= fim && passo > 0 ? 'Recomeçar' : 'Animar'
+  useEffect(() => { setHtmlGerado(null); setErroHtml('') }, [mapa, alg])
 
   // [IA] Codex – texto colado e arquivo usam a mesma validação e os quatro algoritmos existentes.
   async function adicionarMapa(texto, nome) {
@@ -112,10 +92,7 @@ export function Labirinto() {
         <span className="section-label">PARTE 1</span><h2>Labirinto interativo</h2>
         <p className="note">Escolha o mapa e o algoritmo e acompanhe o percurso passo a passo. A cor do caminho muda a cada chave coletada.</p>
       </header>
-      {COM_PYTHON && <AdicionarLabirinto adicionar={adicionarMapa} enviando={enviando} />}
-      <div className="lab">
-        <div className="side">
-          <div className="selecao">
+      <div className="selecao">
           <label className="field">Mapa
             <select id="sel-mapa" value={mapa} disabled={gerando} onChange={(ev) => setMapa(ev.target.value)}>
               {nomes.map((n) => <option key={n} value={n}>{NOMES_MAPAS[n] || n}</option>)}
@@ -123,7 +100,7 @@ export function Labirinto() {
             </select>
           </label>
           <label className="field">Algoritmo
-            <select id="sel-alg" value={alg} disabled={gerando} onChange={(ev) => setAlg(ev.target.value)}>
+            <select id="sel-alg" value={alg} disabled={gerando || comparar} onChange={(ev) => setAlg(ev.target.value)}>
               {ALGORITMOS.map((a) => <option key={a} value={a}>{NOME_ALG[a]}</option>)}
             </select>
           </label>
@@ -135,49 +112,16 @@ export function Labirinto() {
             </label>
           </div>}
           <label className="check-comparar"><input type="checkbox" checked={comparar} onChange={(ev) => setComparar(ev.target.checked)} /> Comparar os quatro algoritmos</label>
+          {COM_PYTHON && <AdicionarLabirinto adicionar={adicionarMapa} enviando={enviando} />}
           {enviando && <p className="status" role="status">Processando mapa…</p>}
           {erroMapa && <p className="status alerta" role="alert">{erroMapa}</p>}
-          <p className={temCaminho ? 'status' : 'status alerta'}>{M.status[alg]}</p>
-          </div>
-          <div className="reproducao">
-          <h3>Acompanhar percurso</h3>
-          <div className="btns">
-            <button className="btn" disabled={!temCaminho || passo === 0}
-              onClick={() => { setTocando(false); setPasso((p) => Math.max(0, p - 1)) }}><Icone nome="anterior" />Anterior</button>
-            <button className="btn primary" disabled={!temCaminho}
-              onClick={() => { if (passo >= fim) setPasso(0); setTocando(!tocando) }}><Icone nome={tocando ? 'pause' : passo >= fim && passo > 0 ? 'reiniciar' : 'play'} />{rotuloBotao}</button>
-            <button className="btn" disabled={!temCaminho || passo === fim}
-              onClick={() => { setTocando(false); setPasso((p) => Math.min(fim, p + 1)) }}>Próximo<Icone nome="proximo" /></button>
-          </div>
-          <label className="field">Posição no percurso: {temCaminho ? `${passo} de ${fim}` : 'indisponível'}
-            <input className="controle-faixa" type="range" min="0" max={Math.max(0, fim)} value={Math.min(passo, Math.max(0, fim))} disabled={!temCaminho} style={{ '--progresso': `${fim > 0 ? (passo / fim) * 100 : 0}%` }} onChange={(ev) => { setTocando(false); setPasso(Number(ev.target.value)) }} />
-          </label>
-          <label className="field">Velocidade: {vel} passos/s
-            <input className="controle-faixa" id="vel" type="range" min="1" max="20" value={vel} style={{ '--progresso': `${((vel - 1) / 19) * 100}%` }} onChange={(ev) => setVel(Number(ev.target.value))} />
-          </label>
-          {e && (
-            <dl className="state">
-              <div><dt>Passo</dt><dd>{passo} / {fim}</dd></div>
-              <div><dt>Custo</dt><dd>{custos[passo] ?? '—'}</dd></div>
-              <div><dt>Posição</dt><dd>({e.l}, {e.c})</dd></div>
-              <div><dt>Chaves</dt><dd>{e.chaves || 'nenhuma'}</dd></div>
-              <div className="wide"><dt>Bônus usados</dt><dd>{e.bonus.length ? e.bonus.join(', ') : 'nenhum'}</dd></div>
-            </dl>
-          )}
-          <p className="note">{fmtInt(M.n_estados)} estados e {fmtInt(M.n_arcos)} arcos no grafo de estados.</p>
-          </div>
-        </div>
-        <div className="mapa-area" style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
-          <Grade grade={M.grade} caminho={caminho} passo={temCaminho ? passo : null} duracao={tocando && passo > 0 ? 1000 / vel : 0} />
-          <div className="path-legend"><span><i className="current-marker" /> posição atual</span><span><i className="path-marker" /> caminho percorrido</span></div>
-          <LegendaCasas />
-        </div>
       </div>
-      {comparar && <div className="comparacao-algoritmos">{ALGORITMOS.map((nome) => {
-        const percurso = M.percursos[nome] || []
-        const custosAlg = M.custos?.[nome] || []
-        return <article key={nome}><h3>{NOME_ALG[nome]}</h3><p>{M.status[nome]}</p><p>{percurso.length ? `${percurso.length - 1} passos · custo ${custosAlg.at(-1) ?? '—'}` : 'Sem percurso disponível'}</p><Grade grade={M.grade} caminho={percurso} /></article>
-      })}</div>}
+      {comparar ? <>
+        <div className="comparacao-algoritmos" role="region" aria-label="Comparação dos quatro algoritmos" tabIndex={0}>
+          {ALGORITMOS.map((nome) => <PercursoLabirinto key={`${mapa}-${nome}`} M={M} alg={nome} comparacao />)}
+        </div>
+        <LegendaCasas />
+      </> : <PercursoLabirinto key={`${mapa}-${alg}`} M={M} alg={alg} />}
       {COM_PYTHON && <div className="exportar-html"><button type="button" className="btn primary" aria-busy={gerando} onClick={() => gerarHtml(false)} disabled={gerando || Boolean(mapasAdicionados[mapa])}>{!gerando && <Icone nome="baixar" />}Gerar HTML deste mapa</button><button type="button" className="btn" aria-busy={gerando} onClick={() => gerarHtml(true)} disabled={gerando}>{!gerando && <Icone nome="baixar" />}Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>}
     </section>
   )
