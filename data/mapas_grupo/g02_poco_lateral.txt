@@ -1,11 +1,16 @@
-; Poco lateral - proposta 4 escolhida pelo grupo.
+; Poco lateral - desvio alagado escolhido pelo grupo.
 ; [IA] Codex - sugestao do desenho; resultados calculados pelo codigo do grupo.
+; [IA] Codex - substituicao do desenho, preservando o nome do segundo mapa.
 #####################
-#S.................G#
+#S......#########..G#
+#.#####.#########.#.#
+#.#####.~~~~~~~~~.#.#
+#.#################.#
+#...###############.#
+###.###############.#
+###.................#
 #####v###############
-#...................#
-#.###.###.###.###...#
-#...................#
-#...###...###...###.#
-#...................#
+###.............#####
+###...#...#...#.#####
+###.............#####
 #####################
