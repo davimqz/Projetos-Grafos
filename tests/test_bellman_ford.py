@@ -279,3 +279,81 @@ def test_bellman_ford_com_networkx_como_oraculo(semente):
                     assert distancias[atual] == distancias[pai] + referencia[pai][atual]["weight"]
                     atual = pai
                 assert resultado["pai"][origem] is None
+
+
+# [IA] Codex - integração e formatação dos seis casos fornecidos pelo usuário.
+def test_ciclo_negativo_cedo():
+    grafo = Grafo()
+    for vi, vj, peso in (
+        ("A", "B", 1), ("B", "C", -3), ("C", "B", 1),
+    ):
+        grafo.adicionar_aresta(vi, vj, peso)
+
+    # Muitos nós elevam V-1, mas não deveriam atrasar a detecção.
+    for i in range(1500):
+        grafo.adicionar_no(f"I{i}")
+
+    resultado = bellman_ford(grafo, "A")
+    assert resultado["status"] == "CICLO_NEGATIVO"
+    assert resultado["passadas_executadas"] < len(grafo.nos()) - 1
+    assert resultado["custo_ciclo"] == -2
+    assert resultado["ciclo_negativo"][0] == resultado["ciclo_negativo"][-1]
+
+
+def test_ciclo_longe_da_origem():
+    grafo = Grafo()
+    for i in range(31):
+        grafo.adicionar_aresta(str(i), str(i + 1), 1)
+    grafo.adicionar_aresta("31", "32", -3)
+    grafo.adicionar_aresta("32", "31", 1)
+
+    resultado = bellman_ford(grafo, "0")
+    assert resultado["status"] == "CICLO_NEGATIVO"
+    assert resultado["custo_ciclo"] == -2
+    assert len(resultado["ciclo_negativo"]) == 3
+
+
+def test_ciclo_zero():
+    grafo = Grafo()
+    for vi, vj, peso in (
+        ("A", "B", 2), ("B", "C", -3), ("C", "A", 1),
+    ):
+        grafo.adicionar_aresta(vi, vj, peso)
+
+    resultado = bellman_ford(grafo, "A")
+    assert resultado["status"] == "OK"
+    assert resultado["distancia"] == {"A": 0, "B": 2, "C": -1}
+
+
+def test_ciclo_inacessivel():
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "B", 2)
+    grafo.adicionar_aresta("X", "Y", -2)
+    grafo.adicionar_aresta("Y", "X", 1)
+
+    resultado = bellman_ford(grafo, "A")
+    assert resultado["status"] == "OK"
+    assert resultado["distancia"]["X"] == float("inf")
+
+
+def test_caminho_sem_ciclo_na_ordem_inversa():
+    grafo = Grafo()
+    for i in reversed(range(50)):
+        grafo.adicionar_aresta(str(i), str(i + 1), 1)
+
+    resultado = bellman_ford(grafo, "0")
+    assert resultado["status"] == "OK"
+    assert resultado["distancia"]["50"] == 50
+    assert resultado["pai"]["50"] == "49"
+    assert resultado["passadas_executadas"] == 50
+
+
+def test_laco_negativo_de_um_no():
+    grafo = Grafo()
+    grafo.adicionar_aresta("A", "A", -4)
+
+    resultado = bellman_ford(grafo, "A")
+    assert resultado["status"] == "CICLO_NEGATIVO"
+    assert resultado["ciclo_negativo"] == ["A", "A"]
+    assert resultado["custo_ciclo"] == -4
+    assert resultado["passadas_executadas"] == 0
