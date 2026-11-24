@@ -1,3 +1,4 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Claude Code – visualização interativa do grafo de estados com Cytoscape.js (zoom, arrastar, layouts e
 // destaque do percurso). Só desenha os nós e arcos que o código do grupo exportou em dados.json; nada é calculado aqui.
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -110,7 +111,7 @@ export function GrafoEstados() {
   return (
     <section className="panel">
       <header>
-        <span className="section-label">GRAFO DE ESTADOS · CYTOSCAPE</span>
+        <span className="section-label">Grafo de estados · Cytoscape.js</span>
         <h2>Grafo de estados interativo</h2>
         <p className="note">Cada nó é um estado (posição, chaves e bônus) e cada arco é um movimento possível. Arraste para mover, use a roda do mouse para dar zoom e clique num estado para ver as conexões. Em vermelho, os arcos que mudam de camada (coleta de chave).</p>
       </header>
@@ -142,23 +143,23 @@ export function GrafoEstados() {
           <dl className="state">
             <div><dt>Estados</dt><dd>{fmtInt(M.n_estados)}</dd></div>
             <div><dt>Arcos</dt><dd>{fmtInt(M.n_arcos)}</dd></div>
-            <div className="wide"><dt>Percurso destacado</dt><dd>{alg ? (caminho.length ? `${NOME_ALG[alg]} · ${caminho.length - 1} passos · custo ${custo ?? '—'}` : `${NOME_ALG[alg]} · sem percurso`) : 'nenhum'}</dd></div>
+            <div className="wide"><dt>Percurso destacado</dt><dd>{alg ? (caminho.length ? `${NOME_ALG[alg]} · ${caminho.length - 1} passos · custo ${custo ?? '—'}` : `${NOME_ALG[alg]} · sem percurso`) : 'Nenhum'}</dd></div>
           </dl>
           <h3>Estado selecionado</h3>
           {sel ? (
             <dl className="state">
               <div className="wide"><dt>Rótulo</dt><dd>{sel.id}</dd></div>
-              <div><dt>Chaves</dt><dd>{sel.chaves || 'nenhuma'}</dd></div>
-              <div><dt>Bônus usados</dt><dd>{sel.bonus || 'nenhum'}</dd></div>
+              <div><dt>Chaves</dt><dd>{sel.chaves || 'Nenhuma'}</dd></div>
+              <div><dt>Bônus usados</dt><dd>{sel.bonus || 'Nenhum'}</dd></div>
               <div><dt>Arcos de saída</dt><dd>{sel.saida}</dd></div>
               <div><dt>Arcos de entrada</dt><dd>{sel.entrada}</dd></div>
             </dl>
           ) : <p className="note">Clique num nó para ver o estado e destacar seus arcos, com o peso de cada um.</p>}
           <div className="chart-legend cy-legenda">
             <strong>Camadas</strong>
-            {camadas.map((c, i) => <span key={c || '-'}><i style={{ background: PALETA[i % PALETA.length] }} />{c ? `chaves ${c}` : 'sem chave'}</span>)}
-            <span><i className="leg-inicio" />início</span>
-            <span><i className="leg-saida" />saída</span>
+            {camadas.map((c, i) => <span key={c || '-'}><i style={{ background: PALETA[i % PALETA.length] }} />{c ? `Chaves ${c}` : 'Sem chave'}</span>)}
+            <span><i className="leg-inicio" />Início</span>
+            <span><i className="leg-saida" />Saída</span>
           </div>
         </aside>
       </div>
@@ -187,16 +188,16 @@ export function ArvoreBfsCy() {
   return (
     <section className="panel">
       <header>
-        <h2>Árvore BFS de estados do m02</h2>
+        <h2>Árvore BFS de estados do M02</h2>
         <p className="note">Arcos de árvore devolvidos pela BFS do grupo: cada nível é a distância, em passos, a partir do início (losango lime).</p>
       </header>
       <div className="cy-palco">
         <BarraZoom cyRef={cyRef} />
-        <Cy cyRef={cyRef} elementos={elementos} layout={layout} estilo={ESTILO_BASE} altura={620} rotulo="Árvore BFS de estados do m02" />
+        <Cy cyRef={cyRef} elementos={elementos} layout={layout} estilo={ESTILO_BASE} altura={620} rotulo="Árvore BFS de estados do M02" />
       </div>
       <div className="legend">
-        <span><i style={{ background: PALETA[0] }}></i>sem chave</span>
-        <span><i style={{ background: PALETA[1] }}></i>com a chave a</span>
+        <span><i style={{ background: PALETA[0] }}></i>Sem chave</span>
+        <span><i style={{ background: PALETA[1] }}></i>Com a chave a</span>
       </div>
     </section>
   )

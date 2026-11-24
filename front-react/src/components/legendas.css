@@ -1,3 +1,4 @@
+/* [IA] Codex – capitalização definida nos textos, preservando siglas, nomes e símbolos. */
 /* [IA] Codex – apresentação responsiva da legenda do mapa */
 /* [IA] Claude Code – legenda no design system brutalista (bordas pretas, rótulos mono) */
 .map-key {
@@ -12,13 +13,13 @@
   background: var(--ink);
   color: #FFFFFF;
   font: 700 11px/1.2 var(--mono);
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: .12em;
 }
 .map-key__groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .map-key__group { padding: var(--s4); }
 .map-key__group + .map-key__group { border-left: var(--borda); }
-.map-key__group h4 { margin: 0 0 var(--s3); font: 400 18px/1 var(--display); text-transform: uppercase; }
+.map-key__group h4 { margin: 0 0 var(--s3); font: 400 18px/1 var(--display); text-transform: none; }
 .map-key__group ul { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
 .map-key__group li { display: flex; align-items: center; gap: var(--s3); min-height: 26px; font-size: 13px; line-height: 1.35; }
 .map-key__symbol {

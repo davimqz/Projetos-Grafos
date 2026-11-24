@@ -19,16 +19,33 @@ npm run dev
 
 Para gerar a versão final: `npm run build` (sai em `front-react/dist/`).
 
-No labirinto, **Comparar os quatro algoritmos** mostra os percursos e resultados lado a lado;
-DFS mostra o caminho da árvore de busca, não necessariamente o mínimo. **Carregar mapa .txt**
-valida o arquivo com o Python do projeto e calcula os quatro resultados. São aceitos até 16 KiB,
-2.500 casas e 8 bônus; o cálculo tem limite de 30 segundos. O mapa enviado fica apenas na
-sessão e não integra o HTML conjunto. Estas funções de envio exigem `npm run dev` ou
+No labirinto, **Comparar os quatro algoritmos** substitui a visualização individual por quatro
+mapas em uma grade 2×2, com um único menu de anterior/próximo, animação, posição e velocidade.
+A altura dos mapas acompanha a tela e os dados de estado aparecem em uma faixa compacta.
+Ativar a comparação ou trocar o mapa mantém a posição de rolagem da página.
+Todos seguem o mesmo passo; percursos mais curtos permanecem no fim enquanto os demais continuam.
+O estado e o custo de cada algoritmo aparecem no respectivo mapa. Em celulares, os mapas ficam em uma coluna.
+Desmarcar retorna ao modo individual.
+DFS mostra o caminho da árvore de busca, não necessariamente o mínimo. **Adicionar labirinto**
+abre um formulário para colar o conteúdo de um TXT e dar um nome opcional ao mapa.
+**Validar e adicionar** usa a validação Python do projeto e calcula BFS, DFS, Dijkstra e Bellman-Ford;
+erros são apresentados no formulário, mantendo o texto para correção. São aceitos até 16 KiB,
+2.500 casas e 8 bônus; o cálculo tem limite de 30 segundos. Cada mapa válido entra no seletor,
+é selecionado automaticamente e fica salvo com seus resultados no armazenamento local deste navegador,
+inclusive ao recarregar ou trocar de aba. Os mapas adicionados não integram o HTML conjunto
+nem oferecem geração individual de HTML. Estas funções de envio exigem `npm run dev` ou
 `npm run preview` com Python e dependências instalados; não funcionam em hospedagem estática.
-Para publicar o site estático (Vercel), gere com `VITE_SITE_ESTATICO=1 npm run build`: o upload e os
-botões de gerar HTML somem da tela.
+Para publicar o site estático (Vercel), gere com `VITE_SITE_ESTATICO=1 npm run build`: os
+botões de adicionar labirinto e gerar HTML somem da tela.
 Na Vercel isso já está no `vercel.json` da raiz do repositório (instala e compila em `front-react/` e publica
 `front-react/dist`), então não é preciso configurar nada no painel.
+
+Os labirintos adicionados ficam no `localStorage`, na chave `grafos.labirintos.v1`, vinculados
+ao navegador e à origem do site (protocolo, endereço e porta). Não são arquivos TXT no projeto
+e não são compartilhados entre navegadores ou entre `localhost` e `127.0.0.1`.
+Para apagar um, selecione o mapa com a indicação **Adicionado** e clique em **Excluir** ao lado
+do seletor. O mapa sai da lista e do armazenamento local, e uma mensagem confirma a remoção.
+Os mapas fornecidos pelo projeto não oferecem exclusão.
 
 No labirinto, **Gerar HTML deste mapa** usa o mapa e o algoritmo selecionados e grava
 `out/parte1/html/labirinto_<mapa>.html`; o botão também oferece um link para abri-lo.
@@ -54,3 +71,9 @@ sem depender de instalação da fonte ou acesso à rede.
 - `src/App.jsx`: cabeçalho e abas
 
 O `package.json` troca o Rollup pela versão em WebAssembly (`overrides`), porque em algumas máquinas Windows o binário nativo é bloqueado.
+
+## Textos da interface
+
+Use inicial maiúscula e o restante em caixa normal em títulos, botões, rótulos, legendas e valores isolados.
+Preserve siglas (BFS, DFS, HTML, AVD), nomes próprios (Dijkstra, Bellman-Ford, Cytoscape.js, Elliptic++)
+e identificadores exibidos literalmente. A capitalização fica no texto; não force caixa alta pelo CSS.

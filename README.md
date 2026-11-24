@@ -148,6 +148,8 @@ Os CSVs ficam em `csv/` e os JSONs em `json/`, dentro da pasta indicada por `--o
 
 Os mapas do grupo são `g01_tres_depositos.txt` e `g02_poco_lateral.txt`. Seus gabaritos, calculados pelo código do
 grupo, ficam em [`data/solucoes_mapas_grupo/`](data/solucoes_mapas_grupo/), separados dos labirintos.
+O segundo mapa usa o desenho Desvio alagado: BFS faz 22 passos com custo 58, enquanto Dijkstra e Bellman-Ford
+fazem 30 passos com custo 30; 37 dos 89 estados são armadilhas (41,57%). O nome dos arquivos foi mantido.
 O gerador de visualizações inclui automaticamente os arquivos de `data/mapas_grupo/` no HTML conjunto;
 use `--mapas-grupo <pasta>` para mudar esse diretório. Para atualizar a seleção de mapas no React,
 execute `python -m scripts.exportar_front` novamente.
