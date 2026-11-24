@@ -20,13 +20,18 @@ npm run dev
 Para gerar a versão final: `npm run build` (sai em `front-react/dist/`).
 
 No labirinto, **Comparar os quatro algoritmos** mostra os percursos e resultados lado a lado;
-DFS mostra o caminho da árvore de busca, não necessariamente o mínimo. **Carregar mapa .txt**
-valida o arquivo com o Python do projeto e calcula os quatro resultados. São aceitos até 16 KiB,
-2.500 casas e 8 bônus; o cálculo tem limite de 30 segundos. O mapa enviado fica apenas na
-sessão e não integra o HTML conjunto. Estas funções de envio exigem `npm run dev` ou
+DFS mostra o caminho da árvore de busca, não necessariamente o mínimo. **Adicionar labirinto**
+abre um formulário para colar o conteúdo de um TXT e dar um nome opcional ao mapa.
+**Validar e adicionar** usa a validação Python do projeto e calcula BFS, DFS, Dijkstra e Bellman-Ford;
+erros são apresentados no formulário, mantendo o texto para correção. **Carregar mapa .txt**
+oferece a mesma inclusão a partir de arquivo. São aceitos até 16 KiB,
+2.500 casas e 8 bônus; o cálculo tem limite de 30 segundos. Cada mapa válido entra no seletor,
+é selecionado automaticamente e fica salvo com seus resultados no armazenamento local deste navegador,
+inclusive ao recarregar ou trocar de aba. Os mapas adicionados não integram o HTML conjunto
+nem oferecem geração individual de HTML. Estas funções de envio exigem `npm run dev` ou
 `npm run preview` com Python e dependências instalados; não funcionam em hospedagem estática.
 Para publicar o site estático (Vercel), gere com `VITE_SITE_ESTATICO=1 npm run build`: o upload e os
-botões de gerar HTML somem da tela.
+botões de adicionar labirinto e gerar HTML somem da tela.
 Na Vercel isso já está no `vercel.json` da raiz do repositório (instala e compila em `front-react/` e publica
 `front-react/dist`), então não é preciso configurar nada no painel.
 

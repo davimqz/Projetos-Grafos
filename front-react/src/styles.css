@@ -213,6 +213,16 @@ input.controle-faixa:disabled { opacity: .4; cursor: not-allowed; }
 .input-arquivo { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 
 /* ───────────── 7. Labirinto ───────────── */
+/* [IA] Codex – entrada de TXT com tipografia monoespaçada e ações responsivas. */
+.adicionar-labirinto { min-width: 0; }
+.novo-labirinto { display: grid; gap: var(--s4); margin-top: var(--s4); padding: var(--s4); border: var(--borda-forte); background: var(--surface); }
+.novo-labirinto input, .novo-labirinto textarea {
+  width: 100%; min-width: 0; padding: 12px; border: var(--borda-forte); border-radius: 0;
+  background: var(--bg); color: var(--ink); font: 500 15px/1.5 var(--mono); letter-spacing: 0; text-transform: none;
+}
+.novo-labirinto textarea { resize: vertical; min-height: 160px; white-space: pre; overflow: auto; }
+.novo-labirinto input:focus-visible, .novo-labirinto textarea:focus-visible { outline: 3px solid var(--lime); outline-offset: 1px; }
+.acoes-labirinto { display: flex; flex-wrap: wrap; gap: var(--s3); }
 .lab { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--s5) 0; align-items: start; }
 .side { display: contents; }
 .selecao { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--s4) var(--s5); align-items: end; padding-bottom: var(--s5); border-bottom: 1px solid var(--line); }
