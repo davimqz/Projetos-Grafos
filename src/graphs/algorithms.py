@@ -141,9 +141,10 @@ def bfs(grafo: Grafo, origem: str) -> dict:
         "estado": estado,
     }
 
-def bellman_ford(grafo: Grafo, origem: str) -> dict:
-    nos = grafo.nos()
 
+def bellman_ford(grafo: Grafo, origem: str) -> dict:
+    """Calcula caminhos mínimos e identifica ciclos negativos alcançáveis."""
+    nos = grafo.nos()
     if origem not in nos:
         raise ValueError(f"Nó '{origem}' não existe.")
 
@@ -151,72 +152,63 @@ def bellman_ford(grafo: Grafo, origem: str) -> dict:
     pai = {no: None for no in nos}
     peso_pai = {no: None for no in nos}
     distancia[origem] = 0
+    arestas = [(vi, vj, peso) for vi in nos for vj, peso in grafo.vizinhos(vi)]
+    passadas_executadas = 0
 
-    arestas = [
-        (vi, vj, peso)
-        for vi in nos
-        for vj, peso in grafo.vizinhos(vi)
-    ]
-
-    for _ in range(len(nos) - 1):
-        alterou = False
-
-        for vi, vj, peso in arestas:
-            if distancia[vi] == float("inf"):
-                continue
-
-            novo_custo = distancia[vi] + peso
-            if novo_custo < distancia[vj]:
-                distancia[vj] = novo_custo
-                pai[vj] = vi
-                peso_pai[vj] = peso
-                alterou = True
-
-        if not alterou:
-            break
-
-    ultimo_atualizado = None
-    for vi, vj, peso in arestas:
-        if distancia[vi] == float("inf"):
-            continue
-
-        novo_custo = distancia[vi] + peso
-        if novo_custo < distancia[vj]:
-            distancia[vj] = novo_custo
-            pai[vj] = vi
-            peso_pai[vj] = peso
-            ultimo_atualizado = vj
+    def encontrar_ciclo():
+        verificados = set()
+        for no in nos:
+            caminho = {}
+            atual = no
+            while atual is not None and atual not in verificados:
+                if atual in caminho:
+                    vertices = list(caminho)[caminho[atual]:]
+                    custo = sum(peso_pai[v] for v in vertices)
+                    if custo < 0:
+                        ciclo = list(reversed(vertices))
+                        ciclo.append(ciclo[0])
+                        return ciclo, custo
+                    break
+                caminho[atual] = len(caminho)
+                atual = pai[atual]
+            verificados.update(caminho)
+        return [], None
 
     ciclo_negativo = []
     custo_ciclo = None
+    for _ in range(len(nos) - 1):
+        passadas_executadas += 1
+        alterou = False
+        for vi, vj, peso in arestas:
+            if distancia[vi] != float("inf") and distancia[vi] + peso < distancia[vj]:
+                distancia[vj] = distancia[vi] + peso
+                pai[vj] = vi
+                peso_pai[vj] = peso
+                alterou = True
+        if not alterou:
+            break
+        ciclo_negativo, custo_ciclo = encontrar_ciclo()
+        if ciclo_negativo:
+            break
 
-    if ultimo_atualizado is not None:
-        atual = ultimo_atualizado
-        for _ in range(len(nos)):
-            atual = pai[atual]
-
-        inicio_ciclo = atual
-        ciclo_inverso = [inicio_ciclo]
-        atual = pai[inicio_ciclo]
-
-        while atual != inicio_ciclo:
-            ciclo_inverso.append(atual)
-            atual = pai[atual]
-
-        ciclo_inverso.append(inicio_ciclo)
-        ciclo_negativo = list(reversed(ciclo_inverso))
-        custo_ciclo = sum(peso_pai[vj] for vj in ciclo_negativo[1:])
-
-    tem_ciclo_negativo = bool(ciclo_negativo)
+    if not ciclo_negativo:
+        for vi, vj, peso in arestas:
+            if distancia[vi] != float("inf") and distancia[vi] + peso < distancia[vj]:
+                distancia[vj] = distancia[vi] + peso
+                pai[vj] = vi
+                peso_pai[vj] = peso
+        ciclo_negativo, custo_ciclo = encontrar_ciclo()
 
     return {
         "distancia": distancia,
         "pai": pai,
-        "tem_ciclo_negativo": tem_ciclo_negativo,
+        "tem_ciclo_negativo": bool(ciclo_negativo),
         "ciclo_negativo": ciclo_negativo,
         "custo_ciclo": custo_ciclo,
-        "status": "CICLO_NEGATIVO" if tem_ciclo_negativo else "OK",
+        "passadas_executadas": passadas_executadas,
+        "status": "CICLO_NEGATIVO" if ciclo_negativo else "OK",
     }
+
 
 def dijkstra(grafo: Grafo, origem: str) -> dict:
     """Lança ValueError se a origem não existir ou houver peso negativo.
