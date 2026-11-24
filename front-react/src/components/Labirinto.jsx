@@ -3,7 +3,6 @@
 // [IA] Codex - indicação da pasta organizada de saída do HTML.
 import { useEffect, useState } from 'react'
 import { ALGORITMOS, MAPAS, NOME_ALG } from '../util.js'
-import { LegendaCasas } from './Grade.jsx'
 // [IA] Claude Code – ícones e estado de carregamento nos botões (design system brutalista)
 import { Icone } from './Icone.jsx'
 // [IA] Codex – inclusão por texto e coleção persistente de labirintos locais.
@@ -24,7 +23,7 @@ const NOMES_MAPAS = {
   g02_poco_lateral: 'G02 · Poço lateral',
 }
 
-// [IA] Claude Code – no site estático não há Python; upload e geração de HTML ficam só no ambiente local.
+// [IA] Codex – inclusão por texto e geração de HTML dependem do Python local.
 const COM_PYTHON = import.meta.env.VITE_SITE_ESTATICO !== '1'
 
 export function Labirinto() {
@@ -36,17 +35,16 @@ export function Labirinto() {
   const [erroHtml, setErroHtml] = useState('')
   const [mapasAdicionados, setMapasAdicionados] = useState(lerMapasLocais)
   const [enviando, setEnviando] = useState(false)
-  const [erroMapa, setErroMapa] = useState('')
   const [comparar, setComparar] = useState(false)
 
   const M = mapasAdicionados[mapa] || MAPAS[mapa]
   useEffect(() => { setHtmlGerado(null); setErroHtml('') }, [mapa, alg])
 
-  // [IA] Codex – texto colado e arquivo usam a mesma validação e os quatro algoritmos existentes.
+  // [IA] Codex – texto colado usa a validação e os quatro algoritmos existentes.
   async function adicionarMapa(texto, nome) {
     if (!texto.trim()) throw new Error('Cole o conteúdo do labirinto.')
     if (new TextEncoder().encode(texto).length > 16384) throw new Error('O conteúdo deve ter no máximo 16 KiB.')
-    setEnviando(true); setErroMapa('')
+    setEnviando(true)
     try {
       const resposta = await fetch('/__grafos__/mapa', { method: 'POST', headers: { 'Content-Type': 'text/plain; charset=utf-8' }, body: texto })
       const dados = await resposta.json()
@@ -56,18 +54,6 @@ export function Labirinto() {
       salvarMapasLocais(novos)
       setMapasAdicionados(novos); setMapa(id)
     } finally { setEnviando(false) }
-  }
-
-  async function enviarMapa(evento) {
-    const arquivo = evento.target.files?.[0]
-    evento.target.value = ''
-    if (!arquivo) return
-    if (!arquivo.name.toLowerCase().endsWith('.txt') || arquivo.size > 16384) { setErroMapa('Escolha um arquivo .txt de até 16 KiB.'); return }
-    setEnviando(true); setErroMapa('')
-    try {
-      await adicionarMapa(await arquivo.text(), arquivo.name.replace(/\.txt$/i, ''))
-    } catch (erro) { setErroMapa(erro.message || 'Não foi possível conectar ao servidor local.') }
-    finally { setEnviando(false) }
   }
 
   async function gerarHtml(conjunto = false) {
@@ -104,24 +90,11 @@ export function Labirinto() {
               {ALGORITMOS.map((a) => <option key={a} value={a}>{NOME_ALG[a]}</option>)}
             </select>
           </label>
-          {/* [IA] Claude Code – upload em botão próprio e mensagens na largura toda, sem deslocar os campos */}
-          {COM_PYTHON && <div className="field">Carregar mapa .txt
-            <label className={`btn btn-arquivo${enviando ? ' desativado' : ''}`}>
-              {!enviando && <Icone nome="enviar" />}{enviando ? 'Processando…' : 'Escolher arquivo'}
-              <input type="file" className="input-arquivo" accept=".txt,text/plain" disabled={enviando} onChange={enviarMapa} />
-            </label>
-          </div>}
           <label className="check-comparar"><input type="checkbox" checked={comparar} onChange={(ev) => setComparar(ev.target.checked)} /> Comparar os quatro algoritmos</label>
           {COM_PYTHON && <AdicionarLabirinto adicionar={adicionarMapa} enviando={enviando} />}
           {enviando && <p className="status" role="status">Processando mapa…</p>}
-          {erroMapa && <p className="status alerta" role="alert">{erroMapa}</p>}
       </div>
-      {comparar ? <>
-        <div className="comparacao-algoritmos" role="region" aria-label="Comparação dos quatro algoritmos" tabIndex={0}>
-          {ALGORITMOS.map((nome) => <PercursoLabirinto key={`${mapa}-${nome}`} M={M} alg={nome} comparacao />)}
-        </div>
-        <LegendaCasas />
-      </> : <PercursoLabirinto key={`${mapa}-${alg}`} M={M} alg={alg} />}
+      <PercursoLabirinto key={`${mapa}-${comparar ? 'comparacao' : alg}`} M={M} alg={alg} comparacao={comparar} />
       {COM_PYTHON && <div className="exportar-html"><button type="button" className="btn primary" aria-busy={gerando} onClick={() => gerarHtml(false)} disabled={gerando || Boolean(mapasAdicionados[mapa])}>{!gerando && <Icone nome="baixar" />}Gerar HTML deste mapa</button><button type="button" className="btn" aria-busy={gerando} onClick={() => gerarHtml(true)} disabled={gerando}>{!gerando && <Icone nome="baixar" />}Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>}
     </section>
   )

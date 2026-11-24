@@ -197,7 +197,7 @@ input.controle-faixa:disabled { opacity: .4; cursor: not-allowed; }
 .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 3px var(--lime); }
 .btn:disabled { opacity: .35; cursor: not-allowed; }
 .btn[aria-busy=true] { cursor: progress; }
-.btn[aria-busy=true]::before, .btn-arquivo.desativado::before {
+.btn[aria-busy=true]::before {
   content: ''; width: 12px; height: 12px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%;
   animation: girar .6s linear infinite;
 }
@@ -206,11 +206,6 @@ input.controle-faixa:disabled { opacity: .4; cursor: not-allowed; }
 .btns .btn { padding-inline: 8px; }
 .btns .btn + .btn { border-left-width: 0; }
 .zoom-btn { min-height: 36px; padding: 6px 12px; font-size: 11px; }
-
-.btn-arquivo { position: relative; cursor: pointer; text-transform: uppercase; }
-.btn-arquivo.desativado { opacity: .6; cursor: progress; }
-.btn-arquivo:focus-within { outline: 3px solid var(--ink); outline-offset: 3px; }
-.input-arquivo { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 
 /* ───────────── 7. Labirinto ───────────── */
 /* [IA] Codex – entrada de TXT com tipografia monoespaçada e ações responsivas. */
@@ -226,9 +221,8 @@ input.controle-faixa:disabled { opacity: .4; cursor: not-allowed; }
 .acoes-labirinto { display: flex; flex-wrap: wrap; gap: var(--s3); }
 .lab { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--s5) 0; align-items: start; }
 .side { display: contents; }
-.selecao { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .7fr) minmax(0, .85fr) minmax(150px, 1fr) auto; gap: var(--s4); align-items: end; padding-bottom: var(--s5); border-bottom: 1px solid var(--line); }
+.selecao { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .7fr) minmax(150px, 1fr) auto; gap: var(--s4); align-items: end; padding-bottom: var(--s5); border-bottom: 1px solid var(--line); }
 .selecao > .field { min-width: 0; }
-.selecao .btn-arquivo { white-space: normal; padding-inline: 8px; }
 .selecao .status { grid-column: 1 / -1; }
 
 .mapa-area { grid-column: 1; grid-row: 2; min-width: 0; padding-right: var(--s5); }
@@ -273,22 +267,25 @@ input.controle-faixa:disabled { opacity: .4; cursor: not-allowed; }
 @keyframes revelar-trecho { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 .trecho-animado { stroke-dasharray: 1; animation: revelar-trecho linear both; }
 
-/* [IA] Codex – quatro percursos lado a lado com reprodução independente. */
+/* [IA] Codex – grade 2×2 com reprodução sincronizada em um único menu. */
 .percurso-labirinto { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
 .percurso-labirinto > .lab { display: flex; gap: var(--s5); }
 .percurso-labirinto .mapa-area { flex: 1; }
 .percurso-labirinto .reproducao { flex: 0 0 290px; }
-.comparacao-algoritmos { display: grid; grid-template-columns: repeat(4, minmax(280px, 1fr)); overflow-x: auto; align-items: start; border-top: var(--borda); border-left: var(--borda); }
-.comparacao-algoritmos article { min-width: 0; padding: var(--s4); border-right: var(--borda); border-bottom: var(--borda); }
-.comparacao-algoritmos .lab { flex-direction: column; }
-.comparacao-algoritmos .mapa-area { padding: 0; }
-.comparacao-algoritmos .reproducao { flex-basis: auto; width: 100%; border-left: 0; border-top: var(--borda); padding: var(--s4) 0 0; }
-.comparacao-algoritmos .grade-container { min-height: 180px; padding: var(--s3); }
-.comparacao-algoritmos .btns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.comparacao-algoritmos .btns .btn { min-width: 0; padding-inline: 4px; gap: 4px; font-size: 10px; }
+.percurso-labirinto.comparando > .lab { flex-direction: column-reverse; }
+.comparando .mapa-area { width: 100%; padding: 0; }
+.comparando .reproducao { flex: none; width: 100%; padding: 0 0 var(--s4); border-left: 0; border-bottom: var(--borda); display: grid; grid-template-columns: minmax(340px, 1fr) 1fr 1fr; align-items: center; }
+.comparando .reproducao h3, .comparando .reproducao > .note { grid-column: 1 / -1; }
+.comparacao-algoritmos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: var(--borda); border-left: var(--borda); }
+.comparacao-algoritmos article { min-width: 0; display: grid; align-content: start; gap: var(--s3); padding: var(--s4); border-right: var(--borda); border-bottom: var(--borda); }
+.comparacao-algoritmos .grade-container { min-height: 280px; }
+.comparacao-algoritmos .grade-container:not(.ampliado) .grade-svg { width: 100%; max-height: 400px; }
 .comparacao-algoritmos h3 { margin: 0 0 var(--s2); font: 400 26px/1 var(--display); text-transform: uppercase; }
 .comparacao-algoritmos p { margin: 0 0 var(--s2); font-size: 13px; color: var(--muted); }
 .comparacao-algoritmos > article > .status { min-height: 3em; }
+@media (max-width: 767px) {
+  .comparacao-algoritmos, .comparando .reproducao { grid-template-columns: minmax(0, 1fr); }
+}
 
 .exportar-html { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s3); padding-top: var(--s5); border-top: var(--borda-forte); }
 .exportar-html p { flex-basis: 100%; margin: 0; font-size: 14px; overflow-wrap: anywhere; }
@@ -342,9 +339,6 @@ svg.fit { width: 100%; height: auto; max-width: 560px; }
 
 /* ───────────── 10. Responsividade ───────────── */
 @media (max-width: 1279px) {
-  .selecao { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .selecao > .check-comparar { grid-column: 1 / 3; }
-  .adicionar-labirinto > .btn { grid-column: 3; }
   .lab { grid-template-columns: minmax(0, 1fr) 290px; }
   .p2-corpo { grid-template-columns: minmax(0, 1fr) 300px; }
 }
@@ -391,7 +385,7 @@ svg.fit { width: 100%; height: auto; max-width: 560px; }
   .grade-container.ampliado .grade-svg { width: 800px; }
   .grafo-frame svg { padding: 6px; }
   .selecao { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .selecao > .field:first-child { grid-column: 1 / -1; }
+  .selecao > .field { grid-column: 1 / -1; }
   .selecao > .check-comparar { grid-column: 1; }
   .adicionar-labirinto > .btn { grid-column: 2; max-width: 100%; white-space: normal; }
   .btn { min-height: 46px; }
