@@ -1,6 +1,7 @@
 // [IA] Claude Code – os 4 gráficos exploratórios da AVD (tipos escolhidos pelo Vagner no notebook)
 // [IA] Codex – contraste, legendas e tabelas responsivas dos dados existentes
 import { DADOS_AVD as A, NOME_CLASSE, ORDEM, corClasse, fmt, fmtInt } from '../util.js'
+// [IA] Claude Code – barras e células com cantos retos e contorno preto; escala da matriz em off-white → preto
 
 function Barras({ dados, rotulo, yLabel, fmtV, fmtEixo }) {
   const W = 520
@@ -26,7 +27,7 @@ function Barras({ dados, rotulo, yLabel, fmtV, fmtEixo }) {
           const x = m.l + i * bw + bw * 0.2
           return (
             <g key={d.k}>
-              <rect x={x} y={H - m.b - h} width={bw * 0.6} height={Math.max(h, 0)} fill={corClasse(d.k)} rx="4" />
+              <rect x={x} y={H - m.b - h} width={bw * 0.6} height={Math.max(h, 0)} fill={corClasse(d.k)} stroke="var(--ink)" strokeWidth="1.5" />
               <text x={x + bw * 0.3} y={H - m.b - h - 8} textAnchor="middle" fontSize="12" fontWeight="600">{fmtV(d.v)}</text>
               <text x={x + bw * 0.3} y={H - m.b + 18} textAnchor="middle" fontSize="12">{NOME_CLASSE[d.k]}</text>
             </g>
@@ -54,7 +55,7 @@ const COR_SINAL = { negativo: 'var(--neg)', zero: 'var(--zero)', positivo: 'var(
 
 function corMatriz(valor) {
   const t = Math.max(0, Math.min(1, valor))
-  const rgb = [225, 235, 250].map((claro, i) => Math.round(claro + ([35, 85, 180][i] - claro) * t))
+  const rgb = [242, 241, 236].map((claro, i) => Math.round(claro + ([8, 8, 8][i] - claro) * t))
   const luminancia = rgb.map((c) => c / 255).map((c) => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
   const brilho = 0.2126 * luminancia[0] + 0.7152 * luminancia[1] + 0.0722 * luminancia[2]
   return { fundo: `rgb(${rgb.join(',')})`, texto: brilho > 0.179 ? '#000000' : '#ffffff' }
@@ -87,7 +88,7 @@ export function Avd() {
               const cor = corMatriz(v)
               return (
                 <g key={o + d}>
-                  <rect x={130 + j * 122} y={34 + i * 78} width="118" height="74" fill={cor.fundo} rx="6" />
+                  <rect x={130 + j * 122} y={34 + i * 78} width="118" height="74" fill={cor.fundo} stroke="var(--ink)" />
                   <text x={189 + j * 122} y={76 + i * 78} textAnchor="middle" fontSize="15" fontWeight="600" style={{ fill: cor.texto }}>{fmt(100 * v)}%</text>
                 </g>
               )
@@ -121,7 +122,7 @@ export function Avd() {
               const x = 80 + i * 146 + j * 40
               return (
                 <g key={c + s}>
-                  <rect x={x} y={248 - h} width="36" height={h} fill={COR_SINAL[s]} rx="3" />
+                  <rect x={x} y={248 - h} width="36" height={h} fill={COR_SINAL[s]} stroke="var(--ink)" strokeWidth="1.5" />
                   <text x={x + 18} y={244 - h} textAnchor="middle" fontSize="10" className="muted">{fmtInt(v)}</text>
                 </g>
               )

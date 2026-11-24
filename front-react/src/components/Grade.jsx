@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react'
 import { PALETA, corCasa, lerRotulo } from '../util.js'
 import './legendas.css'
+// [IA] Claude Code – ícone no botão de ampliar e marcador atual no tema claro
+import { Icone } from './Icone.jsx'
 
 export function Grade({ grade, caminho = [], passo = null, heat = null, tam, duracao = 0 }) {
   const [ampliado, setAmpliado] = useState(false)
@@ -43,7 +45,7 @@ export function Grade({ grade, caminho = [], passo = null, heat = null, tam, dur
 
   return (
     <div className="grade-view">
-      <div className="view-actions"><button className="btn zoom-btn" type="button" onClick={() => setAmpliado((v) => !v)} aria-pressed={ampliado}>{ampliado ? 'Ajustar à tela' : 'Ampliar mapa'}</button>{ampliado && <span>Role para explorar o mapa ampliado.</span>}</div>
+      <div className="view-actions"><button className="btn zoom-btn" type="button" onClick={() => setAmpliado((v) => !v)} aria-pressed={ampliado}><Icone nome={ampliado ? 'reduzir' : 'ampliar'} />{ampliado ? 'Ajustar à tela' : 'Ampliar mapa'}</button>{ampliado && <span>Role para explorar o mapa ampliado.</span>}</div>
     <div className={`grade-container${ampliado ? ' ampliado' : ''}`} tabIndex={ampliado ? 0 : undefined}>
       <svg className="grade-svg" width={C * s} height={L * s} viewBox={`0 0 ${C * s} ${L * s}`} role="img" aria-label="Mapa do labirinto">
         {casas.fundos}
