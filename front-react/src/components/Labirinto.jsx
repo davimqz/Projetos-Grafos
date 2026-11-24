@@ -1,3 +1,4 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Claude Code – labirinto interativo: escolha de mapa/algoritmo e animação passo a passo
 // [IA] Codex – organização dos controles, navegação pelo percurso e apresentação
 // [IA] Codex - indicação da pasta organizada de saída do HTML.
@@ -28,7 +29,8 @@ const COM_PYTHON = import.meta.env.VITE_SITE_ESTATICO !== '1'
 
 export function Labirinto() {
   const nomes = Object.keys(MAPAS)
-  const [mapa, setMapa] = useState(nomes.includes('m03_tres_chaves') ? 'm03_tres_chaves' : nomes[0])
+  const mapaInicial = nomes.includes('m03_tres_chaves') ? 'm03_tres_chaves' : nomes[0]
+  const [mapa, setMapa] = useState(mapaInicial)
   const [alg, setAlg] = useState('DIJKSTRA')
   const [gerando, setGerando] = useState(false)
   const [htmlGerado, setHtmlGerado] = useState(null)
@@ -36,6 +38,9 @@ export function Labirinto() {
   const [mapasAdicionados, setMapasAdicionados] = useState(lerMapasLocais)
   const [enviando, setEnviando] = useState(false)
   const [comparar, setComparar] = useState(false)
+  // [IA] Codex – mensagem de confirmação da exclusão persistida no navegador.
+  const [avisoExclusao, setAvisoExclusao] = useState('')
+  const [erroEdicao, setErroEdicao] = useState('')
 
   const M = mapasAdicionados[mapa] || MAPAS[mapa]
   useEffect(() => { setHtmlGerado(null); setErroHtml('') }, [mapa, alg])
@@ -54,6 +59,17 @@ export function Labirinto() {
       salvarMapasLocais(novos)
       setMapasAdicionados(novos); setMapa(id)
     } finally { setEnviando(false) }
+  }
+
+  function excluirMapa() {
+    if (!mapasAdicionados[mapa]) return
+    const novos = { ...mapasAdicionados }
+    delete novos[mapa]
+    try {
+      salvarMapasLocais(novos)
+      setAvisoExclusao(`Labirinto “${mapasAdicionados[mapa].nome}” excluído deste navegador.`)
+      setMapasAdicionados(novos); setMapa(mapaInicial); setErroEdicao('')
+    } catch (erro) { setErroEdicao(erro.message) }
   }
 
   async function gerarHtml(conjunto = false) {
@@ -75,16 +91,21 @@ export function Labirinto() {
   return (
     <section className="panel">
       <header>
-        <span className="section-label">PARTE 1</span><h2>Labirinto interativo</h2>
+        <span className="section-label">Parte 1</span><h2>Labirinto interativo</h2>
         <p className="note">Escolha o mapa e o algoritmo e acompanhe o percurso passo a passo. A cor do caminho muda a cada chave coletada.</p>
       </header>
       <div className="selecao">
-          <label className="field">Mapa
+          <div className="field">
+            <label htmlFor="sel-mapa">Mapa</label>
+            <div className="seletor-mapa">
             <select id="sel-mapa" value={mapa} disabled={gerando} onChange={(ev) => setMapa(ev.target.value)}>
               {nomes.map((n) => <option key={n} value={n}>{NOMES_MAPAS[n] || n}</option>)}
               {Object.entries(mapasAdicionados).map(([id, dados]) => <option key={id} value={id}>{dados.nome} · Adicionado</option>)}
             </select>
-          </label>
+            {mapasAdicionados[mapa] && <button type="button" className="btn excluir-mapa" disabled={gerando || enviando}
+              aria-label="Excluir labirinto adicionado" title={`Excluir ${mapasAdicionados[mapa].nome}`} onClick={excluirMapa}>Excluir</button>}
+            </div>
+          </div>
           <label className="field">Algoritmo
             <select id="sel-alg" value={alg} disabled={gerando || comparar} onChange={(ev) => setAlg(ev.target.value)}>
               {ALGORITMOS.map((a) => <option key={a} value={a}>{NOME_ALG[a]}</option>)}
@@ -93,6 +114,8 @@ export function Labirinto() {
           <label className="check-comparar"><input type="checkbox" checked={comparar} onChange={(ev) => setComparar(ev.target.checked)} /> Comparar os quatro algoritmos</label>
           {COM_PYTHON && <AdicionarLabirinto adicionar={adicionarMapa} enviando={enviando} />}
           {enviando && <p className="status" role="status">Processando mapa…</p>}
+          {avisoExclusao && <p className="status" role="status">{avisoExclusao}</p>}
+          {erroEdicao && <p className="status alerta" role="alert">{erroEdicao}</p>}
       </div>
       <PercursoLabirinto key={`${mapa}-${comparar ? 'comparacao' : alg}`} M={M} alg={alg} comparacao={comparar} />
       {COM_PYTHON && <div className="exportar-html"><button type="button" className="btn primary" aria-busy={gerando} onClick={() => gerarHtml(false)} disabled={gerando || Boolean(mapasAdicionados[mapa])}>{!gerando && <Icone nome="baixar" />}Gerar HTML deste mapa</button><button type="button" className="btn" aria-busy={gerando} onClick={() => gerarHtml(true)} disabled={gerando}>{!gerando && <Icone nome="baixar" />}Gerar HTML conjunto</button><span className="note">O conjunto reúne os mapas do projeto; os arquivos são salvos em out/parte1/html.</span>{gerando && <p role="status">Gerando HTML…</p>}{htmlGerado && <p role="status">Gerado: <code>{htmlGerado.arquivo}</code> · <a href={htmlGerado.url} target="_blank" rel="noreferrer">Abrir HTML</a></p>}{erroHtml && <p role="alert">{erroHtml}</p>}</div>}

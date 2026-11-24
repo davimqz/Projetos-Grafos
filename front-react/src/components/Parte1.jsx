@@ -1,3 +1,4 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Claude Code – figuras da Parte 1: percursos, camadas do m02, árvore BFS e heatmap do m08
 // [IA] Codex – ampliação, contraste e legendas das figuras existentes
 import { MAPAS } from '../util.js'
@@ -29,7 +30,7 @@ function Heatmap() {
   return (
     <section className="panel">
       <header>
-        <h2>Heatmap de multiplicidade do m08</h2>
+        <h2>Heatmap de multiplicidade do M08</h2>
         <p className="note">Número de estados associados a cada casa. A escala vai de azul (menos) a vermelho (mais).</p>
       </header>
       <Grade grade={M.grade} heat={M.multiplicidade} tam={13} />
@@ -41,10 +42,10 @@ function Heatmap() {
 export function Parte1() {
   return (
     <div className="figuras">
-      <Percurso nome="m03_tres_chaves" titulo="Percurso de menor custo no m03" />
       <GrafoEstados />
       <ArvoreBfsCy />
-      <Percurso nome="m08_grande" titulo="Percurso de menor custo no m08" />
+      <Percurso nome="m03_tres_chaves" titulo="Percurso de menor custo no M03" />
+      <Percurso nome="m08_grande" titulo="Percurso de menor custo no M08" />
       <Heatmap />
     </div>
   )

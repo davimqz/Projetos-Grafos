@@ -16,5 +16,5 @@ export function lerMapasLocais() {
 
 export function salvarMapasLocais(mapas) {
   try { localStorage.setItem(CHAVE, JSON.stringify(mapas)) }
-  catch { throw new Error('Não foi possível salvar o labirinto neste navegador. Verifique o espaço e a permissão de armazenamento.') }
+  catch { throw new Error('Não foi possível atualizar os labirintos neste navegador. Verifique o espaço e a permissão de armazenamento.') }
 }

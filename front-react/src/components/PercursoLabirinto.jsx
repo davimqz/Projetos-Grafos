@@ -1,3 +1,4 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Codex – reprodução individual ou sincronizada dos quatro algoritmos.
 import { useEffect, useState } from 'react'
 import { ALGORITMOS, NOME_ALG, fmtInt, lerRotulo } from '../util.js'
@@ -44,7 +45,7 @@ export function PercursoLabirinto({ M, alg, comparacao = false }) {
               </article>
             })}
           </div> : <Grade grade={M.grade} caminho={caminho} passo={temCaminho ? passo : null} duracao={tocando && passo > 0 ? 1000 / vel : 0} />}
-          <div className="path-legend"><span><i className="current-marker" /> posição atual</span><span><i className="path-marker" /> caminho percorrido</span></div>
+          <div className="path-legend"><span><i className="current-marker" /> Posição atual</span><span><i className="path-marker" /> Caminho percorrido</span></div>
           <LegendaCasas />
         </div>
         <div className="reproducao">
@@ -82,8 +83,8 @@ function EstadoPercurso({ caminho, custos, passo }) {
       <div><dt>Passo</dt><dd>{passo} / {fim}</dd></div>
       <div><dt>Custo</dt><dd>{custos[passo] ?? '—'}</dd></div>
       <div><dt>Posição</dt><dd>({e.l}, {e.c})</dd></div>
-      <div><dt>Chaves</dt><dd>{e.chaves || 'nenhuma'}</dd></div>
-      <div className="wide"><dt>Bônus usados</dt><dd>{e.bonus.length ? e.bonus.join(', ') : 'nenhum'}</dd></div>
+      <div><dt>Chaves</dt><dd>{e.chaves || 'Nenhuma'}</dd></div>
+      <div className="wide"><dt>Bônus usados</dt><dd>{e.bonus.length ? e.bonus.join(', ') : 'Nenhum'}</dd></div>
     </dl>
   )
 }

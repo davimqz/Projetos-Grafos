@@ -1,6 +1,8 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Claude Code – aba da AVD: mostra as figuras oficiais do Vagner (out/parte2/avd/) com os textos das seções
 // 6.4 e 6.6 do relatório, lidos direto dos arquivos no build. Tipo de gráfico, cores e análise são do Vagner;
 // aqui nada é redesenhado nem escrito, só exibido, então a aba acompanha o notebook e o relatório.
+import { capitalizarInicial } from '../util.js'
 import relatorio from '../../../docs/relatorio/RELATORIO.md?raw'
 
 const FIGURAS = import.meta.glob('../../../out/parte2/avd/*.png', { eager: true, query: '?url', import: 'default' })
@@ -41,8 +43,8 @@ function Figura({ titulo, alt, src, paragrafos }) {
   return (
     <section className="panel avd-figura">
       <header>
-        <span className="section-label">{rotulo.toUpperCase()}</span>
-        <h2>{resto.join(':').trim() || titulo}</h2>
+        <span className="section-label">{rotulo}</span>
+        <h2>{capitalizarInicial(resto.join(':').trim() || titulo)}</h2>
       </header>
       {src ? <img className="avd-img" src={src} alt={alt || titulo} loading="lazy" /> : <p className="status alerta">Figura não encontrada em out/parte2/avd/.</p>}
       <div className="avd-texto">{paragrafos.map((p, i) => <p key={i}><Texto>{p}</Texto></p>)}</div>

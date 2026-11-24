@@ -1,9 +1,10 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Claude Code – tela da Parte 2 (pedidos R5/R6 da reunião de 19/11): fontes e pares com os resultados já
 // calculados pelo código do grupo (parte2.json) e desenho do subgrafo de cada caso com a cor da classe da carteira
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BarraZoom, Cy } from './CyGrafo.jsx'
 import P2 from '../parte2.json'
-import { NOME_CLASSE, corClasse, fmt, fmtInt } from '../util.js'
+import { NOME_CLASSE, NOME_STATUS, capitalizarInicial, corClasse, fmt, fmtInt } from '../util.js'
 // [IA] Claude Code – cores dos grafos no design system brutalista (fundo claro, contornos pretos)
 
 const CASOS = [
@@ -127,11 +128,11 @@ function Legenda() {
     <div className="chart-legend">
       <strong>Classe da carteira</strong>
       {['ilicito', 'licito', 'desconhecido'].map((c) => (
-        <span key={c}><i style={{ background: corClasse(c) }} />{NOME_CLASSE[c]}</span>
+        <span key={c}><i style={{ background: corClasse(c) }} />{capitalizarInicial(NOME_CLASSE[c])}</span>
       ))}
-      <span><i className="leg-inicio" />origem</span>
-      <span><i className="leg-arco" />arco da árvore / caminho</span>
-      <span><i className="leg-arco tracejado" />outro arco do dataset</span>
+      <span><i className="leg-inicio" />Origem</span>
+      <span><i className="leg-arco" />Arco da árvore / caminho</span>
+      <span><i className="leg-arco tracejado" />Outro arco do dataset</span>
     </div>
   )
 }
@@ -180,7 +181,7 @@ function Busca({ c }) {
         <Dados itens={[
           ['Árvore', fmtInt(arcosDfs.arvore)], ['Retorno', fmtInt(arcosDfs.retorno)],
           ['Avanço', fmtInt(arcosDfs.avanco)], ['Cruzamento', fmtInt(arcosDfs.cruzamento)],
-          ['Ciclo alcançável', c.dfs.tem_ciclo ? 'sim (há arco de retorno)' : 'não', true],
+          ['Ciclo alcançável', c.dfs.tem_ciclo ? 'Sim (há arco de retorno)' : 'Não', true],
         ]} />
       </aside>
     </div>
@@ -219,7 +220,7 @@ function BellmanFord({ c }) {
           <h3>Resultado</h3>
           <Dados itens={[
             ['Origem', `${curto(c.origem)} · ${NOME_CLASSE[classe(c.origem)]}`, true],
-            ['Status', c.status], ['Custo do ciclo', fmtBtc(c.custo_ciclo)],
+            ['Status', NOME_STATUS[c.status] || c.status], ['Custo do ciclo', fmtBtc(c.custo_ciclo)],
             ['Alcançadas', `${fmtInt(c.alcancados)} de ${fmtInt(c.total_nos)}`, true],
           ]} />
           <ol className="p2-lista">{c.ciclo.map((n, i) => <li key={i}><i style={{ background: corClasse(classe(n)) }} />{curto(n)}</li>)}</ol>
@@ -239,7 +240,7 @@ function BellmanFord({ c }) {
         <h3>Resultado</h3>
         <Dados itens={[
           ['Origem', `${curto(c.origem)} · ${NOME_CLASSE[classe(c.origem)]}`, true],
-          ['Status', c.status], ['Alcançadas', fmtInt(c.alcancados)],
+          ['Status', NOME_STATUS[c.status] || c.status], ['Alcançadas', fmtInt(c.alcancados)],
           ['Arcos negativos alcançáveis', fmtInt(c.arcos_negativos_alcancaveis), true],
         ]} />
         <table className="p2-tabela">
@@ -256,7 +257,7 @@ function Tempos() {
   return (
     <section className="panel">
       <header>
-        <span className="section-label">DESEMPENHO NO GRAFO COMPLETO</span>
+        <span className="section-label">Desempenho no grafo completo</span>
         <h2>Tempo e memória por algoritmo</h2>
         <p className="note">Média de 5 execuções no recorte inteiro ({fmtInt(P2.tempos[0].nos)} carteiras e {fmtInt(P2.tempos[0].arestas)} arcos), do <code>parte2_report.json</code>.</p>
       </header>
@@ -266,7 +267,7 @@ function Tempos() {
           <tbody>{P2.tempos.map((t) => (
             <tr key={t.algoritmo}>
               <th scope="row">{t.algoritmo}</th><td>{t.complexidade}</td><td>{fmt(t.tempo_medio_ms, 2)}</td>
-              <td>{fmt(t.latencia_min_ms, 2)} – {fmt(t.latencia_max_ms, 2)}</td><td>{fmt(t.memoria_pico_kb, 1)}</td><td>{t.status}</td>
+              <td>{fmt(t.latencia_min_ms, 2)} – {fmt(t.latencia_max_ms, 2)}</td><td>{fmt(t.memoria_pico_kb, 1)}</td><td>{NOME_STATUS[t.status] || t.status}</td>
             </tr>
           ))}</tbody>
         </table>
@@ -290,7 +291,7 @@ export function Parte2() {
     <div className="figuras">
       <section className="panel">
         <header>
-          <span className="section-label">PARTE 2 · ELLIPTIC++</span>
+          <span className="section-label">Parte 2 · Elliptic++</span>
           <h2>Os algoritmos na rede de carteiras</h2>
           <p className="note">Cada nó é uma carteira Bitcoin e cada arco liga quem enviou a quem recebeu. Os resultados são os mesmos do relatório,
             calculados pelos algoritmos do grupo e lidos de <code>parte2.json</code>.</p>

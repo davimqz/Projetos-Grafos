@@ -1,3 +1,4 @@
+// [IA] Codex – capitalização de títulos, legendas e valores apresentados na interface.
 // [IA] Claude Code – estrutura da página: cabeçalho, abas e conteúdo de cada aba
 // [IA] Codex – revisão da identidade visual e navegação
 // [IA] Claude Code – layout brutalista: sidebar preta com navegação numerada e masthead editorial por seção
@@ -56,7 +57,7 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-foot"><strong>Teoria dos Grafos + AVD</strong>Projeto final · 2026.2</div>
+        <div className="sidebar-foot"><strong>Teoria dos grafos + AVD</strong>Projeto final · 2026.2</div>
       </aside>
       <main className="conteudo">
         <header className="masthead">
