@@ -3,8 +3,6 @@
 import dados from './dados.json'
 
 export const MAPAS = dados.parte1.mapas
-export const DADOS_AVD = dados.avd
-export const ORDEM = DADOS_AVD.ordem
 export const ALGORITMOS = ['BFS', 'DFS', 'DIJKSTRA', 'BELLMAN_FORD']
 export const NOME_ALG = { BFS: 'BFS', DFS: 'DFS', DIJKSTRA: 'Dijkstra', BELLMAN_FORD: 'Bellman-Ford' }
 export const NOME_CLASSE = { ilicito: 'ilícito', desconhecido: 'desconhecido', licito: 'lícito' }

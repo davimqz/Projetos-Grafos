@@ -84,4 +84,6 @@ function gerarHtmlLocal() {
 export default defineConfig({
   plugins: [react(), gerarHtmlLocal()],
   base: './',
+  // [IA] Claude Code – a aba da AVD lê as figuras de out/parte2/avd e o relatório em docs/, fora de front-react
+  server: { fs: { allow: [raiz] } },
 })
