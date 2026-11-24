@@ -2,7 +2,7 @@
 
 <!-- [IA] Claude Code – instruções do projeto React -->
 
-Projeto React (Vite) com o labirinto interativo, as figuras da Parte 1 e os 4 gráficos exploratórios da AVD.
+Projeto React (Vite) com o labirinto interativo, as figuras da Parte 1 e as figuras da AVD.
 É uma versão extra, fora dos requisitos do enunciado. Os dados vêm do código do grupo.
 
 ## Como rodar
@@ -50,7 +50,7 @@ sem depender de instalação da fonte ou acesso à rede.
 - `src/components/Labirinto.jsx`: labirinto interativo com animação
 - `src/components/Parte1.jsx`: percursos, grafo de estados interativo, árvore BFS e heatmap do m08
 - `src/components/GrafoEstados.jsx`: grafo de estados e árvore BFS com [Cytoscape.js](https://js.cytoscape.org/) (zoom, arrastar, layouts e destaque do percurso)
-- `src/components/Avd.jsx`: os 4 gráficos exploratórios
+- `src/components/Avd.jsx`: figuras da AVD lidas de `out/parte2/avd/` com os textos das seções 6.4 e 6.6 do relatório (atualizam sozinhas quando o notebook e o relatório mudam)
 - `src/App.jsx`: cabeçalho e abas
 
 O `package.json` troca o Rollup pela versão em WebAssembly (`overrides`), porque em algumas máquinas Windows o binário nativo é bloqueado.

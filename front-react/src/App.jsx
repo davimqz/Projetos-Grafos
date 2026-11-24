@@ -18,7 +18,7 @@ const ABAS = [
   ['parte2', 'Rede de carteiras', 'Algoritmos · Parte 2', ['Parte 2', 'Elliptic++'],
     'BFS, DFS, Dijkstra e Bellman-Ford executados sobre a rede de transações entre carteiras Bitcoin.'],
   ['avd', 'Análise de dados', 'AVD · Parte 2', ['Parte 2', 'AVD'],
-    'Os quatro gráficos exploratórios do recorte de carteiras do Elliptic++.'],
+    'Gráficos exploratórios e explanatórios do recorte de carteiras do Elliptic++, como estão no notebook e no relatório.'],
 ]
 
 function lerAba() {
