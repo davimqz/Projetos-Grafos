@@ -9,8 +9,8 @@ Matheus Araujo · Thomaz Lima · Davi Marques Oliveira · Vagner Montenegro de M
 Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/2026
 
 > **Estado da redação.** Os blocos **[A ESCREVER]** indicam conteúdo ainda pendente. A seção 4.3 registra
-> a contagem do mapa mínimo conferida manualmente por Matheus. As demais seções entre 4.1 e 4.10 aguardam
-> a redação do grupo.
+> a contagem do mapa mínimo conferida manualmente por Matheus. Entre 4.1 e 4.10, ainda faltam o desenho
+> indicado em 4.1 e a prova indicada em 4.7.
 
 ---
 
@@ -131,13 +131,80 @@ como oráculo.
 
 ### 4.1 Modelagem: G_pos e G_est
 
-> **[A ESCREVER — Matheus]** O que é um nó em cada grafo, o rótulo `(l,c)|chaves|{bônus}`, a numeração dos bônus em
-> ordem de leitura, a construção por exploração a partir de `S`, o nó `ALVO` com arco de custo 0 e as variantes
-> (portas como chão/parede, `+` fixo, fonte consumível). Incluir o G_est do m02 desenhado à mão.
+A resolução do labirinto utiliza dois grafos dirigidos. O primeiro, **G_pos** (grafo de posições), possui um nó para
+cada casa não parede da grade (`.`, `,`, `~`, `S`, `G`, chaves, portas, esteiras, bônus e fontes) e um arco para cada movimento
+permitido entre casas vizinhas, respeitando paredes e a restrição de saída das esteiras. O rótulo de cada nó segue o
+formato `(linha,coluna)`, com coordenadas começando em zero na grade sem comentários. G_pos não possui memória do que
+o jogador já coletou. Na variante padrão, trata portas como chão e inclui todas as casas não parede, mesmo as
+inalcançáveis a partir de `S`. É usado nas métricas estruturais (seção 4.4), nas comparações de modelagens ingênuas
+(seção 4.6) e no experimento de bônus com custo fixo (seção 4.7). Em `G`, não há movimentos físicos de saída.
+
+O segundo grafo, **G_est** (grafo de estados), incorpora a memória do jogador. Cada nó representa um **estado**
+composto por três informações: a posição `(l,c)`, o conjunto de chaves coletadas e o conjunto de bônus já consumidos.
+O rótulo segue o formato `(l,c)|chaves|{bônus}`. Chaves são letras minúsculas em ordem alfabética (`a`, `ab`, `abc`,
+...); sem chaves, o campo contém `-`. Bônus são identificadores inteiros atribuídos em **ordem de leitura** da grade
+(linha por linha, coluna por coluna), começando em zero; sem bônus consumidos, o campo mostra `{}`. Por exemplo, o
+rótulo `(3,5)|ab|{0,2}` indica que o jogador está na posição (3,5), possui as chaves `a` e `b` e consumiu os bônus
+de identificadores 0 e 2.
+
+A construção de G_est é feita **por exploração** a partir do estado inicial em `S`, sem chaves e sem bônus:
+`(ls,cs)|-|{}`. Apenas os estados alcançáveis são incluídos. A exploração utiliza uma fila: para cada estado
+retirado, são geradas as transições válidas na ordem N, L, S, O. Se o estado de destino ainda não existe no grafo,
+ele é adicionado e enfileirado. As regras de transição são:
+
+- **Chaves** (`a`–`d`): ao entrar na casa, a chave é adicionada ao conjunto do jogador e permanece em todas as
+  transições seguintes. A coleta é irreversível.
+- **Portas** (`A`–`D`): a transição só é permitida se o jogador possui a chave correspondente (minúscula).
+- **Esteiras** (`>`, `<`, `^`, `v`): permitem sair apenas na direção da seta. Se a saída aponta para fora da grade
+  ou para uma parede, o estado não tem movimento.
+- **Custos**: chão (`.`), `S`, `G`, chaves, portas e esteiras custam 1; lama (`,`) custa 3; água (`~`) custa 5;
+  bônus (`+`) custa −4 na primeira coleta e 1 nas seguintes; fonte (`*`) custa −2 sempre (ou apenas na primeira
+  coleta com `--fonte-consumivel`, passando a custar 1 depois).
+
+Ao término da exploração, é adicionado o vértice virtual **`ALVO`**, com um arco de custo zero partindo de cada
+estado cuja posição corresponde a `G`. Esses estados não têm saída física, pois o percurso termina em `G`.
+O `ALVO` não possui saída e é incluído mesmo se nenhuma saída física for alcançável. As buscas partem do estado
+inicial em `S`, e a existência de caminho até `ALVO` determina se o mapa tem solução. Dijkstra só é aplicável
+quando não há pesos negativos; Bellman-Ford também verifica se há ciclo negativo que afeta o custo até o alvo.
+
+As **variantes** de modelagem são:
+
+- **Portas como chão** (`portas="chao"`): G_pos onde as portas são tratadas como piso, sem exigir chave. Usada na
+  seção 4.6 para mostrar que essa simplificação gera caminhos inválidos.
+- **Portas como parede** (`portas="parede"`): G_pos onde as portas são removidas como se fossem paredes. Também
+  usada na seção 4.6.
+- **`+` fixo em −4**: no G_pos, todo bônus vale −4 em qualquer entrada, sem memória de consumo. Usado na seção 4.7
+  para demonstrar o ciclo negativo no m05.
+- **`--fonte-consumivel`**: no G_est, as fontes `*` são tratadas como consumíveis com identificadores próprios
+  (após todos os `+`), valendo −2 apenas na primeira visita. Usado para corrigir o ciclo negativo do m06.
+
+**[INSERIR AQUI: G_est do m02 desenhado à mão]**
+
+O m02 possui uma chave `a` na posição (3,11) e uma porta `A` na posição (1,6). O G_est resultante tem 39 estados
+físicos e 74 arcos físicos, distribuídos em duas camadas: a camada `-` (sem chaves, 16 estados) e a camada `a`
+(com a chave, 23 estados). O único arco entre camadas é gerado pela casa (3,11), onde o jogador entra e coleta a
+chave `a`, passando da camada `-` para a camada `a`.
 
 ### 4.2 Por que o grafo tem que ser dirigido
 
-> **[A ESCREVER — Matheus]** Exigido pelo enunciado (Seção 2). Pensar em esteiras e em pegar uma chave.
+O grafo de estados precisa ser dirigido porque existem movimentos que não podem ser desfeitos na direção oposta.
+Dois exemplos concretos ilustram essa necessidade:
+
+**Esteiras.** No m04, a posição (1,3) contém uma esteira `^` que aponta para o norte. O estado `(1,3)|-|{}` só
+poderia sair para o norte, mas há uma parede em (0,3), portanto não tem arco de saída. O movimento para leste
+que chega a essa posição a partir de `(1,2)` não pode ser revertido, pois a esteira não permite sair pelo oeste.
+Se o grafo fosse não dirigido, existiria uma ligação
+bidirecional entre `(1,2)|-|{}` e `(1,3)|-|{}`, permitindo voltar pela esteira, o que viola as regras do labirinto.
+No g02, a esteira `v` na posição (8,5) aponta para o sul: o jogador pode entrar nela, mas ao descer para o poço
+(linhas 9–11) não pode retornar ao corredor da linha 7. A esteira e as 36 casas do poço somam 37 estados-armadilha
+entre os 89 estados físicos (41,6%), pois não há movimento permitido da esteira para o norte.
+
+**Coleta de chaves.** No m02, quando o jogador se move de `(3,10)|-|{}` para a casa da chave em (3,11), a chave `a`
+é coletada automaticamente, e o estado de destino é `(3,11)|a|{}`. O estado `(3,11)|-|{}` não é gerado, pois a
+coleta ocorre na entrada. A transição muda de camada (de `-` para `a`). Se o grafo
+fosse não dirigido, o arco de volta levaria de `(3,11)|a|{}` para `(3,10)|-|{}`, o que implicaria que o jogador
+perderia a chave ao retornar, violando a regra de que chaves coletadas são permanentes. No G_est correto, o arco de
+volta leva a `(3,10)|a|{}`, mantendo a chave no conjunto do jogador.
 
 ### 4.3 Mapa mínimo contado à mão
 
@@ -203,19 +270,148 @@ e `ALVO` fica isolado.
 
 Fonte: `out/parte1/json/metricas_global.json` e `out/parte1/json/camadas.json`.
 
+#### Métricas globais
+
 | Mapa | G_pos: ordem | tamanho | densidade | G_est: ordem | tamanho | densidade | teto teórico | ocupação |
 |---|---|---|---|---|---|---|---|---|
-| m01 … m08 | | | | | | | | |
+| m01 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 1,0000 |
+| m02 | 23 | 43 | 0,0850 | 39 | 74 | 0,0499 | 46 | 0,8478 |
+| m03 | 76 | 167 | 0,0293 | 213 | 466 | 0,0103 | 608 | 0,3503 |
+| m04 | 24 | 39 | 0,0707 | 37 | 66 | 0,0495 | 48 | 0,7708 |
+| m05 | 44 | 90 | 0,0476 | 215 | 438 | 0,0095 | 352 | 0,6108 |
+| m06 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 1,0000 |
+| m07 | 31 | 69 | 0,0742 | 16 | 38 | 0,1583 | 62 | 0,2581 |
+| m08 | 1169 | 2574 | 0,0019 | 2919 | 6364 | 0,0007 | 18704 | 0,1561 |
+| g01 | 39 | 72 | 0,0486 | 104 | 194 | 0,0181 | 1248 | 0,0833 |
+| g02 | 89 | 205 | 0,0262 | 89 | 205 | 0,0262 | 89 | 1,0000 |
 
-> **[A ESCREVER — Matheus]** Comentário da tabela, métricas por camada, quantos arcos ligam camadas e **por que são
-> exatamente aquelas casas**.
+As ordens, os tamanhos e as densidades desta seção excluem `ALVO` e seus arcos virtuais. Ordem é o número de
+vértices, tamanho é o número de arcos e a densidade dirigida é `tamanho / (ordem × (ordem − 1))` para ordem maior
+que 1 (zero nos demais casos).
+
+O **teto teórico** é um limite superior combinatório, calculado como
+`casas_livres × 2^(chaves_distintas) × 2^(bônus)`. Ele inclui combinações que podem ser incompatíveis com as regras
+ou inalcançáveis no mapa. A **ocupação** é a razão entre os estados físicos alcançáveis e esse teto.
+Com `--fonte-consumivel`, cada fonte acrescenta mais um consumível ao expoente.
+
+Nos mapas sem chaves nem bônus (m01, m06 padrão, g02), a parte física de G_est tem a mesma estrutura de G_pos,
+com rótulos diferentes, e a ocupação é 1,0000: nesses três mapas, todas as casas livres são alcançáveis e cada
+uma corresponde a exatamente um estado. Nos mapas com chaves e sem consumíveis, cada casa pode gerar até
+`2^(chaves)` estados, um para cada subconjunto de chaves que o jogador pode ter ao visitá-la. No m03, com três chaves,
+o teto é 608, mas apenas 213 estados (35%) são alcançáveis, porque muitas combinações de posição e chaves não podem
+ser atingidas: por exemplo, o jogador não alcança a região além da porta `B` sem antes coletar `a` e `b`.
+
+No m08, o teto é 18.704 (1.169 casas × 2^4 chaves), e apenas 15,6% dos estados são alcançáveis. Isso se deve à
+topologia do labirinto: muitas casas só podem ser visitadas depois de coletar certas chaves, restringindo as
+combinações realizáveis. O g01, com 3 chaves e 2 bônus, tem o menor percentual de ocupação (8,3%) porque o teto
+é muito amplo (1.248), mas o layout linear do mapa impõe uma ordem rígida de coleta que limita as combinações
+possíveis.
+
+O m07 tem apenas 16 estados alcançáveis dos 62 possíveis (25,8%). A chave `a` está atrás de uma porta `A` que a
+exige, tornando impossível coletá-la. Assim, apenas os estados da camada `-` (sem chaves) são alcançáveis, e a
+saída `G` está bloqueada pela segunda porta `A` na posição (1,6).
+
+#### Métricas por camada e arcos entre camadas
+
+| Mapa | Camada (chaves) | Ordem | Tamanho | Densidade |
+|---|---|---|---|---|
+| m01 | - | 24 | 46 | 0,0833 |
+| m02 | - | 16 | 30 | 0,1250 |
+| m02 | a | 23 | 43 | 0,0850 |
+| m03 | - | 12 | 22 | 0,1667 |
+| m03 | a | 53 | 114 | 0,0414 |
+| m03 | ab | 72 | 160 | 0,0313 |
+| m03 | abc | 76 | 167 | 0,0293 |
+| m04 | - | 17 | 30 | 0,1103 |
+| m04 | a | 20 | 35 | 0,0921 |
+| m05 | - | 215 | 438 | 0,0095 |
+| m06 | - | 24 | 46 | 0,0833 |
+| m07 | - | 16 | 38 | 0,1583 |
+| m08 | - | 165 | 356 | 0,0132 |
+| m08 | a | 314 | 670 | 0,0068 |
+| m08 | ab | 442 | 940 | 0,0048 |
+| m08 | abc | 829 | 1818 | 0,0026 |
+| m08 | abcd | 1169 | 2574 | 0,0019 |
+| g01 | - | 9 | 15 | 0,2083 |
+| g01 | a | 28 | 51 | 0,0675 |
+| g01 | ab | 39 | 72 | 0,0486 |
+| g01 | abc | 28 | 51 | 0,0675 |
+| g02 | - | 89 | 205 | 0,0262 |
+
+Cada camada é definida somente pelo conjunto de chaves e reúne todos os conjuntos de bônus alcançáveis com
+essas chaves. Seu tamanho conta apenas os arcos internos ao subgrafo induzido. Assim, coletar um bônus muda o
+estado, mas não muda a camada desta tabela.
+
+| Mapa | Arcos entre camadas | Casas que os geram |
+|---|---|---|
+| m01 | 0 | — |
+| m02 | 1 | (3,11) `a` |
+| m03 | 3 | (1,12) `b`, (6,6) `c`, (8,1) `a` |
+| m04 | 1 | (3,11) `a` |
+| m05 | 0 | — |
+| m06 | 0 | — |
+| m07 | 0 | — |
+| m08 | 6 | (3,23) `b`, (3,29) `d`, (5,37) `c`, (27,5) `a` |
+| g01 | 5 | (3,4) `a`, (3,10) `b`, (3,16) `c` |
+| g02 | 0 | — |
+
+Os arcos entre camadas são gerados pela entrada em casas de **chaves ainda não coletadas**. Nessa entrada,
+o conjunto de chaves aumenta e o estado passa a pertencer a uma camada diferente. Revisitar uma chave já
+coletada não muda a camada. Essas são as únicas
+transições que atravessam camadas, pois nenhum outro tipo de casa altera o conjunto de chaves. No m03, as três
+casas de chave — `a` em (8,1), `b` em (1,12) e `c` em (6,6) — geram os três arcos entre camadas. No m08, com
+quatro chaves, há seis arcos entre camadas a partir de quatro casas: dois coletam `a`, um coleta `b`, dois
+coletam `c` e um coleta `d`. Os dois arcos de coleta de `a` chegam de (27,4) e (28,5), ambos sem chaves;
+os dois de coleta de `c` chegam de (6,37) e (4,37), ambos com `ab`. Portanto, nesse mapa, a contagem maior que
+o número de casas de chave vem de diferentes posições de origem, e não de diferentes inventários na mesma coleta.
+
+A densidade diminui ao longo das camadas dos mapas m02, m03, m04 e m08: com mais chaves, o jogador acessa mais
+casas do mapa, mas o número de arcos cresce proporcionalmente menos que o quadrado da ordem. No m08, a camada `-` tem densidade 0,0132
+com 165 estados, enquanto a camada `abcd` tem densidade 0,0019 com 1.169 estados, refletindo a esparsidade do
+labirinto grande. Isso não é uma regra geral: no g01, a densidade aumenta de 0,0486 na camada `ab` para
+0,0675 na camada `abc`, cuja ordem é menor.
 
 ### 4.5 Graus, multiplicidade e becos
 
 Fonte: `out/parte1/csv/graus_<mapa>.csv`, `out/parte1/figuras/heatmap_m08.png`.
 
-> **[A ESCREVER — Matheus]** Maior grau de entrada e de saída por mapa; multiplicidade máxima no m08, quantas casas a
-> atingem e por quê; becos encontrados.
+| Mapa | Maior grau de entrada | estado | Maior grau de saída | estado | Multiplicidade máx. | casas | Becos |
+|---|---|---|---|---|---|---|---|
+| m01 | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | <code>(1,1)&#124;-&#124;{}</code> | 1 | 24 | 0 |
+| m02 | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | 16 | 0 |
+| m03 | 3 | <code>(1,12)&#124;ab&#124;{}</code> | 3 | <code>(3,12)&#124;abc&#124;{}</code> | 4 | 12 | 0 |
+| m04 | 3 | <code>(3,8)&#124;-&#124;{}</code> | 3 | <code>(3,8)&#124;-&#124;{}</code> | 2 | 17 | 2 |
+| m05 | 4 | <code>(3,10)&#124;-&#124;{0,1,2}</code> | 3 | <code>(3,1)&#124;-&#124;{0,1,2}</code> | 6 | 21 | 0 |
+| m06 | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | <code>(1,1)&#124;-&#124;{}</code> | 1 | 24 | 0 |
+| m07 | 3 | <code>(3,1)&#124;-&#124;{}</code> | 3 | <code>(3,1)&#124;-&#124;{}</code> | 1 | 16 | 0 |
+| m08 | 4 | <code>(11,65)&#124;abcd&#124;{}</code> | 4 | <code>(11,65)&#124;abcd&#124;{}</code> | 5 | 165 | 0 |
+| g01 | 3 | <code>(1,13)&#124;abc&#124;{0,1}</code> | 3 | <code>(1,13)&#124;abc&#124;{0,1}</code> | 5 | 2 | 3 |
+| g02 | 4 | <code>(10,12)&#124;-&#124;{}</code> | 4 | <code>(10,12)&#124;-&#124;{}</code> | 1 | 89 | 0 |
+
+Os graus da tabela contam somente arcos físicos. O estado indicado é um representante do máximo, escolhido pelo
+menor rótulo em ordem lexicográfica quando há empate. A coluna `casas` conta as posições que atingem a
+multiplicidade máxima. A **multiplicidade** de uma casa é o número de estados distintos que compartilham a mesma
+posição `(l,c)`. Ela reflete quantas combinações de chaves e bônus o jogador pode ter ao visitar aquela casa.
+
+No **m08**, a multiplicidade máxima é 5, atingida por 165 das 1.169 casas livres. Essas casas são as que podem ser
+visitadas nas cinco camadas alcançáveis: `-`, `a`, `ab`, `abc` e `abcd`. As outras 11 combinações teóricas de quatro
+chaves não aparecem no grafo desse mapa. Como as casas da camada `-` podem ser revisitadas após cada coleta, elas
+atingem multiplicidade 5; por exemplo, `S` em (1,1) aparece nas cinco camadas. Casas que só se tornam acessíveis
+após certas coletas aparecem em menos camadas. O heatmap do m08 (`out/parte1/figuras/heatmap_m08.png`) representa
+essa contagem por posição, com cores mais quentes nas casas de maior multiplicidade.
+
+No **m05**, a multiplicidade máxima é 6, atingida por 21 casas. Embora o mapa não tenha chaves, possui três bônus
+(`+`), gerando até 2^3 = 8 subconjuntos de bônus. A multiplicidade de 6 indica que nem todos os 8 subconjuntos são
+alcançáveis em cada uma dessas casas, mas que a maioria deles é.
+
+**Becos** (estados sem saída física que não estão em `G`) aparecem em dois mapas. No **m04**, há 2 becos: os estados
+`(1,3)|-|{}` e `(1,3)|a|{}`, correspondentes à casa da esteira `^` na posição (1,3). Essa esteira aponta para o
+norte, mas acima dela há uma parede em (0,3), portanto o estado não possui nenhum arco de saída.
+Os estados chegam a essa posição movendo-se para leste a partir de `(1,2)`, mas não
+podem sair. No **g01**, há 3 becos: `(1,5)|-|{}`, `(1,11)|a|{0}` e `(1,17)|ab|{0,1}`, correspondentes às três
+casas de esteira `>` nas posições (1,5), (1,11) e (1,17). Cada esteira empurra o jogador para a porta seguinte,
+mas sem a chave correspondente a porta bloqueia a passagem e, como a esteira só permite sair na direção `L`, o
+estado fica preso.
 
 ### 4.6 Comparação de modelagens (m02, m03, m04)
 
@@ -223,18 +419,57 @@ Fonte: `out/parte1/csv/comparacao_modelagem.csv`.
 
 | Mapa | Abordagem | Passos | Caminho válido | Observação |
 |---|---|---|---|---|
-| | portas como chão | | | |
-| | portas como parede | | | |
-| | G_est | | | |
+| m02 | portas como chão | 10 | Não | Ignora chaves e atravessa portas diretamente. |
+| m02 | portas como parede | — | Não | Bloqueia portas mesmo quando há chave disponível. |
+| m02 | grafo de estados | 34 | Sim | Modelagem exata com memória de chaves coletadas. |
+| m03 | portas como chão | 21 | Não | Ignora chaves e atravessa portas diretamente. |
+| m03 | portas como parede | — | Não | Bloqueia portas mesmo quando há chave disponível. |
+| m03 | grafo de estados | 87 | Sim | Modelagem exata com memória de chaves coletadas. |
+| m04 | portas como chão | 14 | Não | Ignora chaves e atravessa portas diretamente. |
+| m04 | portas como parede | — | Não | Bloqueia portas mesmo quando há chave disponível. |
+| m04 | grafo de estados | 20 | Sim | Modelagem exata com memória de chaves coletadas. |
 
-> **[A ESCREVER — Matheus]** Por que (a) gera caminho inválido e (b) falha.
+A abordagem **portas como chão** trata as portas como piso livre, sem exigir chave. No m02, o caminho encontrado
+pela BFS em G_pos(chão) tem apenas 10 passos e passa pela porta `A` em (1,6) sem que o jogador tenha coletado a
+chave `a`, que está em (3,11). Esse caminho é inválido: na execução real do labirinto, o jogador seria bloqueado ao
+tentar atravessar a porta sem a chave. O mesmo acontece nos m03 e m04, onde os caminhos encontrados com 21 e 14
+passos, respectivamente, também atravessam portas sem as chaves necessárias. Essa abordagem é rápida, mas gera
+soluções que violam as regras do jogo.
+
+A abordagem **portas como parede** exclui as portas de G_pos como se fossem paredes intransponíveis. No m02, isso
+bloqueia a única passagem entre o corredor superior e a saída `G`, tornando o mapa sem solução: a BFS não encontra
+caminho. Essa modelagem é excessivamente conservadora, pois ignora completamente a mecânica de chaves e portas,
+recusando mapas que são resolvíveis.
+
+Nos três mapas comparados, apenas o **grafo de estados** encontra um caminho válido até a saída, porque mantém
+o registro das chaves coletadas em cada estado.
+No m02, o caminho com 34 passos primeiro desce até a chave `a` em (3,11), retorna ao corredor superior com a chave
+no inventário e então atravessa a porta `A` legitimamente. Os 34 passos são o mínimo entre os caminhos válidos
+nesse mapa; isso não significa que exista um único percurso válido.
 
 ### 4.7 m05: pesos negativos e a prova
 
 Fonte: Bellman-Ford no G_pos com `+` fixo em −4 × no G_est.
 
-> **[A ESCREVER — Matheus]** Resultado dos dois casos e a **prova** de que o G_est do m05 não tem ciclo negativo
-> (dica do enunciado: o que acontece com o conjunto de bônus ao longo de um caminho?).
+| Grafo | Status | Ciclo encontrado | Custo do ciclo | Custo até ALVO |
+|---|---|---|---|---|
+| G_pos com + fixo em −4 | CICLO_NEGATIVO | (3,3) → (3,2) → (3,3) | −3 | — |
+| G_est | OK | — | — | 5 |
+
+No **G_pos** com `+` fixo em −4, o Bellman-Ford detecta um ciclo negativo entre as posições (3,3) e (3,2). Os
+bônus nas posições (3,2), (3,10) e (5,4) valem −4 em toda entrada. O ciclo (3,3) → (3,2) → (3,3) tem custo −3:
+entrar em (3,2), que é bônus (custo −4), e voltar para (3,3), que é chão (custo 1), soma (−4) + 1 = −3. Sem memória
+de consumo, o jogador poderia repetir esse ciclo indefinidamente, reduzindo o custo total sem limite. O G_pos com
+`+` fixo é uma simplificação que não corresponde às regras reais do jogo.
+
+No **G_est**, o Bellman-Ford encontra caminho até ALVO com custo 5, sem ciclo negativo. Cada bônus `+` vale −4
+apenas na primeira coleta; nas seguintes, vale 1. Os três bônus são consumíveis de identificadores 0, 1 e 2,
+nas posições (3,2), (3,10) e (5,4), respectivamente.
+
+**Prova de que o G_est do m05 não pode ter ciclo negativo.**
+
+**[A ESCREVER — Matheus, sem IA]** Hipótese, passo central (dica: o que acontece com o conjunto de bônus ao longo
+de um caminho?) e conclusão.
 
 ### 4.8 Caminhos nos mapas
 
@@ -242,31 +477,204 @@ Fonte: `out/parte1/csv/solucoes.csv`, `out/parte1/csv/dfs_classificacao.csv`, `o
 
 | Mapa | BFS (passos) | Dijkstra (custo / status) | Bellman-Ford | DFS: árvore / retorno / avanço / cruzamento |
 |---|---|---|---|---|
-| m01 … m08, mapas do grupo | | | | |
+| m01 | 10 | 20 (14 passos) | 20 (14 passos) | 24 / 22 / 0 / 1 |
+| m02 | 34 | 46 (34 passos) | 46 (34 passos) | 39 / 36 / 0 / 0 |
+| m03 | 87 | 99 (91 passos) | 99 (91 passos) | 213 / 231 / 23 / 0 |
+| m04 | 20 | 36 (20 passos) | 36 (20 passos) | 37 / 30 / 0 / 0 |
+| m05 | 12 | RECUSA | 5 (20 passos) | 215 / 208 / 5 / 16 |
+| m06 | 10 | RECUSA | CICLO_NEGATIVO | 24 / 22 / 0 / 1 |
+| m07 | SEM_SOLUCAO | SEM_SOLUCAO | SEM_SOLUCAO | 15 / 19 / 4 / 0 |
+| m08 | 392 | 482 (396 passos) | 482 (396 passos) | 2919 / 3178 / 265 / 3 |
+| g01 | 48 | RECUSA | 38 (48 passos) | 104 / 89 / 0 / 2 |
+| g02 | 22 | 30 (30 passos) | 30 (30 passos) | 89 / 101 / 15 / 1 |
 
-> **[A ESCREVER — Matheus e Thomaz]** Discussões obrigatórias:
-> - **m01:** por que BFS e Dijkstra dão caminhos diferentes;
-> - **m06:** o ciclo negativo (sequência de estados e custo, de `ciclo_negativo_m06.json`), a correção com
->   `--fonte-consumivel` e o resultado finito do Bellman-Ford;
-> - **m07:** como a busca mostra que não há solução e quantos estados são alcançáveis.
+Os passos excluem o arco virtual até `ALVO`. Já a classificação da DFS inclui `ALVO` e os arcos virtuais
+alcançáveis; por isso, suas contagens não somam apenas os arcos físicos da seção 4.4. A DFS faz a exploração e
+a classificação dos arcos, sem garantir um caminho mínimo em passos ou custo. `RECUSA` indica que Dijkstra
+encontrou peso negativo no grafo, mesmo que exista um caminho até a saída.
+
+#### m01: por que BFS e Dijkstra dão caminhos diferentes
+
+No m01, a BFS encontra o caminho com menos passos: 10 movimentos pelo corredor superior, passando pelas casas de
+água (`~`) de custo 5 cada. O caminho é `(1,1) → (1,2) → ... → (1,11)`, com custo total 30: são cinco entradas
+em água e cinco entradas de custo 1, incluindo `G`, totalizando `5 × 5 + 5 × 1 = 30`. A posição inicial `S` não é cobrada.
+
+O Dijkstra encontra o caminho de menor custo: 14 passos descendo pelo corredor inferior, onde há lama (`,`, custo 3)
+em vez de água (custo 5). O caminho é `(1,1) → (2,1) → (3,1) → (3,2) → ... → (3,10) → (3,11) → (2,11) → (1,11)`,
+com custo total 20 (3 entradas em lama × 3 + 11 entradas de custo 1 = 9 + 11 = 20). O caminho tem mais passos, mas
+evita a água e paga menos no total.
+
+Essa diferença ilustra que a BFS minimiza o número de arcos (passos), enquanto o Dijkstra minimiza a soma dos pesos
+(custo). Com pesos físicos iguais e positivos, os dois critérios têm os mesmos caminhos ótimos. Com pesos
+diferentes, os caminhos ainda podem coincidir, como ocorre no m02 e no m04, mas isso não é garantido.
+
+#### m06: ciclo negativo e fonte consumível
+
+Ciclo negativo do m06 (`ciclo_negativo_m06.json`): `(3,6)|-|{}` → `(3,5)|-|{}` → `(3,6)|-|{}`, custo −1.
+
+O m06 possui uma fonte `*` na posição (3,5), que custa −2 a cada entrada. O ciclo entre (3,6) e (3,5) alterna entre
+uma casa de chão (custo 1) e a fonte (custo −2), resultando em custo −1 por volta. Como a fonte vale −2 em toda
+entrada, o jogador pode repetir o ciclo indefinidamente e depois alcançar `G`, reduzindo o custo até a saída sem
+limite. Portanto, há percurso até a saída, mas não há custo mínimo finito. Esse comportamento funciona
+como um **exploit**: o jogador "abusa" da fonte infinita para obter custo arbitrariamente baixo.
+
+A correção é a variante `--fonte-consumivel`, que trata as fontes como consumíveis (assim como os bônus `+`): a
+fonte vale −2 apenas na primeira visita e custa 1 nas seguintes. Com essa regra, o ciclo entre (3,6) e (3,5) passa
+a custar 1 + 1 = 2 por volta após o consumo. Na primeira coleta, o conjunto de consumíveis muda, portanto o
+retorno à mesma posição não fecha um ciclo no grafo de estados anterior à coleta. A mudança elimina o ciclo
+negativo, embora ainda haja arcos negativos de primeira entrada na fonte e Dijkstra continue recusando o grafo.
+
+Com `--fonte-consumivel` (`out/parte1/fonte_consumivel/`): Bellman-Ford OK, custo 10, 10 passos. O caminho é o
+mesmo da BFS no m06 padrão, seguindo direto pelo corredor superior, na linha 1, sem visitar a fonte.
+
+#### m07: impossibilidade
+
+No m07, BFS, Dijkstra e Bellman-Ford retornam `SEM_SOLUCAO`; a DFS também não alcança `ALVO`. O mapa contém uma
+chave `a` na posição (4,7) e duas portas `A`: uma em (1,6) e outra em (3,7). A chave está atrás da porta `A` em
+(3,7), que exige a própria chave `a` para ser atravessada. Como não é possível coletar a chave sem antes ter a
+chave, o mapa é impossível de resolver.
+
+Dos 62 estados teóricos (31 casas × 2 combinações de chave), apenas 16 são alcançáveis, todos na camada `-` (sem
+chaves). A DFS a partir de `S` classifica 15 arcos de árvore, 19 de retorno e 4 de avanço, sem arcos de cruzamento.
+Os 19 arcos de retorno confirmam que a região alcançável contém ciclos (o jogador pode ir e voltar nos corredores),
+mas nenhum desses caminhos leva à saída `G`, que está bloqueada pela porta (1,6).
 
 ### 4.9 Estados-armadilha (m04 e m07)
 
 Fonte: `out/parte1/csv/armadilhas_m04.csv`, `out/parte1/csv/armadilhas_m07.csv`.
 
-> **[A ESCREVER — Matheus]** Método (busca a partir de `ALVO` no grafo transposto), quantos estados são armadilha e
-> exemplos.
+| Mapa | Estados alcançáveis | Estados-armadilha | % do total |
+|---|---|---|---|
+| m01 | 24 | 0 | 0,0% |
+| m02 | 39 | 0 | 0,0% |
+| m03 | 213 | 0 | 0,0% |
+| m04 | 37 | 4 | 10,8% |
+| m05 | 215 | 0 | 0,0% |
+| m06 | 24 | 0 | 0,0% |
+| m07 | 16 | 16 | 100,0% |
+| m08 | 2919 | 0 | 0,0% |
+| g01 | 104 | 3 | 2,9% |
+| g02 | 89 | 37 | 41,6% |
+
+Um estado é uma **armadilha** quando, a partir dele, não existe caminho dirigido até `ALVO`. O método de detecção
+utiliza o **grafo transposto**: inverte a direção de todos os arcos de G_est e executa uma BFS a partir de `ALVO`.
+Todo estado alcançado por essa BFS reversa possui, no grafo original, um caminho até `ALVO`, portanto não é
+armadilha. Os estados alcançáveis no G_est original que não são encontrados pela BFS no transposto são armadilhas.
+
+No **m04**, há 4 estados-armadilha:
+
+| Estado | Situação |
+|---|---|
+| <code>(1,3)&#124;-&#124;{}</code> | Esteira `^` em (1,3) sem chave, sem saída (aponta para parede). |
+| <code>(1,3)&#124;a&#124;{}</code> | Mesma esteira com a chave `a`, também sem saída. |
+| <code>(1,8)&#124;-&#124;{}</code> | Esteira `>` que só permite avançar para (1,9), sem a chave `a`. |
+| <code>(1,9)&#124;-&#124;{}</code> | Chão antes da porta `A` em (1,10); sem a chave, só permite voltar para a esteira em (1,8). |
+
+Os 2 primeiros são os becos identificados na seção 4.5: a esteira na posição (1,3) aponta para o norte, onde há
+parede, e o jogador não pode sair de lá. Os estados `(1,8)|-|{}` e `(1,9)|-|{}` não são becos (possuem arcos de
+saída), mas formam um ciclo fechado de dois estados sem a chave. A porta `A` fica em (1,10) e bloqueia o avanço;
+a esteira em (1,8) impede descer de volta para (2,8) e buscar a chave. Com a chave, é possível atravessar a porta,
+por isso os estados nessas duas posições na camada `a` não são armadilhas.
+
+No **m07**, todos os 16 estados alcançáveis são armadilhas (100,0%). Como a saída `G` é inalcançável (a chave está
+trancada atrás da porta que a exige), nenhum estado pode chegar a `ALVO`. O vértice `ALVO` existe no grafo mas não
+é alcançável a partir de nenhum estado, o que a BFS no transposto confirma: apenas `ALVO` é encontrado por ela.
+
+No **g02**, 37 dos 89 estados são armadilhas (41,6%). A esteira `v` na posição (8,5) empurra o jogador para o
+poço nas linhas 9–11. As 37 armadilhas são a própria esteira e as 36 casas do poço. Existe uma ligação física
+entre o poço e a esteira, mas, ao voltar para ela, sua única saída aponta novamente para o sul. Assim, não há
+caminho dirigido de retorno ao corredor da linha 7 nem até `G`.
 
 ### 4.10 Mapas do grupo
 
 Fonte: `data/mapas_grupo/`.
 
-| Mapa | Estados | Arcos | Passos (BFS) | Custo (Dijkstra ou BF) | % armadilhas |
-|---|---|---|---|---|---|
-| mapa 1 (≥ 3 chaves, esteira e bônus no caminho ótimo) | | | | | |
-| mapa 2 (≥ 20% de armadilhas) | | | | | |
+#### g01 — Três depósitos
 
-> **[A ESCREVER — Matheus]** Desenho de cada mapa e o que ele exercita.
+```text
+#####################
+#S...>A.+..>B.+..>CG#
+#.#####.#####.#######
+#...a.#...b.#...c...#
+#####################
+```
+
+| Métrica | Valor |
+|---|---|
+| Dimensões | 5 × 21 |
+| Estados alcançáveis (G_est) | 104 |
+| Arcos físicos | 194 |
+| Estados-armadilha | 3 (2,9%) |
+
+| Algoritmo | Passos | Custo | Status |
+|---|---|---|---|
+| BFS | 48 | 38 | OK |
+| Dijkstra | — | — | RECUSA (pesos negativos) |
+| Bellman-Ford | 48 | 38 | OK |
+
+O g01 foi projetado para exercitar **três chaves**, **esteiras** e **bônus no caminho ótimo**. O layout é linear,
+com três "depósitos" em sequência: em cada um, o jogador desce pelo corredor inferior para coletar a chave (`a`, `b` ou
+`c`), retorna ao corredor superior, passa pela esteira `>` que o empurra para leste, atravessa a porta
+correspondente (`A`, `B` ou `C`). Há dois bônus `+` (custo −4), após as duas primeiras portas, nas posições
+(1,8) e (1,14), com identificadores 0 e 1. As três esteiras estão nas posições (1,5), (1,11) e (1,17).
+
+Neste mapa, o caminho mínimo em passos encontrado pela BFS também tem o custo mínimo encontrado por
+Bellman-Ford: 48 passos e custo 38. Ele percorre os três depósitos em sequência, coletando cada
+chave antes de prosseguir. Os dois bônus reduzem o custo: cada `+` vale −4 na primeira coleta, e o custo total
+com os bônus é 38: são 46 entradas de custo 1 e duas de custo −4, ou `46 − 8 = 38`. Em relação a 48 entradas
+de custo 1, cada bônus reduz o custo em 5, resultando em `48 − 2 × 5 = 38`. O Dijkstra recusa a execução por haver pesos
+negativos no grafo.
+
+As 3 armadilhas são os estados nas esteiras `>` antes de cada porta: `(1,5)|-|{}`, `(1,11)|a|{0}` e
+`(1,17)|ab|{0,1}`. Se o jogador chegar a uma esteira sem a chave da porta seguinte, fica preso, pois a esteira
+só permite sair para leste e a porta bloqueia sem a chave.
+
+#### g02 — Poço lateral (desvio alagado)
+
+```text
+#####################
+#S......#########..G#
+#.#####.#########.#.#
+#.#####.~~~~~~~~~.#.#
+#.#################.#
+#...###############.#
+###.###############.#
+###.................#
+#####v###############
+###.............#####
+###...#...#...#.#####
+###.............#####
+#####################
+```
+
+| Métrica | Valor |
+|---|---|
+| Dimensões | 13 × 21 |
+| Estados alcançáveis (G_est) | 89 |
+| Arcos físicos | 205 |
+| Estados-armadilha | 37 (41,6%) |
+
+| Algoritmo | Passos | Custo | Status |
+|---|---|---|---|
+| BFS | 22 | 58 | OK |
+| Dijkstra | 30 | 30 | OK |
+| Bellman-Ford | 30 | 30 | OK |
+
+O g02 foi projetado para ter **pelo menos 20% de armadilhas** (atinge 41,6%) e para ilustrar a diferença entre
+minimizar passos e minimizar custo. Não possui chaves nem bônus; como todas as casas livres são alcançáveis,
+a parte física de G_est tem a mesma estrutura de G_pos, com rótulos diferentes e sem contar `ALVO`.
+
+A BFS encontra o caminho mais curto em passos: 22 movimentos pelo corredor superior, passando pelas 9 casas de
+água (`~`, custo 5 cada) na linha 3. O custo total é 58 (9 × 5 + 13 × 1 = 45 + 13 = 58).
+
+O Dijkstra e o Bellman-Ford encontram o caminho mais barato: 30 passos pelo desvio seco, descendo pela esquerda,
+percorrendo o corredor da linha 7 (todo de chão, custo 1) e subindo pela direita até `G`. O custo é 30 (30 passos ×
+1 = 30), bem inferior aos 58 do caminho curto.
+
+A esteira `v` na posição (8,5) é a responsável pelas 37 armadilhas: ela aponta para o sul e empurra qualquer
+jogador que a alcance para o poço nas linhas 9–11. Há 36 casas no poço, e a esteira é a 37ª armadilha.
+O jogador pode voltar do poço para a esteira, mas não subir dela para o corredor da linha 7, pois sua única
+saída aponta para o sul. Nenhum desses 37 estados possui caminho até `G`.
 
 ### 4.11 Visualizações
 
