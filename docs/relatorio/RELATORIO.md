@@ -8,9 +8,9 @@ Matheus Araujo · Thomaz Lima · Davi Marques Oliveira · Vagner Montenegro de M
 
 Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/2026
 
-> **Como usar este esqueleto.** Cada bloco marcado com **[A ESCREVER]** diz o que o enunciado pede e quem é o dono.
-> Pelas regras de IA, análises, discussões, conclusões, notas analíticas e a prova do m05 têm que ser escritas por
-> nós; a IA só pode revisar ortografia e clareza depois. Apagar este aviso e os marcadores antes de gerar o PDF.
+> **Estado da redação.** Os blocos **[A ESCREVER]** indicam conteúdo ainda pendente. A seção 4.3 registra
+> a contagem do mapa mínimo conferida manualmente por Matheus. As demais seções entre 4.1 e 4.10 aguardam
+> a redação do grupo.
 
 ---
 
@@ -141,8 +141,63 @@ como oráculo.
 
 ### 4.3 Mapa mínimo contado à mão
 
-> **[A ESCREVER — Matheus]** O mapa de até 5×7 usado em `tests/test_estados.py`, com o número de estados e de arcos
-> contado à mão e a indicação do teste que confere.
+<!-- [IA] Codex — organização da conferência do mapa mínimo, validada manualmente por Matheus. -->
+
+Para conferir a construção de G_est, utilizamos o caso mínimo com chave e porta presente em
+`tests/test_estados.py`. A grade possui uma linha e quatro colunas, dentro do limite de 5 × 7. A enumeração
+dos estados e dos arcos foi conferida manualmente por Matheus, pelas regras de movimento e de coleta.
+
+```text
+SaAG
+```
+
+As coordenadas começam em zero: `S` está em `(0,0)`, a chave `a` em `(0,1)`, a porta `A` em `(0,2)` e a saída
+`G` em `(0,3)`. Não há bônus, portanto o conjunto de consumíveis permanece vazio em todos os estados.
+Partindo do início sem chave, são alcançáveis os seguintes estados:
+
+| Identificador | Estado | Situação |
+|---|---|---|
+| q0 | <code>(0,0)&#124;-&#124;{}</code> | Início sem a chave |
+| q1 | <code>(0,1)&#124;a&#124;{}</code> | Entrada na chave `a` |
+| q2 | <code>(0,0)&#124;a&#124;{}</code> | Retorno ao início com a chave |
+| q3 | <code>(0,2)&#124;a&#124;{}</code> | Porta `A` atravessada |
+| q4 | <code>(0,3)&#124;a&#124;{}</code> | Saída alcançada |
+
+O início corresponde a dois estados: antes da coleta e após o retorno com a chave. Nas outras três posições,
+há somente um estado alcançável em cada uma. A casa da chave não admite um estado sem `a`, pois a coleta ocorre
+ao entrar; a porta exige essa chave, e a saída só é alcançada depois de atravessá-la. Assim, a contagem por
+posição é `2 + 1 + 1 + 1 = 5 estados físicos`.
+
+Os movimentos permitidos, considerando os vizinhos na ordem N, L, S, O, geram os seis arcos físicos abaixo.
+Todos têm peso 1, correspondente ao custo de entrar na casa de destino.
+
+| Origem | Movimento | Destino | Peso |
+|---|---|---|---|
+| q0 | Leste: coleta a chave | q1 | 1 |
+| q1 | Leste: atravessa a porta | q3 | 1 |
+| q1 | Oeste: retorna com a chave | q2 | 1 |
+| q2 | Leste: revisita a chave | q1 | 1 |
+| q3 | Leste: alcança a saída | q4 | 1 |
+| q3 | Oeste: retorna à casa da chave | q1 | 1 |
+
+Não existem movimentos para norte ou sul, pois levariam para fora da grade. O retorno de q1 para a posição
+inicial leva a q2, e não a q0, porque a chave permanece com o jogador. Em q4, o jogo termina e não há saída
+física. A soma dos graus de saída confirma a contagem: `1 + 2 + 1 + 2 + 0 = 6 arcos físicos`.
+
+Acrescentando o vértice virtual `ALVO`, há somente mais um arco, `q4 → ALVO`, de peso zero. O alvo virtual
+não possui saída. Os totais são:
+
+| Contagem | Estados ou vértices | Arcos |
+|---|---|---|
+| Somente elementos físicos | 5 | 6 |
+| Incluindo ALVO e o arco virtual | 6 | 7 |
+
+O teste `test_grafo_estados_chave_muda_camada_e_permanece_no_retorno` confere esses cinco estados, a ordem 6,
+o tamanho 7 e as listas de vizinhos, incluindo a permanência da chave no retorno. A esteira bloqueada é
+verificada separadamente pelo caso `S^G`, do teste parametrizado
+`test_grafo_estados_tem_exatamente_os_nos_e_arcos_esperados`: somente `S` e `^` são alcançáveis, há um arco
+físico entre eles e a esteira não tem saída, pois aponta para fora da grade. Nesse caso, `G` é inalcançável
+e `ALVO` fica isolado.
 
 ### 4.4 Métricas globais e por camada
 
