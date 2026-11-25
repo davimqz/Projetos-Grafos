@@ -143,7 +143,7 @@ Figura de apoio: `benchmark_caminhos_bfs_dijkstra.png`, em que o mesmo par ilíc
 | Origem | Status | Resultado |
 |---|---|---|
 | `3Fzzji5n…` (lícita) | OK | 45 carteiras alcançadas, 29 arcos negativos alcançáveis |
-| `1MFXYK1X…` (desconhecida) | CICLO_NEGATIVO | ciclo de 2 carteiras com custo −13.226,15 |
+| `1MFXYK1X…` (desconhecida) | CICLO_NEGATIVO | ciclo de 3 carteiras com a própria origem (2 desconhecidas e 1 lícita), custo −1.677,39 |
 
 Falas e interpretação deste bloco: usar as seções 5.3 a 5.5 do relatório.
 
@@ -191,7 +191,7 @@ Cada um escreve a resposta da sua parte e todos leem antes do ensaio.
 | O que é vértice e o que é aresta em G_est? E na Parte 2? | Matheus / Davi |
 | Por que o Dijkstra recusa o m05? | Matheus |
 | Por que o peso do Bellman-Ford é o saldo do destino e não a diferença de saldos? | Davi |
-| Por que o Bellman-Ford leva 42,6 s no grafo inteiro e os outros levam milissegundos? | Vagner |
+| Por que o Bellman-Ford leva 42,6 s no grafo inteiro e os outros levam milissegundos? (refazer depois do novo benchmark: com o PR #49 ele para ao achar o ciclo) | Vagner |
 | Por que a DFS alcança todas as carteiras no benchmark e a BFS não? | Vagner |
 | Como o front sabe o resultado da Parte 2? | Thomaz |
 

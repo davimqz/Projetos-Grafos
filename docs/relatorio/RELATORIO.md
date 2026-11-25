@@ -454,18 +454,29 @@ Fonte: `out/parte2/bellman_ford_*.json`.
 
 #### Resultados do Bellman-Ford
 
+<!-- [IA] Claude Code – tabelas atualizadas a partir de out/parte2/bellman_ford_*.json regenerado pelo Davi em 24/11 (depois do PR #49); sem interpretação -->
+
 | Caso | Origem | Status | Resultado |
 |---|---|---|---|
 | Sem ciclo negativo | `3Fzzji5n…` (lícita) | OK | 45 carteiras alcançadas (incluindo a origem), 29 arcos negativos alcançáveis; distâncias de −0,26 a 36,36; 5 carteiras com distância negativa |
-| Com ciclo negativo | `1MFXYK1X…` (desconhecida) | CICLO_NEGATIVO | ciclo de 2 carteiras: `1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo` → `12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P` → `1DEcTtkr…` |
+| Com ciclo negativo | `1MFXYK1X…` (desconhecida) | CICLO_NEGATIVO | 1.162 carteiras alcançadas até a parada; ciclo de 3 carteiras: `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm` → `3GwfdNG4KVx6pt6s8mNje85GTA5kH1f73q` → `1MFcDAzG1CJaCqY6BGU2LACzeCLFnfmjsh` → `1MFXYK1X…` |
 
 Arcos do ciclo negativo:
 
 | Arco | Peso (saldo do destino) |
 |---|---|
-| `1DEcTtkr…` → `12cgpFdJ…` | −12.585,72 |
-| `12cgpFdJ…` → `1DEcTtkr…` | −640,43 |
-| **Custo do ciclo** | **−13.226,15** |
+| `1MFXYK1X…` → `3GwfdNG4…` | −3,38 |
+| `3GwfdNG4…` → `1MFcDAzG…` | 0,01 |
+| `1MFcDAzG…` → `1MFXYK1X…` | −1.674,02 |
+| **Custo do ciclo** | **−1.677,39** |
+
+Carteiras do ciclo (`data/dataset_parte2/nos.csv`):
+
+| Carteira | Classe | Transações | Recebido (BTC) | Enviado (BTC) | Saldo (BTC) |
+|---|---|---:|---:|---:|---:|
+| `1MFXYK1X…` | desconhecida | 218 | 919,43 | 2.593,45 | −1.674,02 |
+| `3GwfdNG4…` | desconhecida | 15 | 0,20 | 3,58 | −3,38 |
+| `1MFcDAzG…` | lícita | 3 | 0,05 | 0,04 | 0,01 |
 
 Resultados completos: `out/parte2/bellman_ford_<origem>.json`.
 
@@ -483,25 +494,19 @@ As cinco distâncias negativas também indicam que existem trajetórias cujo cus
 
 **Caso 2: origem desconhecida (`1MFXYK1X…`)**
 
-Na execução iniciada pela carteira desconhecida, o Bellman-Ford identificou um ciclo negativo composto por duas carteiras que possuem conexões direcionadas entre si. Os dois arcos apresentam pesos negativos, indicando que ambas possuem saldos negativos segundo a métrica adotada.
+O ciclo negativo identificado a partir da carteira `1MFXYK1X…` apresentou custo total de −1.677,39. Observa-se que o arco de entrada dessa carteira possui peso de −1.674,02, representando aproximadamente 99,8% do custo total do ciclo. Essa concentração evidencia a influência expressiva de um único peso sobre o resultado, embora os demais arcos também componham o custo final. Inclusive, um dos arcos apresenta peso positivo (+0,01), demonstrando que um ciclo negativo não exige que todos os seus arcos tenham pesos negativos, mas apenas que a soma dos pesos seja inferior a zero.
 
-O custo acumulado do ciclo foi de aproximadamente −13.226 BTC. Entretanto, esse valor é fortemente influenciado por um único arco, com peso de aproximadamente −12.586 BTC. A consulta ao arquivo `nos.csv` permitiu identificar a carteira responsável por esse valor: `12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`, classificada como lícita. O endereço apresenta 86 transações, aproximadamente 6.610,13 BTC recebidos e 19.195,85 BTC enviados, resultando em saldo de aproximadamente −12.586 BTC.
-
-Esse resultado evidencia a presença de um valor extremo (*outlier*) em relação às demais carteiras do recorte: o saldo de `12cgpFdJ…` é cerca de 7,5 vezes o segundo saldo mais negativo e responde por aproximadamente 95% do custo do ciclo. Por isso, a magnitude do custo acumulado não representa necessariamente um comportamento típico das carteiras envolvidas. A concentração de grande parte do valor negativo em uma única carteira exige cautela ao interpretar a intensidade econômica da estrutura identificada.
-
-É importante destacar que a carteira de origem `1MFXYK1X…` não participa diretamente do ciclo negativo: ela apenas possui um caminho que permite alcançá-lo. A mesma estrutura também pode ser alcançada a partir da carteira ilícita `39sfuA8p…`. Dessa forma, duas origens de classificações diferentes conseguem alcançar o mesmo ciclo, embora nenhuma delas seja necessariamente integrante de sua estrutura.
-
-A classificação das carteiras que compõem o ciclo também é relevante para a interpretação dos resultados. Uma delas pertence à classe lícita (`12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P`), enquanto a outra é desconhecida (`1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo`), com 48 transações e saldo aproximado de −640 BTC. Portanto, o ciclo negativo identificado é formado por uma carteira lícita e uma desconhecida, sem participação direta de carteiras classificadas como ilícitas. Embora uma origem ilícita consiga alcançar esse ciclo, alcançar uma estrutura não significa participar dela. Esse resultado, portanto, não sustenta a hipótese de que carteiras ilícitas participem mais de ciclos de repasse; além disso, a quantidade limitada de origens analisadas impede uma conclusão geral sobre essa relação.
+Esse comportamento está relacionado ao saldo da carteira `1MFXYK1X…`, que apresenta o segundo valor mais negativo entre as carteiras do recorte. Assim, o resultado deve ser interpretado considerando a concentração do custo em um arco específico, evitando atribuir à totalidade do ciclo uma característica que decorre predominantemente de um único componente.
 
 **Relação com a pergunta de pesquisa**
 
-A pergunta de pesquisa investiga se carteiras ilícitas participam mais frequentemente de ciclos de repasse do que carteiras lícitas. Os resultados obtidos permitem identificar uma estrutura compatível com a definição de ciclo negativo adotada no trabalho, mas não são suficientes para confirmar essa hipótese.
+Os resultados obtidos pelo algoritmo de Bellman-Ford permitem observar comportamentos distintos entre as carteiras analisadas, mas não sustentam a hipótese de que carteiras ilícitas participam mais de ciclos negativos do que carteiras lícitas.
 
-A execução iniciada pela carteira lícita não identificou ciclos negativos alcançáveis, enquanto a execução iniciada pela carteira desconhecida encontrou um ciclo composto por duas outras carteiras. A consulta ao `nos.csv` revelou que uma das integrantes do ciclo é classificada como lícita, apesar de apresentar saldo fortemente negativo. Esse achado demonstra que a classificação de uma carteira não determina, isoladamente, seu comportamento segundo a métrica de saldo utilizada.
+No caso da carteira `3Fzzji5n…`, classificada como lícita, o algoritmo não identificou ciclos negativos alcançáveis a partir da origem, apesar da existência de arcos com pesos negativos. Esse resultado demonstra que a presença de arcos com pesos negativos, isoladamente, não caracteriza a existência de um ciclo negativo.
 
-Além disso, o fato de uma origem ilícita também alcançar o mesmo ciclo não significa que ela participe diretamente dele. Portanto, não é possível utilizar esse resultado como evidência de que carteiras ilícitas integram mais ciclos de repasse. A quantidade reduzida de origens analisadas e a identificação de apenas uma estrutura cíclica limitam qualquer comparação entre as classes.
+Por outro lado, na análise da carteira `1MFXYK1X…`, classificada como desconhecida, foi identificado um ciclo negativo composto por três carteiras: duas classificadas como desconhecidas (`1MFXYK1X…` e `3GwfdNG4…`) e uma classificada como lícita (`1MFcDAzG…`). Nesse caso, a própria carteira de origem participa do ciclo, uma vez que está presente na sequência de vértices que fecha o circuito.
 
-Por fim, o valor extremo identificado influencia significativamente a magnitude do custo acumulado, mas não elimina a existência matemática do ciclo negativo encontrado. Como os dois arcos apresentam pesos negativos, a soma permanece negativa. Assim, o *outlier* enfraquece a interpretação da magnitude do resultado como medida representativa, mas não invalida a identificação do ciclo segundo os critérios definidos.
+Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre o grafo completo, apresentada na seção 6.4.
 
 ### 5.6 Desempenho e escalabilidade
 
@@ -596,11 +601,9 @@ As análises de BFS e DFS permitiram explorar a estrutura da rede a partir de di
 
 Outro resultado relevante do Dijkstra foi a identificação de uma trajetória entre duas carteiras ilícitas que passa por uma carteira desconhecida anteriormente explorada nas análises de BFS e DFS. Esse resultado demonstra que regiões investigadas separadamente podem apresentar conexões por meio de carteiras intermediárias, reforçando a importância de analisar a rede como uma estrutura interconectada.
 
-O Bellman-Ford acrescentou uma dimensão importante à investigação ao permitir trabalhar com pesos negativos e identificar ciclos negativos. Na execução iniciada pela carteira lícita, apesar da presença de 29 arcos negativos, não foi encontrado nenhum ciclo negativo alcançável. Já na execução iniciada pela carteira desconhecida, foi identificado um ciclo composto por duas carteiras, também alcançável a partir de uma origem ilícita.
+A aplicação do algoritmo de Bellman-Ford identificou um ciclo negativo em uma das duas execuções, mas esse resultado deve ser interpretado considerando a classificação das carteiras envolvidas e a composição do ciclo encontrado. No caso da carteira `1MFXYK1X…`, foi identificado um ciclo negativo de três carteiras, composto por duas carteiras desconhecidas e uma lícita. Já na análise da carteira `3Fzzji5n…`, classificada como lícita, não foi identificado ciclo negativo alcançável a partir da origem. Esses resultados demonstram que a identificação de ciclos negativos não implica, por si só, associação com atividades ilícitas.
 
-A análise desse ciclo revelou que uma de suas integrantes é classificada como lícita, embora apresente saldo fortemente negativo. Além disso, o custo acumulado da estrutura é dominado por um valor extremo, o que exige cautela na interpretação de sua magnitude. Esse resultado demonstra que comportamentos identificados pela métrica de saldo não são exclusivos de carteiras classificadas como ilícitas.
-
-Considerando a pergunta de pesquisa, no recorte analisado a resposta é não. O Bellman-Ford só encontra os ciclos negativos alcançáveis a partir da origem escolhida, e por isso as execuções mostraram um único ciclo. Ao procurar ciclos no grafo inteiro (seção 6.4), encontramos 116 carteiras em algum ciclo, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita, e 8 ciclos negativos de duas carteiras, também sem nenhuma carteira ilícita. Como nenhuma carteira ilícita participa de ciclo algum, nenhuma pode participar de um ciclo negativo, enquanto carteiras lícitas participam dos dois.
+Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando o grafo completo do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
 
 Por fim, devem ser consideradas as limitações metodológicas da investigação. O recorte utilizado apresenta viés de seleção, pois foi construído a partir de carteiras previamente identificadas, não representando necessariamente a distribuição real das classes na rede completa. Além disso, a quantidade reduzida de pares analisados pelo Dijkstra e de origens utilizadas pelo Bellman-Ford limita a generalização dos resultados.
 
@@ -784,7 +787,7 @@ Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos d
 
 ## 7. Testes
 
-Executados com `pytest` (503 testes passando em 19/11/2026).
+Executados com `pytest`: 588 testes passando em 24/11/2026.
 
 | Arquivo | O que confere |
 |---|---|
@@ -795,13 +798,13 @@ Executados com `pytest` (503 testes passando em 19/11/2026).
 | `test_estados.py` | mapa mínimo, esteira contra parede, troca de camada ao pegar chave |
 | `test_io.py` | mapas inválidos (não retangular, dois S, sem G, símbolo desconhecido) |
 | `test_graph.py` | lista de adjacência dirigida, graus, densidade, transposto e subgrafo induzido |
-| `tests/parte1/`, `test_solve.py` | saídas da Parte 1: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
+| `tests/parte1/`, `test_solve.py`, `test_cli_parte1.py` | saídas da Parte 1 e CLI: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
 | `test_carga_parte2.py`, `test_casos_parte2.py`, `test_graus_parte2.py` | carga do recorte, casos obrigatórios e graus da Parte 2 |
-| `test_benchmark.py` | medição de tempo e escalabilidade |
+| `test_mapa_surpresa.py` | mapas novos de borda contados à mão e formatos de arquivo (BOM, linha em branco e espaço no fim, comentário indentado, arquivo fora do UTF-8) |
+| `test_benchmark.py`, `test_benchmark_parte1.py` | medição de tempo, memória e escalabilidade nas duas partes |
+| `test_mapa_front.py`, `test_exportar_parte2_front.py`, `test_rotular_transacoes.py` | mapa enviado pelo front, exportação dos casos da Parte 2 e rótulo das transações |
 | `test_viz.py`, `test_visualizar_parte1.py`, `test_gerar_html_front.py` | figuras da Parte 1 e geração do HTML interativo |
 | `test_gerar_pdf.py`, `test_matriz_contribuicao.py` | geração deste PDF e contagem da matriz de contribuição |
-
-> **[COMPLETAR]** Rodar `pytest` de novo na véspera da entrega e atualizar a contagem.
 
 ---
 

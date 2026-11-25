@@ -1,5 +1,8 @@
 # O que falta para terminar o projeto (atualizado em 23/11/2026)
 
+> **24/11:** a lista de tarefas que vale a partir de agora, separada por integrante e com passo a passo, está em
+> [`TAREFAS_FINAIS.md`](TAREFAS_FINAIS.md). Este arquivo fica como histórico até 23/11.
+
 Este arquivo é a lista oficial do que falta. Cada item da rubrica e do enunciado aparece com o que já existe, o que
 falta, o critério para considerar pronto, o responsável e o prazo. Quando um item for concluído, marque `[x]` e
 coloque o número do PR.
@@ -40,6 +43,10 @@ saída. Ela também escolhe quem apresenta, e a nota dessa pessoa vale para o gr
 - `APRESENTACAO.md` continua com os blocos `[A PREENCHER]`; a apresentação fica para depois do acompanhamento de 24/11.
 
 ## Achados do teste do mapa surpresa (23/11)
+
+**Atualização de 24/11:** os achados 1 a 5 foram corrigidos pelo Matheus no `io.py` (commit `808271e`, testes
+ajustados no PR #50) e os 5 testes `xfail` viraram testes normais. O achado 6 foi tratado no PR #49 (Bellman-Ford
+com parada antecipada). Continuam abertos o 7 (tarefa M12 de `TAREFAS_FINAIS.md`) e o 8.
 
 Testes feitos com 37 arquivos novos (formatos de arquivo e casos de borda) e mapas grandes gerados. Nenhum deu
 traceback. Os casos que funcionam viraram testes em `tests/test_mapa_surpresa.py`.

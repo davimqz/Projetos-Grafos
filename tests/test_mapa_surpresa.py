@@ -2,8 +2,8 @@
 
 Cada mapa é pequeno o bastante para conferir à mão: os números esperados foram contados pela regra do
 enunciado (custo = casa de destino, ordem N, L, S, O, G sem saída) e não tirados da saída do código.
-Os testes marcados com xfail descrevem formatos de arquivo que a leitura ainda recusa; quando o io.py
-passar a aceitá-los, o pytest avisa com XPASS e a marcação pode ser removida.
+Também confere os formatos de arquivo que um editor comum produz (BOM, linha em branco no fim, espaço no
+fim da linha, comentário indentado e arquivo fora do UTF-8), aceitos pela leitura desde 24/11.
 """
 
 # [IA] Claude Code – casos de teste sugeridos para mapas novos (borda e formato); números conferidos à mão
@@ -113,31 +113,24 @@ def test_formatos_aceitos_dao_o_mesmo_grafo_do_m02(tmp_path, conteudo):
     assert n_estados(dados) == n_estados(preparar(tmp_path, M02, "original"))
 
 
-# Formatos que um editor comum pode produzir e que ainda são recusados ---------------------------------
+# Formatos que um editor comum pode produzir ---------------------------------------------------------
 
-@pytest.mark.xfail(reason="io.py abre com utf-8, não utf-8-sig: o BOM do Bloco de Notas vira símbolo inválido",
-                   strict=False)
 def test_arquivo_com_bom(tmp_path):
     assert n_estados(preparar(tmp_path, ("﻿" + M02).encode("utf-8"))) > 0
 
 
-@pytest.mark.xfail(reason="linha em branco no fim do arquivo é tratada como linha vazia da grade", strict=False)
 def test_linha_em_branco_no_fim(tmp_path):
     assert n_estados(preparar(tmp_path, M02 + "\n")) > 0
 
 
-@pytest.mark.xfail(reason="espaço no fim da linha vira símbolo inválido", strict=False)
 def test_espaco_no_fim_da_linha(tmp_path):
     assert n_estados(preparar(tmp_path, "\n".join(l + " " for l in M02.splitlines()) + "\n")) > 0
 
 
-@pytest.mark.xfail(reason="comentário com espaço antes do ';' não é reconhecido", strict=False)
 def test_comentario_com_espaco_antes(tmp_path):
     assert n_estados(preparar(tmp_path, "  ; comentário\n" + M02)) > 0
 
 
-@pytest.mark.xfail(reason="arquivo em latin-1 dá erro de codec em inglês em vez de mensagem do projeto",
-                   strict=False)
 def test_arquivo_latin1_tem_mensagem_em_portugues(tmp_path):
     arquivo = tmp_path / "latin1.txt"
     arquivo.write_bytes(("; acentuação\n" + M02).encode("latin-1"))
