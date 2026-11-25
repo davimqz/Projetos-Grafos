@@ -782,7 +782,7 @@ Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos d
 
 ## 7. Testes
 
-Executados com `pytest` (503 testes passando em 19/11/2026).
+Executados com `pytest`: 588 testes passando em 24/11/2026.
 
 | Arquivo | O que confere |
 |---|---|
@@ -793,13 +793,13 @@ Executados com `pytest` (503 testes passando em 19/11/2026).
 | `test_estados.py` | mapa mínimo, esteira contra parede, troca de camada ao pegar chave |
 | `test_io.py` | mapas inválidos (não retangular, dois S, sem G, símbolo desconhecido) |
 | `test_graph.py` | lista de adjacência dirigida, graus, densidade, transposto e subgrafo induzido |
-| `tests/parte1/`, `test_solve.py` | saídas da Parte 1: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
+| `tests/parte1/`, `test_solve.py`, `test_cli_parte1.py` | saídas da Parte 1 e CLI: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
 | `test_carga_parte2.py`, `test_casos_parte2.py`, `test_graus_parte2.py` | carga do recorte, casos obrigatórios e graus da Parte 2 |
-| `test_benchmark.py` | medição de tempo e escalabilidade |
+| `test_mapa_surpresa.py` | mapas novos de borda contados à mão e formatos de arquivo (BOM, linha em branco e espaço no fim, comentário indentado, arquivo fora do UTF-8) |
+| `test_benchmark.py`, `test_benchmark_parte1.py` | medição de tempo, memória e escalabilidade nas duas partes |
+| `test_mapa_front.py`, `test_exportar_parte2_front.py`, `test_rotular_transacoes.py` | mapa enviado pelo front, exportação dos casos da Parte 2 e rótulo das transações |
 | `test_viz.py`, `test_visualizar_parte1.py`, `test_gerar_html_front.py` | figuras da Parte 1 e geração do HTML interativo |
 | `test_gerar_pdf.py`, `test_matriz_contribuicao.py` | geração deste PDF e contagem da matriz de contribuição |
-
-> **[COMPLETAR]** Rodar `pytest` de novo na véspera da entrega e atualizar a contagem.
 
 ---
 

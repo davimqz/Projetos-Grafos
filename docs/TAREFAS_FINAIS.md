@@ -39,6 +39,44 @@ ela atende, os arquivos, o passo a passo, quando está pronta e se a IA pode aju
 
 ---
 
+## Achado de 24/11: o PR #49 mudou resultados do Bellman-Ford
+
+O Bellman-Ford agora procura o ciclo a cada passada e para assim que acha um (PR #49). Os dois ciclos, o antigo e o
+novo, são ciclos negativos válidos; o algoritmo só devolve outro, o primeiro que encontra. Mas **as saídas commitadas
+foram geradas com o código antigo** e não batem mais com o que a CLI gera hoje. Conferido rodando a CLI atual em uma
+pasta temporária, sem mexer em `out/`:
+
+| Saída | Commitado (código antigo) | CLI atual |
+|---|---|---|
+| `out/parte1/json/comparacao_bonus_m05.json`, ciclo no G_pos | `(5,3) → (5,4) → (5,3)`, custo −3 | `(3,3) → (3,2) → (3,3)`, custo −3 |
+| `out/parte2/bellman_ford_1MFXYK1X….json`, ciclo | 2 carteiras, `1DEcTtkr…` ↔ `12cgpFdJ…`, custo −13.226,15; a origem **não** está no ciclo | 3 carteiras, `1MFXYK1X…` → `3GwfdNG4…` → `1MFcDAzG…` → `1MFXYK1X…`, custo −1.677,39; a **origem está** no ciclo (classes: desconhecida, desconhecida, lícita) |
+| mesmo arquivo, `alcancados` | 1.267 | 1.162 |
+| `parte2_report.json`, Bellman-Ford | 5,5 s em 50% e 42,6 s em 100%, "executou todas as rodadas" | cerca de 1 s por execução no grafo inteiro |
+
+O resto da Parte 1 (todos os CSVs e JSONs, inclusive o ciclo do m06) e o caso sem ciclo da Parte 2 continuam iguais.
+
+Se a professora rodar a CLI, ela vê o ciclo novo e o relatório mostra o antigo. Por isso:
+
+### [ ] D12. Regerar as saídas do Bellman-Ford e reescrever o que depende delas
+- **Quem:** Davi (seção 5.5 e 5.7), Vagner (5.6, junto com o V1), Matheus (4.7, que já deve usar o ciclo novo do m05),
+  Thomaz (confirmar que o novo `alcancados` menor é o comportamento esperado da parada antecipada e explicar na seção
+  3).
+- **Passo a passo:**
+  1. Davi roda `python -m src.cli --dataset ./data/dataset_parte2/ --alg BELLMAN_FORD --source
+     1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm --out ./out/parte2/` e commita (vale também como parte do D2).
+  2. Matheus regera a Parte 1 no M11; o único arquivo que muda é `comparacao_bonus_m05.json`.
+  3. Vagner regera o benchmark no V1; a seção 5.6 precisa de tabela e texto novos (as razões de crescimento do
+     Bellman-Ford e a frase "executou todas as rodadas" deixam de valer).
+  4. Davi reescreve a tabela e a interpretação da 5.5 (o ciclo novo inclui a origem e não tem o outlier de −12.586) e
+     os parágrafos da 5.7 que citam o ciclo de 2 carteiras e o −13.226. A resposta à pergunta de pesquisa vem da 6.4
+     e não muda: nenhuma carteira do ciclo novo é ilícita.
+  5. Conferir `docs/APRESENTACAO.md` (blocos 8 e 9 e a pergunta "por que o Bellman-Ford leva 42,6 s") e o front
+     (`python -m scripts.exportar_parte2_front` depois de regerar).
+- **Pronto quando:** `git status` limpo depois de rodar a CLI e o relatório citando o ciclo e os tempos novos.
+- **IA:** pode regerar tabelas a partir dos JSONs; interpretação proibida.
+
+---
+
 ## O que zera a nota se faltar (prioridade máxima)
 
 | Item | Consequência | Situação em 24/11 | Tarefa |
