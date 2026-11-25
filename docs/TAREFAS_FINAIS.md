@@ -58,6 +58,10 @@ O resto da Parte 1 (todos os CSVs e JSONs, inclusive o ciclo do m06) e o caso se
 Se a professora rodar a CLI, ela vê o ciclo novo e o relatório mostra o antigo. Por isso:
 
 ### [ ] D12. Regerar as saídas do Bellman-Ford e reescrever o que depende delas
+- **Andamento (24/11, noite):** feito pelo Davi o passo 1 (JSON regerado), o passo 4 (5.5 e 5.7 reescritas) e o
+  front (`parte2.json` regerado, aba Rede de carteiras já mostra o ciclo de 3 carteiras). Bloco 8 do `APRESENTACAO.md`
+  atualizado. **Faltam:** passo 2 (Matheus, `comparacao_bonus_m05.json`) e passo 3 (Vagner, benchmark e seção 5.6,
+  junto com o V1); depois do V1, rodar de novo `python -m scripts.exportar_parte2_front` para os tempos do front.
 - **Quem:** Davi (seção 5.5 e 5.7), Vagner (5.6, junto com o V1), Matheus (4.7, que já deve usar o ciclo novo do m05),
   Thomaz (confirmar que o novo `alcancados` menor é o comportamento esperado da parada antecipada e explicar na seção
   3).
@@ -370,6 +374,13 @@ A parte de AVD está completa (6 figuras, seções 6.1 a 6.6). O que falta é o 
 apresentação.
 
 ### [ ] V1. `parte2_report.json` com casos obrigatórios e repetições
+- **Andamento (24/11):** o PR #51 (mergeado) limpou os 6 gráficos da AVD e acrescentou a checagem de duplicadas, mas
+  **não mexeu** no `parte2_report.json`, no `src/benchmark.py` nem na seção 5.6. Esta tarefa e o passo 3 da D12 continuam
+  abertos. Conferido no PR #51: as 6 figuras têm título, legenda e eixos.
+- **Ponto do PR #51 para o Vagner conferir:** a frase nova da 6.1 diz que "nenhuma aresta está repetida" e conclui que
+  também não há transações repetidas. Pela seção 5.1 e pelo `recorte_info.json`, as arestas repetidas foram agregadas
+  em um arco por par na preparação (47.346 duplicatas agregadas). Ou seja, não haver arestas repetidas é consequência da
+  construção, e vale dizer isso no texto.
 - **Critério:** desempenho e escalabilidade (0,5): "tempo médio de ≥ 5 execuções **por algoritmo e tarefa** em
   `parte2_report.json`". O slide de arquivos obrigatórios diz: "tempos médios (≥ 5 execuções), **casos obrigatórios** e
   escalabilidade em 3 tamanhos". A ata de 19/11 pede tempo, latência e memória "por algoritmo e por tarefa".
