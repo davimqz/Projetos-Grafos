@@ -140,8 +140,11 @@ def carteiras_usadas(dados: dict) -> set[str]:
     return nos
 
 
-def tempos(relatorio: list[dict]) -> list[dict]:
+def tempos(relatorio: list[dict] | dict) -> list[dict]:
     """Linhas do benchmark no grafo inteiro (fração 1.0)."""
+    # [IA] Claude Code – aceita o report novo (dict com "escalabilidade"), a pedido do Vagner (V1)
+    if isinstance(relatorio, dict):
+        relatorio = relatorio["escalabilidade"]
     campos = ("algoritmo", "nos", "arestas", "complexidade", "alcancados", "status", "tempo_medio_ms",
               "latencia_min_ms", "latencia_max_ms", "memoria_pico_kb")
     return [{c: linha.get(c) for c in campos} for linha in relatorio if linha.get("fracao") == 1.0]

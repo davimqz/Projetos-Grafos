@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from src.benchmark import (FRACOES, custo_bellman_ford, custo_busca, executar_benchmark, maior_grau_saida,
+from src.benchmark import (FONTES_BELLMAN_FORD, FONTES_BUSCA, FRACOES, PARES_DIJKSTRA, custo_bellman_ford, custo_busca, executar_benchmark, maior_grau_saida,
                            pico_memoria, tempo_medio)
 from src.carga_parte2 import PASTA_PADRAO
 from src.graphs.graph import Grafo
@@ -13,8 +13,9 @@ from src.graphs.graph import Grafo
 
 def test_relatorio_compara_os_algoritmos(tmp_path):
     # só 10% dos nós: o Bellman-Ford leva cerca de 45 s por execução no grafo inteiro
-    executar_benchmark(PASTA_PADRAO, tmp_path, fracoes=[0.1])
-    relatorio = json.loads((tmp_path / "parte2_report.json").read_text(encoding="utf-8"))
+    executar_benchmark(PASTA_PADRAO, tmp_path, fracoes=[0.1], com_casos=False)
+    relatorio = json.loads((tmp_path / "parte2_report.json").read_text(encoding="utf-8"))["escalabilidade"]
+    assert all(r["repeticoes"] == 5 for r in relatorio)
     assert [r["algoritmo"] for r in relatorio] == ["DFS", "BFS", "Dijkstra", "Bellman-Ford"]
     dfs, bfs, dijkstra, bellman_ford = relatorio
     assert dfs["origem"] is None and dfs["alcancados"] == dfs["nos"]
@@ -56,3 +57,12 @@ def test_origem_e_custos():
     assert custo_busca(grafo, {"ordem": ["a", "b"]}) == 4 + 1  # V + o único arco percorrido
     assert custo_bellman_ford(grafo, {"status": "CICLO_NEGATIVO"}) == 4 * 3
     assert custo_bellman_ford(grafo, {"status": "OK"}) is None
+
+
+def test_casos_obrigatorios_batem_com_os_jsons():
+    # [IA] Claude Code – confere que o report usa as mesmas fontes e pares dos JSONs da seção 5 (V1)
+    from pathlib import Path
+    pasta = Path(__file__).resolve().parents[1] / "out" / "parte2"
+    assert {f"bfs_{o}.json" for o in FONTES_BUSCA} <= {p.name for p in pasta.glob("bfs_*.json")}
+    assert {f"dijkstra_{o}_{d}.json" for o, d in PARES_DIJKSTRA} == {p.name for p in pasta.glob("dijkstra_*.json")}
+    assert {f"bellman_ford_{o}.json" for o in FONTES_BELLMAN_FORD} == {p.name for p in pasta.glob("bellman_ford_*.json")}
