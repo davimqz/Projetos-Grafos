@@ -1,8 +1,9 @@
-Poco lateral (proposta 4)
-=========================
+Poco lateral (desvio alagado)
+============================
 Mapa: data/mapas_grupo/g02_poco_lateral.txt
 Origem dos valores: funcoes existentes do grupo em src.solve.
 [IA] Codex - sugestao do mapa e transcricao dos resultados do codigo do grupo.
+[IA] Codex - atualizacao do desenho e do gabarito para o desvio alagado, mantendo os nomes.
 Nao foi feita contagem manual; a conferencia autoral cabe ao grupo.
 
 CONVENCOES
@@ -12,34 +13,35 @@ Passos contam apenas movimentos fisicos. Os caminhos incluem ALVO ao final.
 Custos sao a soma dos pesos das casas de destino, conforme as regras do projeto.
 
 METRICAS
-Dimensoes: 9 linhas x 21 colunas
-Estados alcancaveis (G_est): 94
-Arcos fisicos (G_est): 230
-Nos incluindo ALVO: 95
-Arcos incluindo os virtuais: 231
-Estados-armadilha: 75
-Fracao de armadilhas: 75/94
-Percentual de armadilhas: 79.787234%
+Dimensoes: 13 linhas x 21 colunas
+Estados alcancaveis (G_est): 89
+Arcos fisicos (G_est): 205
+Nos incluindo ALVO: 90
+Arcos incluindo os virtuais: 206
+Estados-armadilha: 37
+Fracao de armadilhas: 37/89
+Percentual de armadilhas: 41.573034%
 
 RESULTADOS POR ALGORITMO
 BFS:
   Status: OK
-  Passos: 18
-  Custo: 18.0
+  Passos: 22
+  Custo: 58.0
 DIJKSTRA:
   Status: OK
-  Passos: 18
-  Custo: 18
+  Passos: 30
+  Custo: 30
 BELLMAN_FORD:
   Status: OK
-  Passos: 18
-  Custo: 18
+  Passos: 30
+  Custo: 30
 
-DADOS DO PERCURSO DE MENOR CUSTO (BELLMAN_FORD)
+DADOS DO PERCURSO DE MENOR CUSTO (DIJKSTRA)
 Chaves existentes no mapa: nenhuma
 Chaves no estado final: nenhuma
 Bonus consumidos no estado final (IDs): []
 Posicoes de esteiras visitadas: []
+Mudancas de direcao: 4
 
 CAMINHOS DEVOLVIDOS PELO CODIGO
 BFS:
@@ -50,20 +52,57 @@ BFS:
   04: (1,5)|-|{}
   05: (1,6)|-|{}
   06: (1,7)|-|{}
-  07: (1,8)|-|{}
-  08: (1,9)|-|{}
-  09: (1,10)|-|{}
-  10: (1,11)|-|{}
-  11: (1,12)|-|{}
-  12: (1,13)|-|{}
-  13: (1,14)|-|{}
-  14: (1,15)|-|{}
-  15: (1,16)|-|{}
-  16: (1,17)|-|{}
-  17: (1,18)|-|{}
-  18: (1,19)|-|{}
-  19: ALVO
+  07: (2,7)|-|{}
+  08: (3,7)|-|{}
+  09: (3,8)|-|{}
+  10: (3,9)|-|{}
+  11: (3,10)|-|{}
+  12: (3,11)|-|{}
+  13: (3,12)|-|{}
+  14: (3,13)|-|{}
+  15: (3,14)|-|{}
+  16: (3,15)|-|{}
+  17: (3,16)|-|{}
+  18: (3,17)|-|{}
+  19: (2,17)|-|{}
+  20: (1,17)|-|{}
+  21: (1,18)|-|{}
+  22: (1,19)|-|{}
+  23: ALVO
 
-DIJKSTRA: mesma sequencia de estados de BFS.
+DIJKSTRA:
+  00: (1,1)|-|{}
+  01: (2,1)|-|{}
+  02: (3,1)|-|{}
+  03: (4,1)|-|{}
+  04: (5,1)|-|{}
+  05: (5,2)|-|{}
+  06: (5,3)|-|{}
+  07: (6,3)|-|{}
+  08: (7,3)|-|{}
+  09: (7,4)|-|{}
+  10: (7,5)|-|{}
+  11: (7,6)|-|{}
+  12: (7,7)|-|{}
+  13: (7,8)|-|{}
+  14: (7,9)|-|{}
+  15: (7,10)|-|{}
+  16: (7,11)|-|{}
+  17: (7,12)|-|{}
+  18: (7,13)|-|{}
+  19: (7,14)|-|{}
+  20: (7,15)|-|{}
+  21: (7,16)|-|{}
+  22: (7,17)|-|{}
+  23: (7,18)|-|{}
+  24: (7,19)|-|{}
+  25: (6,19)|-|{}
+  26: (5,19)|-|{}
+  27: (4,19)|-|{}
+  28: (3,19)|-|{}
+  29: (2,19)|-|{}
+  30: (1,19)|-|{}
+  31: ALVO
 
-BELLMAN_FORD: mesma sequencia de estados de BFS.
+
+BELLMAN_FORD: mesma sequencia de estados de DIJKSTRA.

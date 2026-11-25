@@ -32,14 +32,25 @@ def ler_mapa(caminho: str | Path) -> list[str]:
     provocar ValueError com mensagem clara, conforme validar_mapa.
     """
 
-    with open(caminho, "r", encoding="utf-8") as mapa:
-        grade = []
-        for linha in mapa:
-            if linha[0] != ";":
-                grade.append(linha.strip("\n"))
-        validar_mapa(grade)
+    try:
+        with open(caminho, "r", encoding="utf-8-sig") as mapa:
+            mapa = mapa.readlines()
+            grade = []
+            count = 0
+            for linha in mapa:
+                linha = linha.rstrip()
+                if not linha:
+                    if any(proxima.strip() and not proxima.lstrip().startswith(";")for proxima in mapa[count + 1:]):
+                        raise ValueError("Há uma linha vazia antes de outra linha do mapa.")
+                elif not linha.lstrip().startswith(";"):
+                    grade.append(linha)
+                count += 1
+            validar_mapa(grade)
 
-    return grade
+        return grade
+    
+    except UnicodeDecodeError:
+        raise ValueError("Não foi possível ler o mapa. Salve o arquivo em UTF-8.")
 
 
 # [IA] Codex - revisão das mensagens de erro e da consulta aos símbolos permitidos.

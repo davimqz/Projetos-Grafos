@@ -248,9 +248,9 @@
     "camadas": [
       {
         "camada": "-",
-        "ordem": 94,
-        "tamanho": 230,
-        "densidade": 0.0263097689315946
+        "ordem": 89,
+        "tamanho": 205,
+        "densidade": 0.026174668028600613
       }
     ],
     "arcos_entre_camadas": 0,

@@ -3,11 +3,13 @@
 import dados from './dados.json'
 
 export const MAPAS = dados.parte1.mapas
-export const DADOS_AVD = dados.avd
-export const ORDEM = DADOS_AVD.ordem
 export const ALGORITMOS = ['BFS', 'DFS', 'DIJKSTRA', 'BELLMAN_FORD']
 export const NOME_ALG = { BFS: 'BFS', DFS: 'DFS', DIJKSTRA: 'Dijkstra', BELLMAN_FORD: 'Bellman-Ford' }
 export const NOME_CLASSE = { ilicito: 'ilícito', desconhecido: 'desconhecido', licito: 'lícito' }
+// [IA] Codex – rótulos legíveis para códigos de status, sem alterar os dados de origem.
+export const NOME_STATUS = { CICLO_NEGATIVO: 'Ciclo negativo', SEM_SOLUCAO: 'Sem solução', RECUSA: 'Recusa' }
+// [IA] Codex – inicial maiúscula preservando a grafia de siglas e nomes no restante do texto.
+export const capitalizarInicial = (texto) => texto.charAt(0).toLocaleUpperCase('pt-BR') + texto.slice(1)
 export const PALETA = ['#2463eb', '#d04a36', '#a46300', '#00816d', '#8657ac', '#bd4c7d', '#537d19', '#5b6776']
 
 export const corClasse = (c) => `var(--${c})`

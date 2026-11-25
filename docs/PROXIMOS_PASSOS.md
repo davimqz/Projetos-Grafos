@@ -124,8 +124,9 @@ Estes itens não valem pontos isolados: sem eles, perde-se tudo ou um bloco inte
 - [x] Dois mapas em `data/mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes):
   1. `g01_tres_depositos.txt`: 3 chaves; o percurso de menor custo retornado pelo código coleta 2 bônus e passa
      por 3 esteiras. G_est: 104 estados e 194 arcos físicos; BFS: 48 passos; Bellman-Ford: custo 38.
-  2. `g02_poco_lateral.txt`: 75 de 94 estados são armadilha (79,79%). G_est: 94 estados e 230 arcos físicos;
-     BFS: 18 passos; menor custo: 18.
+  2. `g02_poco_lateral.txt`: desenho Desvio alagado, atualizado em 23/11 mantendo o nome dos arquivos.
+     37 de 89 estados são armadilha (41,57%). G_est: 89 estados e 205 arcos físicos;
+     BFS: 22 passos, custo 58; Dijkstra e Bellman-Ford: 30 passos, custo 30.
 - [x] Execução pelo agente das funções existentes do grupo e gabaritos com métricas, status e caminhos em
       `data/solucoes_mapas_grupo/solucao_<mapa>.txt` (commit `5b1eba5`; uso descrito em `REGISTRO_IA.md`).
 - [ ] Conferência final dos mapas e gabaritos pelo grupo, incluindo originalidade em relação aos outros grupos.

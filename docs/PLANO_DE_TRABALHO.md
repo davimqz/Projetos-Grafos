@@ -75,6 +75,8 @@ Cada pessoa em 2+ pacotes: Matheus (P1, P3) · Thomaz (P2, P5a) · Davi (P4a, P5
 - [x] 2 mapas em `data/mapas_grupo/`: `g01_tres_depositos.txt` e `g02_poco_lateral.txt`, com gabaritos TXT em
       `data/solucoes_mapas_grupo/` (commit `5b1eba5`, revisão/PR pendentes). Requisitos conferidos automaticamente
       com o código existente; execução pelo agente registrada em `REGISTRO_IA.md`.
+- [x] Segundo mapa substituído pelo desenho Desvio alagado em 23/11, mantendo os nomes: 89 estados,
+      37 armadilhas (41,57%), BFS com 22 passos/custo 58 e Dijkstra/Bellman-Ford com 30 passos/custo 30.
 - [ ] conferência final dos mapas e gabaritos pelo grupo e revisão por Thomaz
 - [x] saídas CSV/JSON dos mapas do grupo em `out/parte1/csv/` e `out/parte1/json/`, junto das demais saídas
 - [ ] textos do PDF: m01 (BFS × Dijkstra), m06 (exploit e correção), m07 (sem solução), grafo não dirigido estaria errado

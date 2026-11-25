@@ -2,21 +2,19 @@
 
 Uso: python -m scripts.exportar_front
 Gera front-react/src/dados.json a partir dos mapas, do grafo de estados e dos algoritmos do grupo
-(src/graphs) e do recorte da Parte 2. Nenhum algoritmo é implementado aqui.
+(src/graphs). Nenhum algoritmo é implementado aqui.
 """
 # [IA] Claude Code – exporta para JSON os resultados já calculados pelo código do grupo
 
 import json
 from pathlib import Path
 
-import pandas as pd
-
 from src.visualizar_parte1 import preparar_mapa
 from src.viz import ler_rotulo
 
 RAIZ = Path(__file__).resolve().parent.parent
 ALGORITMOS = ("BFS", "DFS", "DIJKSTRA", "BELLMAN_FORD")
-ORDEM = ["ilicito", "desconhecido", "licito"]
+LIMITE_GRAFO_FRONT = 600
 
 
 def dados_parte1():
@@ -40,11 +38,14 @@ def dados_parte1():
                     chave = f"{rotulo[0]},{rotulo[1]}"
                     contagem[chave] = contagem.get(chave, 0) + 1
             mapa["multiplicidade"] = contagem
-        if arquivo.stem.startswith("m02"):
+        # [IA] Claude Code – nós e arcos do grafo de estados para o visualizador interativo (Cytoscape);
+        # o m08 fica de fora por tamanho (quase 3 mil estados deixariam o JSON e o desenho pesados demais)
+        if mapa["n_estados"] <= LIMITE_GRAFO_FRONT:
             mapa["grafo"] = {
                 "nos": [no for no in grafo.nos() if no != "ALVO"],
                 "arcos": [[u, v, p] for u, v, p in grafo.arestas() if "ALVO" not in (u, v)],
             }
+        if arquivo.stem.startswith("m02"):
             bfs = resultados["BFS"]
             mapa["arvore_bfs"] = {
                 "camadas": {str(k): [n for n in v if n != "ALVO"] for k, v in bfs["camadas"].items()},
@@ -54,27 +55,9 @@ def dados_parte1():
     return {"mapas": mapas}
 
 
-def dados_avd():
-    pasta = RAIZ / "data" / "dataset_parte2"
-    nos = pd.read_csv(pasta / "nos.csv")
-    arestas = pd.read_csv(pasta / "arestas.csv")
-    classe = nos.set_index("endereco")["classe"]
-    origem = arestas["origem"].map(classe)
-    destino = arestas["destino"].map(classe)
-    proporcao = pd.crosstab(origem, destino, normalize="index").reindex(index=ORDEM, columns=ORDEM)
-    sinal = arestas["peso"].apply(lambda p: "negativo" if p < 0 else ("zero" if p == 0 else "positivo"))
-    sinais = pd.crosstab(destino, sinal).reindex(ORDEM)[["negativo", "zero", "positivo"]]
-    return {
-        "ordem": ORDEM,
-        "contagem": nos["classe"].value_counts().reindex(ORDEM).astype(int).to_dict(),
-        "mediana_recebido": nos.groupby("classe")["btc_received_total"].median().reindex(ORDEM).round(6).to_dict(),
-        "origem_destino": {o: {d: round(float(proporcao.loc[o, d]), 4) for d in ORDEM} for o in ORDEM},
-        "sinal_peso": {c: {s: int(sinais.loc[c, s]) for s in sinais.columns} for c in ORDEM},
-    }
-
-
 def main():
-    dados = {"parte1": dados_parte1(), "avd": dados_avd()}
+    # [IA] Claude Code – a aba da AVD passou a mostrar as figuras do notebook; o front não usa mais dados da AVD
+    dados = {"parte1": dados_parte1()}
     destino = RAIZ / "front-react" / "src" / "dados.json"
     destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(json.dumps(dados, ensure_ascii=False), encoding="utf-8")
