@@ -9,8 +9,8 @@ Matheus Araujo · Thomaz Lima · Davi Marques Oliveira · Vagner Montenegro de M
 Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/2026
 
 > **Estado da redação.** Os blocos **[A ESCREVER]** indicam conteúdo ainda pendente. A seção 4.3 registra
-> a contagem do mapa mínimo conferida manualmente por Matheus. Entre 4.1 e 4.10, ainda faltam o desenho
-> indicado em 4.1 e a prova indicada em 4.7.
+> a contagem do mapa mínimo conferida manualmente por Matheus. Entre 4.1 e 4.10, ainda falta o desenho
+> indicado em 4.1.
 
 ---
 
@@ -468,8 +468,21 @@ nas posições (3,2), (3,10) e (5,4), respectivamente.
 
 **Prova de que o G_est do m05 não pode ter ciclo negativo.**
 
-**[A ESCREVER — Matheus, sem IA]** Hipótese, passo central (dica: o que acontece com o conjunto de bônus ao longo
-de um caminho?) e conclusão.
+Considere um ciclo dirigido qualquer de G_est, que começa e termina no mesmo estado. Seja `B_i` o conjunto
+de bônus consumidos no i-ésimo estado desse ciclo. Como um bônus consumido nunca volta a ficar disponível,
+em toda transição vale `B_i ⊆ B_(i+1)`. Para o ciclo terminar no estado inicial, seu conjunto final de bônus
+deve ser igual ao inicial. Logo, todas essas inclusões são igualdades: nenhuma transição do ciclo pode consumir
+um bônus novo.
+
+No m05, os únicos arcos de peso negativo são os de primeira entrada em um bônus `+`, com custo −4. Cada um
+desses arcos aumenta estritamente o conjunto de bônus consumidos e, pelo argumento anterior, não pode pertencer
+a um ciclo. Revisitas a bônus já consumidos custam 1; as demais entradas do mapa custam 1 ou 3, e não há fontes
+`*`. Portanto, todo arco físico de um ciclo tem peso positivo, e a soma dos pesos desse ciclo também é positiva.
+O arco virtual de custo zero até `ALVO` não pode integrar um ciclo, pois `ALVO` não tem saída.
+
+Concluímos que G_est do m05 não possui ciclo negativo, embora contenha arcos negativos. Voltar à mesma posição
+após coletar um bônus não fecha um ciclo no grafo de estados, pois o conjunto de bônus mudou. Como o grafo é
+finito e há caminho até `ALVO`, existe um custo mínimo finito, que Bellman-Ford calcula como 5.
 
 ### 4.8 Caminhos nos mapas
 
