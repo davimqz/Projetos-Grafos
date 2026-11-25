@@ -3,25 +3,31 @@
   "peso": "peso",
   "origem": "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
   "total_nos": 14182,
-  "alcancados": 1267,
+  "alcancados": 1162,
   "status": "CICLO_NEGATIVO",
   "tem_ciclo_negativo": true,
   "ciclo_negativo": [
-    "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
-    "12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P",
-    "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo"
+    "3GwfdNG4KVx6pt6s8mNje85GTA5kH1f73q",
+    "1MFcDAzG1CJaCqY6BGU2LACzeCLFnfmjsh",
+    "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+    "3GwfdNG4KVx6pt6s8mNje85GTA5kH1f73q"
   ],
   "arcos_ciclo": [
     [
-      "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
-      "12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P",
-      -12585.72164358
+      "3GwfdNG4KVx6pt6s8mNje85GTA5kH1f73q",
+      "1MFcDAzG1CJaCqY6BGU2LACzeCLFnfmjsh",
+      0.010217490000000003
     ],
     [
-      "12cgpFdJViXbwHbhrA3TuW1EGnL25Zqc3P",
-      "1DEcTtkrbdXxS1wbrMvzub5X4VpByYmAwo",
-      -640.4299999999998
+      "1MFcDAzG1CJaCqY6BGU2LACzeCLFnfmjsh",
+      "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+      -1674.01738783
+    ],
+    [
+      "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+      "3GwfdNG4KVx6pt6s8mNje85GTA5kH1f73q",
+      -3.3785263700000003
     ]
   ],
-  "custo_ciclo": -13226.15164358
+  "custo_ciclo": -1677.38569671
 }
