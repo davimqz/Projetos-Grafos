@@ -447,6 +447,9 @@ apresentação.
 - **Pronto quando:** `docs/DECLARACAO_IA.pdf` na `main` com 4 assinaturas e sem nenhum `[PREENCHER]`/`[CONFIRMAR]`.
 
 ### [ ] D2. Regerar as saídas da Parte 2 com a mão do grupo
+- **Andamento (24/11, noite):** Davi rodou a CLI para as 3 fontes, os 5 pares e os 2 casos do Bellman-Ford; os 12
+  JSONs saíram idênticos aos commitados (só a quebra de linha difere no Windows). Declaração atualizada. **Falta:** o
+  `--benchmark` depois do merge do V1.
 - **Por quê:** igual ao M11. Os JSONs de `out/parte2/` foram gerados pelo agente (registro, linhas 32 e 49).
 - **Passo a passo:** rodar você mesmo os comandos da seção 2.3 do relatório para as 3 fontes, os 5 pares e os 2 casos
   do Bellman-Ford; `git status`; commitar se idêntico; ajustar o registro e a declaração. Se o V1 mudar o benchmark,
