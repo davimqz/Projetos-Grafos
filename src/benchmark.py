@@ -58,7 +58,12 @@ def custo_busca(grafo, retorno):
 
 
 def custo_bellman_ford(grafo, retorno):
-    """V * E, que só vale com ciclo negativo; sem ele o algoritmo para antes (None)."""
+    """V * E, o pior caso; sem ciclo negativo o algoritmo para antes (None).
+
+    Atenção: desde o PR #49 o Bellman-Ford também para ao achar o ciclo (1 passada no recorte),
+    então com ciclo essa coluna supõe o pior caso e não mede o trabalho feito. O relatório não usa.
+    """
+    # [IA] Claude Code – aviso sobre a coluna de custo depois do PR #49, a pedido do Vagner
     if retorno["status"] == "CICLO_NEGATIVO":
         return grafo.ordem() * grafo.tamanho()
     return None

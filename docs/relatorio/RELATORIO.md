@@ -580,7 +580,7 @@ python -m scripts.figuras_benchmark
 
 ![Carteiras alcançadas pelos quatro algoritmos nas três amostras](../../out/parte2/benchmark_comportamento.png)
 
-O gráfico de comportamento mostra as contagens registradas no benchmark. O eixo vertical usa escala logarítmica.
+O gráfico de comportamento mostra as contagens registradas no benchmark. O eixo vertical usa escala logarítmica. Na amostra de 100%, os nós ficam em outra ordem, por isso o Bellman-Ford alcança 1.161 carteiras, e não 1.162 como no caso obrigatório.
 
 ![Cinco caminhos do Dijkstra com setas, pesos por arco e custo total](../../out/parte2/benchmark_caminhos_dijkstra.png)
 
