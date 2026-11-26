@@ -79,7 +79,15 @@ python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
 
-> **[COMPLETAR — Matheus]** Comando que gera as saídas do P3 (`solve.py`) quando entrar na main.
+Para gerar de uma vez as saídas de todos os mapas (os oito do enunciado e os dois do grupo), incluindo métricas,
+camadas, graus, arestas, comparação de modelagens, soluções, armadilhas e o HTML interativo:
+
+```bash
+python -m src.cli --todos-mapas --interactive --out ./out/parte1/
+python -m src.cli --todos-mapas --benchmark --out ./out/parte1/
+```
+
+A CLI chama `src.solve.executar_parte1`, que orquestra as análises de `src/parte1/`.
 
 ### 2.3 Parte 2
 

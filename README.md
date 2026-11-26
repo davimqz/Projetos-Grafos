@@ -4,7 +4,8 @@
 
 **Parte 1:** Labirinto com Chaves (grafo de estados) · **Parte 2:** dataset Elliptic++ (rede de transações Bitcoin)
 
-Status de cada pacote e próximos passos em [`docs/PROXIMOS_PASSOS.md`](docs/PROXIMOS_PASSOS.md).
+Relatório completo em [`docs/relatorio/RELATORIO.md`](docs/relatorio/RELATORIO.md) (o PDF é gerado com
+`python -m scripts.gerar_pdf`, ver abaixo). Status de cada pacote em [`docs/PROXIMOS_PASSOS.md`](docs/PROXIMOS_PASSOS.md).
 
 Enunciado, critérios de avaliação e mapas originais da professora em [`docs/referencias/`](docs/referencias/).
 
@@ -168,8 +169,8 @@ Usamos o grafo de carteiras (endereço → endereço), porque o grafo de transa�
 **Pergunta de pesquisa:** carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?
 
 Decisões de limpeza (laços, arestas repetidas, uma linha por carteira) e limitações do recorte em
-[`docs/PARTE2_DATASET.md`](docs/PARTE2_DATASET.md). Resultados e interpretação em
-[`docs/relatorio/parte2.md`](docs/relatorio/parte2.md).
+[`docs/PARTE2_DATASET.md`](docs/PARTE2_DATASET.md). Resultados e interpretação na
+seção 5 de [`docs/relatorio/RELATORIO.md`](docs/relatorio/RELATORIO.md).
 
 ### Como executar
 
@@ -207,6 +208,7 @@ python scripts/amostrar_dataset.py --arestas 25000 --sementes 50 --seed 42
 | `bellman_ford_<carteira>.json` | 1 caso com peso negativo sem ciclo e 1 com ciclo negativo detectado |
 | `parte2_report.json` | tempos médios e escalabilidade por algoritmo |
 | `benchmark_escalabilidade.png` | tempo × tamanho do grafo |
+| `benchmark_comportamento.png`, `benchmark_caminhos_dijkstra.png`, `benchmark_caminhos_bfs_dijkstra.png` | gráficos complementares do benchmark (seção 5.6 do relatório) |
 | `graus_histograma.png`, `graus_ccdf.png` | distribuição dos graus de entrada e saída por classe |
 | `graus_parte2.csv`, `graus_resumo.json`, `graus_zero.csv` | graus por carteira, estatísticas por classe e carteiras com grau zero |
 
@@ -263,7 +265,8 @@ caminho padrão, defina `NAVEGADOR_PDF` com o executável. O script avisa quando
 │  ├─ PARTE2_DATASET.md        # decisões sobre o dataset da Parte 2
 │  ├─ REGISTRO_IA.md           # registro de cada uso de IA
 │  ├─ referencias/             # enunciado, critérios e zip dos mapas (originais da professora)
-│  └─ relatorio/parte2.md      # resultados e interpretação da Parte 2
+│  ├─ declaracao/              # rascunho da declaração de uso de IA (HTML e PDF)
+│  └─ relatorio/               # RELATORIO.md (fonte do PDF), figuras em img/ e parte2.md (rascunho antigo da Parte 2)
 ├─ data/
 │  ├─ mapas/                   # mapas fornecidos (m01 a m08)
 │  ├─ mapas_grupo/             # 2 mapas criados pelo grupo
