@@ -1544,7 +1544,13 @@ O histórico detalhado, com ferramenta, finalidade e arquivos afetados, está em
 
 A declaração de uso de IA deve ser assinada por todos e adicionada em `docs/DECLARACAO_IA.pdf` antes da entrega.
 
-> **[A ESCREVER — todos]** Reflexão curta do grupo sobre o uso de IA, se a declaração pedir.
+### Reflexão do grupo
+
+A Inteligência Artificial teve papel fundamental no desenvolvimento deste projeto, do início ao fim. Começamos usando a ferramenta para estruturar os diretórios e a hierarquia do projeto, o que nos deu uma base organizada desde as primeiras etapas. Ao longo do desenvolvimento, ela também ajudou a acompanhar em tempo real os requisitos pedidos pela professora. Assim, conseguíamos conferir os checklists, identificar o que ainda faltava e definir os próximos passos com clareza.
+
+A IA também ajudou na organização do grupo. Com ela, dividimos as responsabilidades entre os membros de forma equilibrada, levando em conta as demandas do projeto e distribuindo as tarefas da melhor maneira possível. Na parte técnica, apoiou o versionamento do código: o uso do Git, a organização do repositório no GitHub e a escrita e revisão dos pull requests. Isso deixou o fluxo de trabalho mais padronizado e o histórico do projeto mais fácil de acompanhar. Por fim, contribuímos com a ferramenta na documentação, deixando o projeto mais claro e acessível.
+
+Apesar desses ganhos, entendemos que a IA funcionou como apoio, e não como substituta do nosso trabalho. Todas as sugestões passaram por análise crítica do grupo, porque nem sempre as respostas estavam corretas ou adequadas ao nosso contexto. As decisões finais ficaram sempre com a equipe. Essa experiência mostrou que, usada com responsabilidade, a IA aumenta a produtividade e a organização, mas o entendimento do que está sendo construído continua sendo nosso.
 
 ---
 
