@@ -8,10 +8,6 @@ Matheus Araujo · Thomaz Lima · Davi Marques Oliveira · Vagner Montenegro de M
 
 Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/2026
 
-> **Estado da redação.** Os blocos **[A ESCREVER]** indicam conteúdo ainda pendente. A seção 4.3 registra
-> a contagem do mapa mínimo conferida manualmente por Matheus. As seções 4.1 a 4.10 estão preenchidas,
-> incluindo o desenho à mão do G_est do m02 e a prova do m05.
-
 ---
 
 ## Sumário
@@ -27,6 +23,8 @@ Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/202
 9. Conclusões
 10. Matriz de contribuição
 11. Uso de IA
+
+Apêndice A — Reprodução e conferência das métricas e figuras
 
 ---
 
@@ -103,7 +101,8 @@ O painel de informações acompanha cada etapa e apresenta a posição atual, as
 
 ![Interface do m07 com armadilhas destacadas](img/m07_armadilhas.png)
 
-*Figura 2.2 — Interface do labirinto interativo no mapa m07, com os estados-armadilha destacados.*
+*Figura 2.1 — Interface do labirinto interativo no mapa m07, com os estados-armadilha destacados.*
+
 ### 2.5 Front-end em React (extra)
 
 ```bash
@@ -114,7 +113,7 @@ cd front-react && npm install && npm run dev
 O front tem quatro abas: **Labirinto** (percurso passo a passo de cada mapa, comparação 2×2 dos quatro algoritmos e upload de um `.txt` próprio), **Grafos e mapas** (figuras da Parte 1), **Rede de carteiras** (BFS, DFS, Dijkstra e Bellman-Ford da Parte 2 desenhados sobre a rede de transações) e **Análise de dados** (gráficos da AVD).
 
 ![Aba Rede de carteiras do front-end](img/front_rede_carteiras.jpg)
-*Figura 2.1 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
+*Figura 2.2 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
 
 ---
 
@@ -787,9 +786,6 @@ O mapa de calor do m08 reúne a quantidade de estados associados a cada posiçã
 ---
 ## 5. Parte 2 — Elliptic++
 
-> O conteúdo detalhado já está em [`parte2.md`](parte2.md) e em [`../PARTE2_DATASET.md`](../PARTE2_DATASET.md).
-> Aqui entra a versão final, resumida, para o PDF.
-
 ### 5.1 Dataset e recorte
 
 Fonte: Elliptic++ (<https://github.com/git-disl/EllipticPlusPlus>), grafo de carteiras (endereço → endereço).
@@ -962,14 +958,7 @@ Fonte: `out/parte2/dijkstra_*.json`.
 
 #### Critérios de escolha
 
-##### Bellman-Ford
-
-- **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
-- **Caso sem ciclo negativo:** escolher a carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, pois, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
-
-##### Dijkstra
-
-Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver "Design dos pesos").
+Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver seção 5.2).
 
 Quero analisar cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo é comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
 
@@ -1010,6 +999,11 @@ A comparação entre o número de arcos também demonstra que o caminho de menor
 ### 5.5 Bellman-Ford
 
 Fonte: `out/parte2/bellman_ford_*.json`.
+
+#### Critérios de escolha
+
+- **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
+- **Caso sem ciclo negativo:** escolher a carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, pois, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
 
 #### Resultados do Bellman-Ford
 
@@ -1370,7 +1364,8 @@ Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos d
 
 ## 7. Testes
 
-Executados com `pytest`: 589 testes passando em 25/11/2026.
+Executados com `pytest`: 739 testes passando em 26/11/2026. O teste da animação do HTML interativo roda à parte, com
+Node: `node tests/test_animacao_html.cjs out/parte1/html/labirinto_interativo.html`.
 
 | Arquivo | O que confere |
 |---|---|
@@ -1384,6 +1379,8 @@ Executados com `pytest`: 589 testes passando em 25/11/2026.
 | `tests/parte1/`, `test_solve.py`, `test_cli_parte1.py` | saídas da Parte 1 e CLI: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
 | `test_carga_parte2.py`, `test_casos_parte2.py`, `test_graus_parte2.py` | carga do recorte, casos obrigatórios e graus da Parte 2 |
 | `test_mapa_surpresa.py` | mapas novos de borda contados à mão e formatos de arquivo (BOM, linha em branco e espaço no fim, comentário indentado, arquivo fora do UTF-8) |
+| `test_150_mapas_surpresa.py` | 150 casos reproduzíveis: 100 mapas gerados comparados com o NetworkX, 40 entradas inválidas com mensagem de erro e 10 execuções da CLI com saídas e HTML |
+| `test_animacao_html.cjs` (Node) | reprodução sincronizada dos quatro algoritmos no HTML, conclusão, reinício e mapa sem solução |
 | `test_benchmark.py`, `test_benchmark_parte1.py` | medição de tempo, memória e escalabilidade nas duas partes |
 | `test_mapa_front.py`, `test_exportar_parte2_front.py`, `test_rotular_transacoes.py` | mapa enviado pelo front, exportação dos casos da Parte 2 e rótulo das transações |
 | `test_viz.py`, `test_visualizar_parte1.py`, `test_gerar_html_front.py` | figuras da Parte 1 e geração do HTML interativo |
