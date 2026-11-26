@@ -8,10 +8,6 @@ Matheus Araujo · Thomaz Lima · Davi Marques Oliveira · Vagner Montenegro de M
 
 Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/2026
 
-> **Como usar este esqueleto.** Cada bloco marcado com **[A ESCREVER]** diz o que o enunciado pede e quem é o dono.
-> Pelas regras de IA, análises, discussões, conclusões, notas analíticas e a prova do m05 têm que ser escritas por
-> nós; a IA só pode revisar ortografia e clareza depois. Apagar este aviso e os marcadores antes de gerar o PDF.
-
 ---
 
 ## Sumário
@@ -27,6 +23,8 @@ Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/202
 9. Conclusões
 10. Matriz de contribuição
 11. Uso de IA
+
+Apêndice A — Reprodução e conferência das métricas e figuras
 
 ---
 
@@ -81,7 +79,15 @@ python -m src.cli --mapa ./data/mapas/m03_tres_chaves.txt --interactive --out ./
 python -m src.visualizar_parte1 --out ./out/parte1/
 ```
 
-> **[COMPLETAR — Matheus]** Comando que gera as saídas do P3 (`solve.py`) quando entrar na main.
+Para gerar de uma vez as saídas de todos os mapas (os oito do enunciado e os dois do grupo), incluindo métricas,
+camadas, graus, arestas, comparação de modelagens, soluções, armadilhas e o HTML interativo:
+
+```bash
+python -m src.cli --todos-mapas --interactive --out ./out/parte1/
+python -m src.cli --todos-mapas --benchmark --out ./out/parte1/
+```
+
+A CLI chama `src.solve.executar_parte1`, que orquestra as análises de `src/parte1/`.
 
 ### 2.3 Parte 2
 
@@ -95,8 +101,15 @@ python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte
 
 ### 2.4 Labirinto interativo
 
-> **[A ESCREVER — Thomaz]** Como abrir o `out/parte1/html/labirinto_interativo.html` e o que cada controle faz (seleção de
-> mapa e algoritmo, passo a passo, velocidade, camadas, armadilhas). Incluir 1 captura de tela.
+Além das figuras geradas para os mapas, o projeto possui uma versão interativa do labirinto, que permite acompanhar os percursos sem depender apenas de uma imagem estática. O arquivo `out/parte1/html/labirinto_interativo.html` pode ser aberto diretamente no navegador, sem precisar iniciar um servidor. Na interface, o usuário escolhe o mapa e o algoritmo que deseja visualizar e acompanha a sequência de estados correspondente à execução.
+
+A navegação pode ser feita manualmente, pelos botões Anterior e Próximo, ou de forma automática, pela opção Animar. A barra de posição permite acessar diretamente uma etapa do percurso, enquanto o controle de velocidade ajusta a reprodução de 1 a 20 passos por segundo. Também é possível selecionar a camada exibida, de acordo com o conjunto de chaves do estado, e ativar a opção Mostrar armadilhas para destacar os estados que não possuem caminho até o objetivo.
+
+O painel de informações acompanha cada etapa e apresenta a posição atual, as chaves coletadas, os bônus consumidos, a camada correspondente e o custo acumulado. Dessa forma, as mudanças de estado ficam disponíveis junto do percurso, o que é especialmente útil nos mapas em que o jogador retorna à mesma casa depois de obter uma chave ou utilizar um bônus.
+
+![Interface do m07 com armadilhas destacadas](img/m07_armadilhas.png)
+
+*Figura 2.1 — Interface do labirinto interativo no mapa m07, com os estados-armadilha destacados.*
 
 ### 2.5 Front-end em React (extra)
 
@@ -108,62 +121,343 @@ cd front-react && npm install && npm run dev
 O front tem quatro abas: **Labirinto** (percurso passo a passo de cada mapa, comparação 2×2 dos quatro algoritmos e upload de um `.txt` próprio), **Grafos e mapas** (figuras da Parte 1), **Rede de carteiras** (BFS, DFS, Dijkstra e Bellman-Ford da Parte 2 desenhados sobre a rede de transações) e **Análise de dados** (gráficos da AVD).
 
 ![Aba Rede de carteiras do front-end](img/front_rede_carteiras.jpg)
-*Figura 2.1 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
+*Figura 2.2 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
 
 ---
 
 ## 3. Implementação comum (grafo e algoritmos)
 
-Os algoritmos estão em `src/graphs/algorithms.py`, sobre a lista de adjacência dirigida de `src/graphs/graph.py`
-(vizinhos na ordem N, L, S, O). As mesmas funções são usadas nas duas partes. O `networkx` aparece só em `tests/`,
-como oráculo.
+A implementação dos algoritmos foi concentrada em `src/graphs/algorithms.py`, utilizando a representação de grafo dirigido por listas de adjacência disponível em `src/graphs/graph.py`. A mesma estrutura é utilizada nas duas partes do projeto, o que permite executar as buscas tanto nos estados dos labirintos quanto na rede de carteiras. A biblioteca networkx ficou restrita aos testes, utilizados para comparar os resultados das funções implementadas pelo grupo.
 
-| Algoritmo | Entrada | Saída | Complexidade |
+| Algoritmo | Entrada | Resultado | Complexidade |
 |---|---|---|---|
-| BFS | grafo, origem | ordem, nível de cada nó, árvore | O(V + E) |
-| DFS | grafo, origem | ordem, arcos de árvore/retorno/avanço/cruzamento, existência de ciclo | O(V + E) |
-| Dijkstra (`heapq`) | grafo com pesos ≥ 0, origem | distâncias e caminho; recusa peso negativo | O((V + E) log V) |
-| Bellman-Ford | grafo, origem | distâncias e caminho, ou o ciclo negativo reconstruído | O(V · E) |
+| BFS | Grafo e origem | Ordem de visita, distâncias em arestas, níveis e árvore BFS | O(V + E) |
+| DFS | Grafo e origem opcional | Ordem de visita, tempos, classificação de arcos e presença de ciclos | O(V + E) |
+| Dijkstra | Grafo sem pesos negativos e origem | Distâncias e predecessores | O((V + E) log V) |
+| Bellman-Ford | Grafo e origem | Distâncias e predecessores ou ciclo negativo reconstruído | O(V · E) |
 
-> **[A ESCREVER — Thomaz]** Decisões de implementação que valem explicar: como a DFS classifica cada arco (tempos de
-> descoberta/término), como o Dijkstra recusa peso negativo, como o Bellman-Ford reconstrói o ciclo.
+A BFS utiliza uma fila FIFO implementada com deque, mantendo a exploração em largura a partir de uma origem definida. Cada vértice é marcado como visitado no momento em que entra na fila, evitando inserções repetidas, e sua distância corresponde ao número de arestas percorridas desde a origem. A implementação também registra o vértice pai, a camada de descoberta e as arestas da árvore BFS, permitindo recuperar trajetos e visualizar os níveis da busca. Os pesos das arestas não participam desse cálculo: o algoritmo encontra caminhos com menor quantidade de passos, o que não significa, necessariamente, menor custo acumulado. Essa diferença aparece no m01, em que a BFS encontra um percurso de 10 passos e custo 30, enquanto o Dijkstra encontra um caminho de 14 passos e custo 20. Esses resultados vêm de `out/parte1/csv/solucoes.csv` e ilustram as duas medidas que o projeto compara.
+
+Na DFS, a exploração segue um caminho em profundidade antes de retornar aos vértices anteriores. A primeira implementação utilizava recursão, mas foi substituída por uma pilha explícita, pois uma sequência muito longa de vértices poderia ultrapassar o limite de chamadas do Python. A pilha mantém o vértice atual, seus vizinhos e a próxima posição a ser examinada, preservando a ordem de exploração prevista para os mapas. Os arcos são classificados durante a busca: os que descobrem novos vértices entram na árvore; aqueles que apontam para um vértice ainda aberto são de retorno; os que chegam a um descendente já encerrado são de avanço; e os demais são de cruzamento. Os tempos de descoberta e término também são registrados para permitir a conferência da classificação.
+
+O Dijkstra foi implementado com uma fila de prioridade, utilizando heapq para selecionar o próximo vértice com menor custo conhecido. Antes de começar, a função percorre as arestas e verifica seus pesos. Se encontrar algum valor negativo, interrompe a execução com ValueError, indicando a aresta e o peso que causaram a recusa. Essa verificação evita aplicar o algoritmo em casos incompatíveis, como os mapas com bônus de custo negativo. Neles, a busca por menor custo precisa ser feita com Bellman-Ford, desde que o resultado não seja afetado por um ciclo negativo alcançável.
+
+O Bellman-Ford mantém o relaxamento sucessivo das arestas, registrando os predecessores e os pesos que levaram às atualizações das distâncias. Para identificar ciclos negativos, a implementação atual verifica, após cada passada com alterações, se a cadeia de predecessores contém um ciclo e calcula a soma de seus pesos. Quando o custo é negativo, a sequência de vértices é reconstruída e devolvida junto do status CICLO_NEGATIVO. Essa verificação foi acrescentada depois dos testes com grafos maiores, nos quais a presença de um ciclo podia fazer o algoritmo percorrer praticamente todas as V−1 passadas. O resultado também informa `passadas_executadas`, permitindo acompanhar a interrupção antecipada. Quando há ciclo negativo, as distâncias registradas até o encerramento são parciais e não representam caminhos mínimos definitivos para os vértices afetados.
+
+### Medições de desempenho
+
+O projeto também registra o tempo de execução e o pico de memória associado a cada algoritmo. As medições de tempo foram realizadas cinco vezes por caso, sobre o grafo já construído, sem incluir a leitura do mapa ou a geração dos arquivos de saída. A memória foi medida separadamente, como pico de alocações durante a chamada do algoritmo, e não como consumo total do processo. A tabela apresenta os valores registrados para m03 e m08, que possuem tamanhos diferentes e aparecem nas visualizações produzidas na Parte 1.
+
+| Mapa | Algoritmo | Repetições | Tempo médio (ms) | Pico de memória (KiB) |
+|---|---|---:|---:|---:|
+| m03 | BFS | 5 | 0,1988 | 42,3 |
+| m03 | DFS | 5 | 0,3415 | 48,6 |
+| m03 | Dijkstra | 5 | 0,2312 | 28,0 |
+| m03 | Bellman-Ford | 5 | 0,6635 | 27,7 |
+| m08 | BFS | 5 | 2,8998 | 659,7 |
+| m08 | DFS | 5 | 4,1004 | 929,1 |
+| m08 | Dijkstra | 5 | 3,4339 | 451,2 |
+| m08 | Bellman-Ford | 5 | 14,1109 | 720,0 |
+
+Fonte: `out/parte1/csv/benchmark.csv`, resultados publicados na main. Os tempos e a memória podem variar de acordo com a máquina e com a execução.
+
+Nos dois mapas, os quatro algoritmos terminaram com status OK. Em m03, os tempos médios ficaram abaixo de 1 ms, enquanto m08 apresentou valores maiores para todas as buscas. O Bellman-Ford registrou 14,1109 ms no m08, diante de 2,8998 ms da BFS. Esses resultados descrevem a execução registrada pelo grupo e precisam ser considerados junto das finalidades de cada algoritmo: BFS mede distâncias em número de arestas, DFS explora a estrutura do grafo e os algoritmos de caminhos mínimos consideram os pesos das transições.
 
 ---
-
 ## 4. Parte 1 — Labirinto com Chaves
 
 ### 4.1 Modelagem: G_pos e G_est
 
-> **[A ESCREVER — Matheus]** O que é um nó em cada grafo, o rótulo `(l,c)|chaves|{bônus}`, a numeração dos bônus em
-> ordem de leitura, a construção por exploração a partir de `S`, o nó `ALVO` com arco de custo 0 e as variantes
-> (portas como chão/parede, `+` fixo, fonte consumível). Incluir o G_est do m02 desenhado à mão.
+A resolução do labirinto utiliza dois grafos dirigidos e ponderados. O primeiro, **G_pos** (grafo de posições),
+possui um vértice para cada casa da grade que não é parede e um arco para cada movimento permitido entre casas
+vizinhas nas direções norte, leste, sul e oeste. Os movimentos respeitam as paredes e a direção de saída das
+esteiras; em `G`, não há movimentos de saída. Cada vértice recebe o rótulo `(linha,coluna)`, com coordenadas
+começando em zero na grade sem comentários.
+
+G_pos não registra as coletas do jogador. Na variante padrão, trata portas como chão e inclui todas as casas
+que não são paredes, mesmo as inalcançáveis a partir de `S`. Os pesos correspondem ao custo de entrar na casa
+de destino; sem memória de consumo, cada entrada em `+` custa −4 e cada entrada em `*` custa −2. Esse grafo é
+usado nas métricas estruturais (seção 4.4), nas comparações de modelagens (seção 4.6) e no experimento de bônus
+com custo fixo (seção 4.7).
+
+O segundo grafo, **G_est** (grafo de estados), incorpora a memória do jogador. Cada vértice físico representa
+um **estado** composto por três informações: a posição `(l,c)`, o conjunto de chaves coletadas e o conjunto de
+bônus já consumidos.
+O rótulo segue o formato `(l,c)|chaves|{bônus}`. Chaves são letras minúsculas em ordem alfabética (`a`, `ab`, `abc`,
+...); sem chaves, o campo contém `-`. Os bônus recebem identificadores inteiros em **ordem de leitura** da grade
+(linha por linha, coluna por coluna), começando em zero; sem bônus consumidos, o campo mostra `{}`. Por exemplo, o
+rótulo `(3,5)|ab|{0,2}` indica que o jogador está na posição (3,5), possui as chaves `a` e `b` e consumiu os bônus
+de identificadores 0 e 2.
+
+A construção de G_est é feita **por exploração** a partir do estado inicial em `S`, sem chaves coletadas nem bônus
+consumidos: `(ls,cs)|-|{}`, em que `(ls,cs)` é a posição de `S`. Apenas os estados físicos alcançáveis são incluídos.
+A exploração utiliza uma fila: para cada estado retirado, são geradas as transições válidas na ordem N, L, S, O.
+Se o estado de destino ainda não existe no grafo, ele é adicionado e enfileirado. As regras de transição são:
+
+- **Chaves** (`a`–`d`): ao entrar na casa, a chave é adicionada ao conjunto do jogador e permanece em todas as
+  transições seguintes. A coleta é irreversível.
+- **Portas** (`A`–`D`): a transição só é permitida se o jogador possui a chave correspondente (minúscula).
+- **Esteiras** (`>`, `<`, `^`, `v`): permitem sair apenas na direção da seta. Se a saída aponta para fora da grade
+  ou para uma parede, o estado não tem movimento.
+- **Custos de entrada**: entrar em chão (`.`), `S`, `G`, chaves, portas ou esteiras custa 1; em lama (`,`), 3;
+  em água (`~`), 5; em bônus (`+`), −4 na primeira visita e 1 nas revisitas; em fonte (`*`), −2 em toda visita.
+  Com `--fonte-consumivel`, a fonte custa −2 apenas na primeira visita e 1 nas seguintes. A posição inicial
+  não é cobrada; um retorno a `S` custa 1.
+
+Ao término da exploração, é adicionado o vértice virtual **`ALVO`**, com um arco de custo zero partindo de cada
+estado cuja posição corresponde a `G`. Esses estados não têm saída física, pois o percurso termina em `G`.
+O `ALVO` não possui saída e é incluído mesmo se nenhuma casa `G` for alcançável. As buscas partem do estado
+inicial em `S`, e a existência de caminho até `ALVO` determina se o mapa tem solução. Dijkstra só é aplicável
+quando não há pesos negativos. Um ciclo negativo alcançável a partir de `S` que também possa chegar a `ALVO`
+impede a existência de custo mínimo finito; esse caso é identificado na resolução com Bellman-Ford.
+
+As **variantes** de modelagem são:
+
+- **Portas como chão** (`portas="chao"`): G_pos onde as portas são tratadas como piso, sem exigir chave. Usada na
+  seção 4.6 para mostrar que essa simplificação gera caminhos inválidos.
+- **Portas como parede** (`portas="parede"`): G_pos onde as portas são removidas como se fossem paredes. Também
+  usada na seção 4.6.
+- **`+` fixo em −4**: no G_pos, todo bônus vale −4 em qualquer entrada, sem memória de consumo. Usado na seção 4.7
+  para demonstrar o ciclo negativo no m05.
+- **`--fonte-consumivel`**: no G_est, as fontes `*` são tratadas como consumíveis com identificadores próprios
+  (após todos os `+`), valendo −2 apenas na primeira visita. Usado para corrigir o ciclo negativo do m06.
+
+![Grafo de estados do m02 desenhado à mão, com as camadas sem chave e com a chave a e o vértice ALVO.](img/gest_m02_mao.jpeg)
+
+*Figura — G_est do m02 desenhado à mão, com as duas camadas de chaves e os pesos dos arcos.*
+
+O m02 possui uma chave `a` na posição (3,11) e uma porta `A` na posição (1,6). O G_est resultante tem 39 estados
+físicos e 74 arcos físicos, distribuídos em duas camadas: a camada `-` (sem chaves, 16 estados) e a camada `a`
+(com a chave, 23 estados). O único arco entre camadas é `(3,10)|-|{} → (3,11)|a|{}`: ao entrar na casa (3,11),
+o jogador coleta `a`. Incluindo `ALVO` e o arco virtual de custo zero, o grafo tem 40 vértices e 75 arcos.
 
 ### 4.2 Por que o grafo tem que ser dirigido
 
-> **[A ESCREVER — Matheus]** Exigido pelo enunciado (Seção 2). Pensar em esteiras e em pegar uma chave.
+O grafo de estados precisa ser dirigido porque nem toda transição admite a transição inversa entre os mesmos
+estados. As esteiras e a coleta de chaves ilustram essa necessidade.
+
+**Esteiras.** No m04, a posição (1,3) contém uma esteira `^` que aponta para o norte. O estado `(1,3)|-|{}` só
+poderia sair para o norte, mas há uma parede em (0,3), portanto não tem arco de saída. O movimento para leste
+que chega a essa posição a partir de `(1,2)` não pode ser revertido, pois a esteira não permite sair pelo oeste.
+Se essa ligação fosse não dirigida, seria possível voltar de `(1,3)|-|{}` para `(1,2)|-|{}`, violando a regra da esteira.
+No g02, a esteira `v` na posição (8,5) aponta para o sul: o jogador pode entrar nela, mas ao descer para o poço
+(linhas 9–11) não pode retornar ao corredor da linha 7. A esteira e as 36 casas do poço somam 37 estados-armadilha
+entre os 89 estados físicos (41,6%), pois não há movimento permitido da esteira para o norte.
+
+**Coleta de chaves.** No m02, quando o jogador se move de `(3,10)|-|{}` para a casa da chave em (3,11), a chave `a`
+é coletada automaticamente, e o estado de destino é `(3,11)|a|{}`. O estado `(3,11)|-|{}` não é gerado, pois a
+coleta ocorre na entrada. A transição muda da camada `-` para a camada `a`. Se a ligação fosse não dirigida,
+o retorno levaria de `(3,11)|a|{}` para `(3,10)|-|{}`, o que implicaria que o jogador
+perderia a chave ao retornar, violando a regra de que chaves coletadas são permanentes. No G_est correto, o arco de
+volta leva a `(3,10)|a|{}`, mantendo a chave no conjunto do jogador.
 
 ### 4.3 Mapa mínimo contado à mão
 
-> **[A ESCREVER — Matheus]** O mapa de até 5×7 usado em `tests/test_estados.py`, com o número de estados e de arcos
-> contado à mão e a indicação do teste que confere.
+<!-- [IA] Codex — organização da conferência do mapa mínimo, validada manualmente por Matheus. -->
+
+Para conferir a construção de G_est, utilizamos o caso mínimo com chave e porta presente em
+`tests/test_estados.py`. A grade possui uma linha e quatro colunas, dentro do limite de 5 × 7. A enumeração
+dos estados e dos arcos foi conferida manualmente por Matheus, pelas regras de movimento e de coleta.
+
+```text
+SaAG
+```
+
+As coordenadas começam em zero: `S` está em `(0,0)`, a chave `a` em `(0,1)`, a porta `A` em `(0,2)` e a saída
+`G` em `(0,3)`. Não há bônus, portanto o conjunto de consumíveis permanece vazio em todos os estados.
+Partindo do início sem chave, são alcançáveis os seguintes estados:
+
+| Identificador | Estado | Situação |
+|---|---|---|
+| q0 | <code>(0,0)&#124;-&#124;{}</code> | Início sem a chave |
+| q1 | <code>(0,1)&#124;a&#124;{}</code> | Entrada na chave `a` |
+| q2 | <code>(0,0)&#124;a&#124;{}</code> | Retorno ao início com a chave |
+| q3 | <code>(0,2)&#124;a&#124;{}</code> | Porta `A` atravessada |
+| q4 | <code>(0,3)&#124;a&#124;{}</code> | Saída alcançada |
+
+A posição de `S` corresponde a dois estados: antes da coleta e após o retorno com a chave. Nas outras três posições,
+há somente um estado alcançável em cada uma. A casa da chave não admite um estado sem `a`, pois a coleta ocorre
+ao entrar; a porta exige essa chave, e a saída só é alcançada depois de atravessá-la. Assim, a contagem por
+posição é `2 + 1 + 1 + 1 = 5 estados físicos`.
+
+Os movimentos permitidos, considerando os vizinhos na ordem N, L, S, O, geram os seis arcos físicos abaixo.
+Todos têm peso 1, correspondente ao custo de entrar na casa de destino.
+
+| Origem | Movimento | Destino | Peso |
+|---|---|---|---|
+| q0 | Leste: coleta a chave | q1 | 1 |
+| q1 | Leste: atravessa a porta | q3 | 1 |
+| q1 | Oeste: retorna com a chave | q2 | 1 |
+| q2 | Leste: revisita a chave | q1 | 1 |
+| q3 | Leste: alcança a saída | q4 | 1 |
+| q3 | Oeste: retorna à casa da chave | q1 | 1 |
+
+Não existem movimentos para norte ou sul, pois levariam para fora da grade. O retorno de q1 para a posição
+inicial leva a q2, e não a q0, porque a chave permanece com o jogador. Em q4, o jogo termina e não há saída
+física. A soma dos graus de saída confirma a contagem: `1 + 2 + 1 + 2 + 0 = 6 arcos físicos`.
+
+Acrescentando o vértice virtual `ALVO`, há somente mais um arco, `q4 → ALVO`, de peso zero. O alvo virtual
+não possui saída. Os totais são:
+
+| Contagem | Estados ou vértices | Arcos |
+|---|---|---|
+| Somente elementos físicos | 5 | 6 |
+| Incluindo ALVO e o arco virtual | 6 | 7 |
+
+O teste `test_grafo_estados_chave_muda_camada_e_permanece_no_retorno` confere esses cinco estados, a ordem 6,
+o tamanho 7 e as listas de vizinhos, incluindo a permanência da chave no retorno. A esteira bloqueada é
+verificada separadamente pelo caso `S^G`, do teste parametrizado
+`test_grafo_estados_tem_exatamente_os_nos_e_arcos_esperados`: somente `S` e `^` são alcançáveis, há um arco
+físico entre eles e a esteira não tem saída, pois aponta para fora da grade. Nesse caso, `G` é inalcançável
+e `ALVO` fica isolado.
 
 ### 4.4 Métricas globais e por camada
 
 Fonte: `out/parte1/json/metricas_global.json` e `out/parte1/json/camadas.json`.
 
+#### Métricas globais
+
 | Mapa | G_pos: ordem | tamanho | densidade | G_est: ordem | tamanho | densidade | teto teórico | ocupação |
 |---|---|---|---|---|---|---|---|---|
-| m01 … m08 | | | | | | | | |
+| m01 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 1,0000 |
+| m02 | 23 | 43 | 0,0850 | 39 | 74 | 0,0499 | 46 | 0,8478 |
+| m03 | 76 | 167 | 0,0293 | 213 | 466 | 0,0103 | 608 | 0,3503 |
+| m04 | 24 | 39 | 0,0707 | 37 | 66 | 0,0495 | 48 | 0,7708 |
+| m05 | 44 | 90 | 0,0476 | 215 | 438 | 0,0095 | 352 | 0,6108 |
+| m06 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 1,0000 |
+| m07 | 31 | 69 | 0,0742 | 16 | 38 | 0,1583 | 62 | 0,2581 |
+| m08 | 1169 | 2574 | 0,0019 | 2919 | 6364 | 0,0007 | 18704 | 0,1561 |
+| g01 | 39 | 72 | 0,0486 | 104 | 194 | 0,0181 | 1248 | 0,0833 |
+| g02 | 89 | 205 | 0,0262 | 89 | 205 | 0,0262 | 89 | 1,0000 |
 
-> **[A ESCREVER — Matheus]** Comentário da tabela, métricas por camada, quantos arcos ligam camadas e **por que são
-> exatamente aquelas casas**.
+As ordens, os tamanhos e as densidades desta seção excluem `ALVO` e seus arcos virtuais. Ordem é o número de
+vértices, tamanho é o número de arcos e a densidade dirigida é `tamanho / (ordem × (ordem − 1))` para ordem maior
+que 1 (zero nos demais casos). G_pos inclui todas as posições permitidas pela modelagem, enquanto G_est
+inclui apenas os estados físicos alcançáveis a partir do início.
+
+O **teto teórico** é um limite superior combinatório, calculado como
+`casas_livres × 2^(chaves_distintas) × 2^(bônus)`. Ele inclui combinações que podem ser incompatíveis com as regras
+ou inalcançáveis no mapa. A **ocupação** é a razão entre os estados físicos alcançáveis e esse teto.
+Com `--fonte-consumivel`, o expoente dos consumíveis passa a ser `bônus + fontes`.
+
+Nos mapas sem chaves nem bônus (m01, m06 padrão, g02), a parte física de G_est tem a mesma estrutura de G_pos,
+com rótulos diferentes, e a ocupação é 1,0000: nesses três mapas, todas as casas livres são alcançáveis e cada
+uma corresponde a exatamente um estado. Nos mapas com chaves e sem consumíveis, cada casa pode gerar até
+`2^(chaves)` estados, um para cada subconjunto de chaves que o jogador pode ter ao visitá-la. No m03, com três chaves,
+o teto é 608, mas apenas 213 estados (35%) são alcançáveis, porque muitas combinações de posição e chaves não podem
+ser atingidas: por exemplo, o jogador não alcança a região além da porta `B` sem antes coletar `a` e `b`.
+
+No m08, o teto é 18.704 (1.169 casas × 2^4 chaves), e apenas 15,6% dos estados são alcançáveis. Isso se deve à
+topologia do labirinto: muitas casas só podem ser visitadas depois de coletar certas chaves, restringindo as
+combinações realizáveis. O g01, com 3 chaves e 2 bônus, tem o menor percentual de ocupação (8,3%) porque o teto
+é muito amplo (1.248), mas o layout linear do mapa impõe uma ordem rígida de coleta que limita as combinações
+possíveis.
+
+No m07, há apenas 16 estados alcançáveis, equivalentes a 25,8% do teto teórico de 62. A chave `a` está atrás
+de uma porta `A` que a exige, tornando impossível coletá-la. Assim, apenas os estados da camada `-` (sem
+chaves) são alcançáveis, e a saída `G` está bloqueada pela porta `A` na posição (1,6).
+
+#### Métricas por camada e arcos entre camadas
+
+| Mapa | Camada (chaves) | Ordem | Tamanho | Densidade |
+|---|---|---|---|---|
+| m01 | - | 24 | 46 | 0,0833 |
+| m02 | - | 16 | 30 | 0,1250 |
+| m02 | a | 23 | 43 | 0,0850 |
+| m03 | - | 12 | 22 | 0,1667 |
+| m03 | a | 53 | 114 | 0,0414 |
+| m03 | ab | 72 | 160 | 0,0313 |
+| m03 | abc | 76 | 167 | 0,0293 |
+| m04 | - | 17 | 30 | 0,1103 |
+| m04 | a | 20 | 35 | 0,0921 |
+| m05 | - | 215 | 438 | 0,0095 |
+| m06 | - | 24 | 46 | 0,0833 |
+| m07 | - | 16 | 38 | 0,1583 |
+| m08 | - | 165 | 356 | 0,0132 |
+| m08 | a | 314 | 670 | 0,0068 |
+| m08 | ab | 442 | 940 | 0,0048 |
+| m08 | abc | 829 | 1818 | 0,0026 |
+| m08 | abcd | 1169 | 2574 | 0,0019 |
+| g01 | - | 9 | 15 | 0,2083 |
+| g01 | a | 28 | 51 | 0,0675 |
+| g01 | ab | 39 | 72 | 0,0486 |
+| g01 | abc | 28 | 51 | 0,0675 |
+| g02 | - | 89 | 205 | 0,0262 |
+
+Cada camada é definida somente pelo conjunto de chaves e reúne todos os conjuntos de bônus alcançáveis com
+essas chaves. Seu tamanho conta apenas os arcos internos ao subgrafo induzido. Assim, coletar um bônus muda o
+estado, mas não muda a camada desta tabela.
+
+| Mapa | Arcos entre camadas | Casas que os geram |
+|---|---|---|
+| m01 | 0 | — |
+| m02 | 1 | (3,11) `a` |
+| m03 | 3 | (1,12) `b`, (6,6) `c`, (8,1) `a` |
+| m04 | 1 | (3,11) `a` |
+| m05 | 0 | — |
+| m06 | 0 | — |
+| m07 | 0 | — |
+| m08 | 6 | (3,23) `b`, (3,29) `d`, (5,37) `c`, (27,5) `a` |
+| g01 | 5 | (3,4) `a`, (3,10) `b`, (3,16) `c` |
+| g02 | 0 | — |
+
+Os arcos entre camadas são gerados pela entrada em casas de **chaves ainda não coletadas**. Nessa entrada,
+o conjunto de chaves aumenta e o estado passa a pertencer a uma camada diferente. Revisitar uma chave já
+coletada não muda a camada. Nenhum outro tipo de casa altera o conjunto de chaves. No m03, as três
+casas de chave — `a` em (8,1), `b` em (1,12) e `c` em (6,6) — geram os três arcos entre camadas. No m08, com
+quatro chaves, há seis arcos entre camadas a partir de quatro casas: dois coletam `a`, um coleta `b`, dois
+coletam `c` e um coleta `d`. Os dois arcos de coleta de `a` chegam de (27,4) e (28,5), ambos sem chaves;
+os dois de coleta de `c` chegam de (6,37) e (4,37), ambos com `ab`. Portanto, nesse mapa, a contagem maior que
+o número de casas de chave vem de diferentes posições de origem, e não de diferentes inventários na mesma coleta.
+
+A densidade diminui ao longo das camadas dos mapas m02, m03, m04 e m08: com mais chaves, o jogador acessa mais
+casas, mas o número de arcos cresce proporcionalmente menos que o número de pares de vértices distintos.
+No m08, a camada `-` tem densidade 0,0132 com 165 estados, enquanto a camada `abcd` tem densidade 0,0019 com
+1.169 estados, refletindo a esparsidade do labirinto. Isso não é uma regra geral: no g01, a densidade aumenta
+de 0,0486 na camada `ab` para 0,0675 na camada `abc`, cuja ordem é menor.
 
 ### 4.5 Graus, multiplicidade e becos
 
-Fonte: `out/parte1/csv/graus_<mapa>.csv`, `out/parte1/figuras/heatmap_m08.png`.
+Fontes: `out/parte1/json/metricas_global.json`, `out/parte1/csv/graus_<mapa>.csv` e
+`out/parte1/figuras/heatmap_m08.png`.
 
-> **[A ESCREVER — Matheus]** Maior grau de entrada e de saída por mapa; multiplicidade máxima no m08, quantas casas a
-> atingem e por quê; becos encontrados.
+| Mapa | Maior grau de entrada | estado | Maior grau de saída | estado | Multiplicidade máx. | casas | Becos |
+|---|---|---|---|---|---|---|---|
+| m01 | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | <code>(1,1)&#124;-&#124;{}</code> | 1 | 24 | 0 |
+| m02 | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | 16 | 0 |
+| m03 | 3 | <code>(1,12)&#124;ab&#124;{}</code> | 3 | <code>(3,12)&#124;abc&#124;{}</code> | 4 | 12 | 0 |
+| m04 | 3 | <code>(3,8)&#124;-&#124;{}</code> | 3 | <code>(3,8)&#124;-&#124;{}</code> | 2 | 17 | 2 |
+| m05 | 4 | <code>(3,10)&#124;-&#124;{0,1,2}</code> | 3 | <code>(3,1)&#124;-&#124;{0,1,2}</code> | 6 | 21 | 0 |
+| m06 | 2 | <code>(1,1)&#124;-&#124;{}</code> | 2 | <code>(1,1)&#124;-&#124;{}</code> | 1 | 24 | 0 |
+| m07 | 3 | <code>(3,1)&#124;-&#124;{}</code> | 3 | <code>(3,1)&#124;-&#124;{}</code> | 1 | 16 | 0 |
+| m08 | 4 | <code>(11,65)&#124;abcd&#124;{}</code> | 4 | <code>(11,65)&#124;abcd&#124;{}</code> | 5 | 165 | 0 |
+| g01 | 3 | <code>(1,13)&#124;abc&#124;{0,1}</code> | 3 | <code>(1,13)&#124;abc&#124;{0,1}</code> | 5 | 2 | 3 |
+| g02 | 4 | <code>(10,12)&#124;-&#124;{}</code> | 4 | <code>(10,12)&#124;-&#124;{}</code> | 1 | 89 | 0 |
+
+Os graus da tabela contam somente arcos físicos. O estado indicado é um representante do máximo, escolhido pelo
+menor rótulo em ordem lexicográfica quando há empate. A coluna `casas` conta as posições que atingem a
+multiplicidade máxima. A **multiplicidade** de uma casa é o número de estados distintos que compartilham a mesma
+posição `(l,c)`. Ela reflete quantas combinações de chaves e bônus o jogador pode ter ao visitar aquela casa.
+
+No **m08**, a multiplicidade máxima é 5, atingida por 165 das 1.169 casas livres. Essas casas são as que podem ser
+visitadas nas cinco camadas alcançáveis: `-`, `a`, `ab`, `abc` e `abcd`. As outras 11 combinações teóricas de quatro
+chaves não aparecem no grafo desse mapa. Como as casas da camada `-` podem ser revisitadas após cada coleta, elas
+atingem multiplicidade 5; por exemplo, `S` em (1,1) aparece nas cinco camadas. Casas que só se tornam acessíveis
+após certas coletas aparecem em menos camadas. O heatmap do m08 (`out/parte1/figuras/heatmap_m08.png`) representa
+essa contagem por posição, com tons de azul mais escuros nas casas de maior multiplicidade.
+
+No **m05**, a multiplicidade máxima é 6, atingida por 21 casas. Embora o mapa não tenha chaves, possui três bônus
+(`+`), que permitem considerar `2^3 = 8` subconjuntos teóricos de bônus consumidos. Apenas seis aparecem no
+grafo: `{}`, `{0}`, `{2}`, `{0,2}`, `{1,2}` e `{0,1,2}`. As 21 casas de multiplicidade máxima são alcançáveis
+com todos esses seis conjuntos; as demais aparecem com menos combinações.
+
+**Becos** (estados sem saída física que não estão em `G`) aparecem em dois mapas. No **m04**, há 2 becos: os estados
+`(1,3)|-|{}` e `(1,3)|a|{}`, correspondentes à casa da esteira `^` na posição (1,3). Essa esteira aponta para o
+norte, mas acima dela há uma parede em (0,3), portanto o estado não possui nenhum arco de saída.
+Esses estados são alcançados por um movimento para leste a partir de `(1,2)`. No **g01**, há 3 becos:
+`(1,5)|-|{}`, `(1,11)|a|{0}` e `(1,17)|ab|{0,1}`, correspondentes às três casas de esteira `>` nas posições
+(1,5), (1,11) e (1,17). Em cada caso, a esteira só permite sair para leste, onde há uma porta cuja chave ainda
+não foi coletada. A porta bloqueia essa única saída, deixando o estado sem transições válidas.
 
 ### 4.6 Comparação de modelagens (m02, m03, m04)
 
@@ -171,68 +465,334 @@ Fonte: `out/parte1/csv/comparacao_modelagem.csv`.
 
 | Mapa | Abordagem | Passos | Caminho válido | Observação |
 |---|---|---|---|---|
-| | portas como chão | | | |
-| | portas como parede | | | |
-| | G_est | | | |
+| m02 | portas como chão | 10 | Não | Ignora chaves e atravessa portas diretamente. |
+| m02 | portas como parede | — | — | Não encontra caminho, pois exclui todas as portas. |
+| m02 | grafo de estados | 34 | Sim | Modelagem exata com memória de chaves coletadas. |
+| m03 | portas como chão | 21 | Não | Ignora chaves e atravessa portas diretamente. |
+| m03 | portas como parede | — | — | Não encontra caminho, pois exclui todas as portas. |
+| m03 | grafo de estados | 87 | Sim | Modelagem exata com memória de chaves coletadas. |
+| m04 | portas como chão | 14 | Não | Ignora chaves e atravessa portas diretamente. |
+| m04 | portas como parede | — | — | Não encontra caminho, pois exclui todas as portas. |
+| m04 | grafo de estados | 20 | Sim | Modelagem exata com memória de chaves coletadas. |
 
-> **[A ESCREVER — Matheus]** Por que (a) gera caminho inválido e (b) falha.
+A tabela compara os caminhos de menor número de passos encontrados pela BFS em cada modelagem; não compara
+seus custos. O símbolo `—` indica que não foi encontrado caminho.
+
+A abordagem **portas como chão** trata as portas como piso livre, sem exigir chave. No m02, o caminho encontrado
+pela BFS em G_pos(chão) tem apenas 10 passos e passa pela porta `A` em (1,6) sem que o jogador tenha coletado a
+chave `a`, que está em (3,11). Esse caminho é inválido: na execução real do labirinto, o jogador seria bloqueado ao
+tentar atravessar a porta sem a chave. O mesmo acontece nos m03 e m04, onde os caminhos encontrados com 21 e 14
+passos, respectivamente, também atravessam portas sem as chaves necessárias. Nesses três casos, a simplificação
+produz caminhos mais curtos que violam as regras do jogo.
+
+A abordagem **portas como parede** exclui as portas de G_pos como se fossem paredes intransponíveis. No m02,
+remover a porta `A` em (1,6) interrompe o corredor superior e impede alcançar `G` nesse grafo. A BFS também
+não encontra caminho nos grafos dos mapas m03 e m04 com essa modelagem. Os mapas originais têm solução,
+mas a exclusão das portas impede atravessá-las mesmo depois da coleta das chaves.
+
+Nos três mapas comparados, apenas o **grafo de estados** encontra um caminho válido até a saída, porque mantém
+o registro das chaves coletadas em cada estado.
+No m02, o caminho com 34 passos primeiro desce até a chave `a` em (3,11), retorna ao corredor superior com a chave
+no inventário e então atravessa a porta `A` legitimamente. Os 34 passos são o mínimo entre os caminhos válidos
+nesse mapa; isso não significa que exista um único percurso válido.
 
 ### 4.7 m05: pesos negativos e a prova
 
-Fonte: Bellman-Ford no G_pos com `+` fixo em −4 × no G_est.
+Fonte: `out/parte1/json/comparacao_bonus_m05.json`, com os resultados de Bellman-Ford no G_pos com `+`
+fixo em −4 e no G_est com memória de consumo.
 
-> **[A ESCREVER — Matheus]** Resultado dos dois casos e a **prova** de que o G_est do m05 não tem ciclo negativo
-> (dica do enunciado: o que acontece com o conjunto de bônus ao longo de um caminho?).
+| Grafo | Status | Ciclo encontrado | Custo do ciclo | Custo até ALVO |
+|---|---|---|---|---|
+| G_pos com + fixo em −4 | CICLO_NEGATIVO | (3,3) → (3,2) → (3,3) | −3 | — |
+| G_est | OK | — | — | 5 |
+
+No **G_pos** com `+` fixo em −4, o Bellman-Ford detecta um ciclo negativo entre as posições (3,3) e (3,2). Os
+bônus nas posições (3,2), (3,10) e (5,4) valem −4 em toda entrada. O ciclo (3,3) → (3,2) → (3,3) tem custo −3:
+entrar no bônus em (3,2) custa −4, e retornar ao chão em (3,3) custa 1, totalizando `(−4) + 1 = −3`.
+Esse ciclo é alcançável a partir de `S` e permite seguir até `G`. Sem memória de consumo, seria possível
+repeti-lo indefinidamente antes de alcançar a saída, reduzindo o custo total sem limite. O G_pos com
+`+` fixo é uma simplificação que não corresponde às regras reais do jogo.
+
+No **G_est**, o Bellman-Ford encontra um caminho até `ALVO` com custo mínimo 5, sem ciclo negativo. Cada bônus
+`+` custa −4 na primeira entrada e 1 nas revisitas. Os três bônus são consumíveis de identificadores 0, 1 e 2,
+nas posições (3,2), (3,10) e (5,4), respectivamente.
+
+**Prova de que o G_est do m05 não pode ter ciclo negativo.**
+
+Considere um ciclo dirigido qualquer de G_est, que começa e termina no mesmo estado. Seja `B_i` o conjunto
+de bônus consumidos no i-ésimo estado desse ciclo. Como um bônus consumido nunca volta a ficar disponível,
+em toda transição vale `B_i ⊆ B_(i+1)`. Para o ciclo terminar no estado inicial, seu conjunto final de bônus
+deve ser igual ao inicial. Logo, todas essas inclusões são igualdades: nenhuma transição do ciclo pode consumir
+um bônus novo.
+
+No m05, os únicos arcos de peso negativo são os de primeira entrada em um bônus `+`, com custo −4. Cada um
+desses arcos aumenta estritamente o conjunto de bônus consumidos e, pelo argumento anterior, não pode pertencer
+a um ciclo. Revisitas a bônus já consumidos custam 1; as demais entradas do mapa custam 1 ou 3, e não há fontes
+`*`. Portanto, todo arco físico de um ciclo tem peso positivo, e a soma dos pesos desse ciclo também é positiva.
+O arco virtual de custo zero até `ALVO` não pode integrar um ciclo, pois `ALVO` não tem saída.
+
+Concluímos que G_est do m05 não possui ciclo negativo, embora contenha arcos negativos. Voltar à mesma posição
+após coletar um bônus não fecha um ciclo no grafo de estados, pois o conjunto de bônus mudou. Como o grafo é
+finito e há caminho até `ALVO`, existe um custo mínimo finito, que Bellman-Ford calcula como 5.
 
 ### 4.8 Caminhos nos mapas
 
 Fonte: `out/parte1/csv/solucoes.csv`, `out/parte1/csv/dfs_classificacao.csv`, `out/parte1/json/percurso_m03.json`.
 
-| Mapa | BFS (passos) | Dijkstra (custo / status) | Bellman-Ford | DFS: árvore / retorno / avanço / cruzamento |
+| Mapa | BFS (passos) | Dijkstra | Bellman-Ford | DFS: árvore / retorno / avanço / cruzamento |
 |---|---|---|---|---|
-| m01 … m08, mapas do grupo | | | | |
+| m01 | 10 | 20 (14 passos) | 20 (14 passos) | 24 / 22 / 0 / 1 |
+| m02 | 34 | 46 (34 passos) | 46 (34 passos) | 39 / 36 / 0 / 0 |
+| m03 | 87 | 99 (91 passos) | 99 (91 passos) | 213 / 231 / 23 / 0 |
+| m04 | 20 | 36 (20 passos) | 36 (20 passos) | 37 / 30 / 0 / 0 |
+| m05 | 12 | RECUSA | 5 (20 passos) | 215 / 208 / 5 / 16 |
+| m06 | 10 | RECUSA | CICLO_NEGATIVO | 24 / 22 / 0 / 1 |
+| m07 | SEM_SOLUCAO | SEM_SOLUCAO | SEM_SOLUCAO | 15 / 19 / 4 / 0 |
+| m08 | 392 | 482 (396 passos) | 482 (396 passos) | 2919 / 3178 / 265 / 3 |
+| g01 | 48 | RECUSA | 38 (48 passos) | 104 / 89 / 0 / 2 |
+| g02 | 22 | 30 (30 passos) | 30 (30 passos) | 89 / 101 / 15 / 1 |
 
-> **[A ESCREVER — Matheus e Thomaz]** Discussões obrigatórias:
-> - **m01:** por que BFS e Dijkstra dão caminhos diferentes;
-> - **m06:** o ciclo negativo (sequência de estados e custo, de `ciclo_negativo_m06.json`), a correção com
->   `--fonte-consumivel` e o resultado finito do Bellman-Ford;
-> - **m07:** como a busca mostra que não há solução e quantos estados são alcançáveis.
+As colunas de Dijkstra e Bellman-Ford mostram o custo seguido do número de passos entre parênteses quando
+há solução finita, ou o status nos demais casos.
+
+Os passos contam apenas movimentos físicos. A BFS percorre também o arco virtual até `ALVO`, mas esse passo
+adicional é descontado do resultado. Como todo percurso até `ALVO` termina com exatamente um arco virtual,
+minimizar a quantidade total de arcos também minimiza os movimentos físicos. Esse arco tem custo zero e
+não altera os custos obtidos por Dijkstra e Bellman-Ford.
+
+A classificação da DFS inclui todos os arcos alcançáveis, inclusive os virtuais até `ALVO`; por isso, suas
+contagens podem superar o tamanho físico apresentado na seção 4.4. A DFS não garante caminho mínimo em
+passos ou custo. `RECUSA` indica a presença de peso negativo, `SEM_SOLUCAO` indica que `ALVO` é inalcançável
+e `CICLO_NEGATIVO` indica um ciclo alcançável que permite reduzir sem limite o custo até a saída.
+
+#### m01: por que BFS e Dijkstra dão caminhos diferentes
+
+No m01, a BFS encontra o caminho com menos passos: 10 movimentos pelo corredor superior, passando pelas casas de
+água (`~`) de custo 5 cada. O caminho é `(1,1) → (1,2) → ... → (1,11)`, com custo total 30: são cinco entradas
+em água e cinco entradas de custo 1, incluindo `G`, totalizando `5 × 5 + 5 × 1 = 30`. A posição inicial `S` não é cobrada.
+
+O Dijkstra encontra o caminho de menor custo: 14 passos descendo pelo corredor inferior, onde há lama (`,`, custo 3)
+em vez de água (custo 5). O caminho é `(1,1) → (2,1) → (3,1) → (3,2) → ... → (3,10) → (3,11) → (2,11) → (1,11)`,
+com custo total 20 (3 entradas em lama × 3 + 11 entradas de custo 1 = 9 + 11 = 20). O caminho tem mais passos, mas
+evita a água e paga menos no total.
+
+Essa diferença ilustra que a BFS minimiza os passos, enquanto Dijkstra minimiza a soma dos pesos. Com pesos
+físicos iguais e positivos, os dois critérios têm os mesmos caminhos ótimos, embora possam retornar percursos
+distintos em caso de empate. Com pesos diferentes, os caminhos ainda podem coincidir, como ocorre no m02 e
+no m04, mas isso não é garantido.
+
+#### m06: ciclo negativo e fonte consumível
+
+Ciclo negativo do m06 (`ciclo_negativo_m06.json`): `(3,6)|-|{}` → `(3,5)|-|{}` → `(3,6)|-|{}`, custo −1.
+
+O m06 possui uma fonte `*` na posição (3,5), que custa −2 a cada entrada. O ciclo entre (3,6) e (3,5) alterna entre
+uma casa de chão (custo 1) e a fonte (custo −2), resultando em custo −1 por volta. Como a fonte vale −2 em toda
+entrada, o jogador pode repetir o ciclo indefinidamente e depois alcançar `G`, reduzindo o custo até a saída sem
+limite. Portanto, há percurso até a saída, mas não há custo mínimo finito. A fonte de uso ilimitado permite
+explorar uma falha da regra de custos para obter valores arbitrariamente baixos.
+
+A correção é a variante `--fonte-consumivel`, que trata as fontes como consumíveis (assim como os bônus `+`): a
+fonte vale −2 apenas na primeira visita e custa 1 nas seguintes. Após o consumo, a volta entre (3,6) e (3,5)
+custa `1 + 1 = 2`. Na primeira visita à fonte, o conjunto de consumíveis muda: voltar à posição anterior
+não significa retornar ao mesmo estado. Como o único custo negativo do m06 passa a ocorrer nessa coleta
+irreversível, a mudança elimina os ciclos negativos. Ainda há arcos negativos de primeira entrada na fonte,
+por isso Dijkstra continua recusando o grafo.
+
+Com `--fonte-consumivel` (`out/parte1/fonte_consumivel/`): Bellman-Ford OK, custo 10, 10 passos. O caminho é o
+mesmo da BFS no m06 padrão, seguindo direto pelo corredor superior, na linha 1, sem visitar a fonte.
+
+No m06, a execução do Bellman-Ford identifica o ciclo (3,6) → (3,5) → (3,6), com custo total de −1. Como esse ciclo pode ser percorrido novamente, seu custo continua diminuindo, de modo que não existe um menor custo finito enquanto a fonte de energia puder ser utilizada sem limite. O algoritmo devolve o status CICLO_NEGATIVO e a sequência de estados que compõem o ciclo, em vez de apresentar esse resultado como um caminho mínimo até a saída.
+
+Para testar uma regra alternativa, o projeto permite executar o mapa com a opção `--fonte-consumivel`. Nesse caso, a utilização da fonte passa a integrar o estado do jogador, impedindo que o mesmo benefício seja obtido indefinidamente. O resultado registrado para essa variante é OK, com custo de 10 até o objetivo. Assim, o mesmo mapa pode ser analisado sob as duas regras, deixando explícito o efeito da fonte sobre a existência do ciclo negativo.
+
+#### m07: impossibilidade
+
+No m07, BFS, Dijkstra e Bellman-Ford retornam `SEM_SOLUCAO`; a DFS também não alcança `ALVO`. O mapa contém uma
+chave `a` na posição (4,7) e duas portas `A`: uma em (1,6) e outra em (3,7). A chave está atrás da porta `A` em
+(3,7), que exige a própria chave `a` para ser atravessada. Como não é possível coletar a chave sem antes ter a
+chave, o mapa é impossível de resolver.
+
+O teto teórico é de 62 estados (31 casas × 2 subconjuntos de chaves), mas apenas 16 são alcançáveis, todos na
+camada `-` (sem chaves). A busca esgota esses estados sem alcançar `ALVO`, confirmando a ausência de solução.
+A DFS a partir de `S` classifica 15 arcos de árvore, 19 de retorno e 4 de avanço, sem arcos de cruzamento.
+Os 19 arcos de retorno confirmam que a região alcançável contém ciclos (o jogador pode ir e voltar nos corredores),
+mas nenhum desses caminhos leva à saída `G`, que está bloqueada pela porta (1,6).
 
 ### 4.9 Estados-armadilha (m04 e m07)
 
-Fonte: `out/parte1/csv/armadilhas_m04.csv`, `out/parte1/csv/armadilhas_m07.csv`.
+Fontes: `out/parte1/json/metricas_global.json` e `out/parte1/csv/armadilhas_<mapa>.csv`.
 
-> **[A ESCREVER — Matheus]** Método (busca a partir de `ALVO` no grafo transposto), quantos estados são armadilha e
-> exemplos.
+| Mapa | Estados alcançáveis | Estados-armadilha | % do total |
+|---|---|---|---|
+| m01 | 24 | 0 | 0,0% |
+| m02 | 39 | 0 | 0,0% |
+| m03 | 213 | 0 | 0,0% |
+| m04 | 37 | 4 | 10,8% |
+| m05 | 215 | 0 | 0,0% |
+| m06 | 24 | 0 | 0,0% |
+| m07 | 16 | 16 | 100,0% |
+| m08 | 2919 | 0 | 0,0% |
+| g01 | 104 | 3 | 2,9% |
+| g02 | 89 | 37 | 41,6% |
+
+As contagens consideram apenas estados físicos alcançáveis a partir de `S`, excluindo `ALVO`. O percentual
+é calculado em relação ao total desses estados em cada mapa.
+
+Um estado é uma **armadilha** quando, a partir dele, não existe caminho dirigido até `ALVO`. O método de detecção
+utiliza o **grafo transposto**: inverte a direção de todos os arcos de G_est e executa uma BFS a partir de `ALVO`.
+Todo estado alcançado por essa BFS reversa possui, no grafo original, um caminho até `ALVO`, portanto não é
+armadilha. Os estados físicos de G_est não encontrados pela BFS no transposto são as armadilhas. A classificação
+depende apenas da existência de caminho, não dos pesos: no m06, o ciclo negativo impede um custo mínimo
+finito, mas não impede chegar à saída, portanto não produz estados-armadilha.
+
+No **m04**, há 4 estados-armadilha:
+
+| Estado | Situação |
+|---|---|
+| <code>(1,3)&#124;-&#124;{}</code> | Esteira `^` em (1,3) sem chave, sem saída (aponta para parede). |
+| <code>(1,3)&#124;a&#124;{}</code> | Mesma esteira com a chave `a`, também sem saída. |
+| <code>(1,8)&#124;-&#124;{}</code> | Esteira `>` que só permite avançar para (1,9), sem a chave `a`. |
+| <code>(1,9)&#124;-&#124;{}</code> | Chão antes da porta `A` em (1,10); sem a chave, só permite voltar para a esteira em (1,8). |
+
+Os 2 primeiros são os becos identificados na seção 4.5: a esteira na posição (1,3) aponta para o norte, onde há
+parede, e o jogador não pode sair de lá. Os estados `(1,8)|-|{}` e `(1,9)|-|{}` não são becos (possuem arcos de
+saída), mas formam um ciclo fechado de dois estados sem a chave. A porta `A` fica em (1,10) e bloqueia o avanço;
+a esteira em (1,8) impede descer de volta para (2,8) e buscar a chave. Com a chave, é possível atravessar a porta,
+por isso os estados nessas duas posições na camada `a` não são armadilhas.
+
+No **m07**, todos os 16 estados alcançáveis são armadilhas (100,0%). Como a saída `G` é inalcançável (a chave está
+trancada atrás da porta que a exige), nenhum estado físico pode chegar a `ALVO`. O vértice virtual fica isolado,
+e a BFS no transposto visita apenas o próprio `ALVO`.
+
+No **g02**, 37 dos 89 estados são armadilhas (41,6%). A esteira `v` na posição (8,5) empurra o jogador para o
+poço nas linhas 9–11. As 37 armadilhas são a própria esteira e as 36 casas do poço. Existe uma ligação física
+entre o poço e a esteira, mas, ao voltar para ela, sua única saída aponta novamente para o sul. Assim, não há
+caminho dirigido de retorno ao corredor da linha 7 nem até `G`.
 
 ### 4.10 Mapas do grupo
 
-Fonte: `data/mapas_grupo/`.
+Fontes: `data/mapas_grupo/`, `data/solucoes_mapas_grupo/` e os resultados de `out/parte1/`.
 
-| Mapa | Estados | Arcos | Passos (BFS) | Custo (Dijkstra ou BF) | % armadilhas |
-|---|---|---|---|---|---|
-| mapa 1 (≥ 3 chaves, esteira e bônus no caminho ótimo) | | | | | |
-| mapa 2 (≥ 20% de armadilhas) | | | | | |
+Nos dois mapas, as contagens de estados e arcos excluem `ALVO` e seus arcos virtuais. Os passos contam
+movimentos físicos, e o custo soma os pesos de entrada nas casas visitadas, sem cobrar a posição inicial.
 
-> **[A ESCREVER — Matheus]** Desenho de cada mapa e o que ele exercita.
+#### g01 — Três depósitos
+
+```text
+#####################
+#S...>A.+..>B.+..>CG#
+#.#####.#####.#######
+#...a.#...b.#...c...#
+#####################
+```
+
+| Métrica | Valor |
+|---|---|
+| Dimensões | 5 × 21 |
+| Estados alcançáveis (G_est) | 104 |
+| Arcos físicos | 194 |
+| Estados-armadilha | 3 (2,9%) |
+
+| Algoritmo | Passos | Custo | Status |
+|---|---|---|---|
+| BFS | 48 | 38 | OK |
+| Dijkstra | — | — | RECUSA (pesos negativos) |
+| Bellman-Ford | 48 | 38 | OK |
+
+O g01 foi projetado para exercitar **três chaves**, **esteiras** e **bônus no caminho ótimo**. Os três
+"depósitos" aparecem em sequência: em cada um, o jogador desce pelo corredor inferior para coletar a chave
+(`a`, `b` ou `c`), retorna ao corredor superior e atravessa a esteira `>` e a porta correspondente (`A`, `B`
+ou `C`). Há dois bônus `+` (custo −4 na primeira entrada), após as duas primeiras portas, nas posições
+(1,8) e (1,14), com identificadores 0 e 1. As três esteiras estão nas posições (1,5), (1,11) e (1,17).
+
+Neste mapa, BFS e Bellman-Ford retornam o mesmo percurso, com 48 passos e custo 38. O percurso coleta as
+três chaves, passa pelas três esteiras e consome os dois bônus. São 46 entradas de custo 1 e duas de custo −4,
+totalizando `46 × 1 + 2 × (−4) = 38`. Assim, o caminho mínimo em passos retornado pela BFS também tem custo
+mínimo. Dijkstra recusa a execução porque o grafo contém pesos negativos.
+
+As 3 armadilhas, também classificadas como becos na seção 4.5, são os estados nas esteiras `>` antes de cada
+porta: `(1,5)|-|{}`, `(1,11)|a|{0}` e `(1,17)|ab|{0,1}`. Se o jogador chegar a uma esteira sem a chave da
+porta seguinte, fica preso: a esteira só permite sair para leste, e a porta bloqueia a passagem sem a chave.
+
+#### g02 — Poço lateral (desvio alagado)
+
+```text
+#####################
+#S......#########..G#
+#.#####.#########.#.#
+#.#####.~~~~~~~~~.#.#
+#.#################.#
+#...###############.#
+###.###############.#
+###.................#
+#####v###############
+###.............#####
+###...#...#...#.#####
+###.............#####
+#####################
+```
+
+| Métrica | Valor |
+|---|---|
+| Dimensões | 13 × 21 |
+| Estados alcançáveis (G_est) | 89 |
+| Arcos físicos | 205 |
+| Estados-armadilha | 37 (41,6%) |
+
+| Algoritmo | Passos | Custo | Status |
+|---|---|---|---|
+| BFS | 22 | 58 | OK |
+| Dijkstra | 30 | 30 | OK |
+| Bellman-Ford | 30 | 30 | OK |
+
+O g02 foi projetado para ter **pelo menos 20% de armadilhas** (atinge 41,6%) e para ilustrar a diferença entre
+minimizar passos e minimizar custo. Não possui chaves nem bônus; como todas as casas livres são alcançáveis,
+a parte física de G_est tem a mesma estrutura de G_pos, com rótulos diferentes e sem contar `ALVO`.
+
+A BFS encontra o caminho mais curto em passos: 22 movimentos pelo corredor superior, passando pelas 9 casas de
+água (`~`, custo 5 cada) na linha 3. O custo total é 58 (9 × 5 + 13 × 1 = 45 + 13 = 58).
+
+O Dijkstra e o Bellman-Ford encontram o caminho mais barato: 30 passos pelo desvio seco, descendo pela esquerda,
+percorrendo o corredor da linha 7 (todo de chão, custo 1) e subindo pela direita até `G`. O custo é 30 (30 passos ×
+1 = 30), inferior aos 58 do caminho de menor número de passos.
+
+A esteira `v` na posição (8,5) é a responsável pelas 37 armadilhas: ela aponta para o sul e empurra qualquer
+jogador que a alcance para o poço nas linhas 9–11. Há 36 casas no poço, e a esteira é a 37ª armadilha.
+O jogador pode voltar do poço para a esteira, mas não subir dela para o corredor da linha 7, pois sua única
+saída aponta para o sul. Nenhum desses 37 estados possui caminho até `G`.
 
 ### 4.11 Visualizações
 
-Figuras em `out/parte1/figuras/`:
+As visualizações da Parte 1 foram preparadas a partir dos percursos e dos grafos de estados obtidos na execução. Foram utilizados dois mapas para apresentar os caminhos sobre o próprio labirinto, além de representações em camadas, da árvore BFS e da multiplicidade de estados por posição. A proposta foi manter as figuras próximas dos resultados que aparecem nas tabelas, de forma que o percurso e a estrutura do grafo possam ser examinados em conjunto.
 
-- `percurso_m03.png` e `percurso_m08.png`: percurso de menor custo, com a cor mudando a cada chave;
-- `camadas_m02.png`: G_est do m02 por camada, destacando os arcos entre camadas;
-- `arvore_bfs_m02.png`: árvore BFS do m02 com os níveis;
-- `heatmap_m08.png`: multiplicidade das casas do m08.
+No m03, o caminho registrado pelo Dijkstra possui 91 passos e custo 99. Ao longo desse percurso, os conjuntos de chaves passam por quatro situações: nenhuma chave, a, ab e abc. Como algumas posições são visitadas novamente depois da coleta de chaves, a diferenciação por cor precisa continuar visível mesmo nos trechos sobrepostos. No m08, a mesma representação foi utilizada para mostrar o percurso em um mapa maior.
 
-> **[A ESCREVER — Thomaz]** Inserir as figuras com legenda e uma frase sobre o que cada uma mostra.
+![Percurso do m03](../../out/parte1/figuras/percurso_m03.png)
+
+*Figura 4.1 — Percurso calculado para o m03, separado pelas etapas de coleta das chaves.*
+
+![Percurso do m08](../../out/parte1/figuras/percurso_m08.png)
+
+*Figura 4.2 — Percurso calculado para o m08, com destaque para as mudanças no conjunto de chaves.*
+
+A árvore BFS do m02 decorre do mesmo processo utilizado para calcular os níveis da busca. No m02, a primeira representação organiza o G_est de acordo com os conjuntos de chaves disponíveis em cada estado, incluindo as transições entre camadas. A segunda mostra a árvore produzida pela BFS, mantendo os níveis alcançados a partir da origem. São duas formas de observar o mesmo grafo: uma a partir da informação que compõe os estados e outra pela ordem de descoberta da busca.
+
+![Camadas do m02](../../out/parte1/figuras/camadas_m02.png)
+
+*Figura 4.3 — Grafo de estados do m02 organizado por conjunto de chaves.*
+
+![Árvore BFS do m02](../../out/parte1/figuras/arvore_bfs_m02.png)
+
+*Figura 4.4 — Árvore de busca em largura do m02, organizada por níveis.*
+
+O mapa de calor do m08 reúne a quantidade de estados associados a cada posição física. Ele permite localizar as casas que aparecem com diferentes combinações de chaves ou bônus, sem precisar desenhar individualmente todos os vértices do grafo de estados. Essa representação complementa o percurso e apresenta outra dimensão da diferença entre G_pos e G_est.
+
+![Mapa de calor do m08](../../out/parte1/figuras/heatmap_m08.png)
+
+*Figura 4.5 — Quantidade de estados distintos por posição física no m08.*
 
 ---
-
 ## 5. Parte 2 — Elliptic++
-
-> O conteúdo detalhado já está em [`parte2.md`](parte2.md) e em [`../PARTE2_DATASET.md`](../PARTE2_DATASET.md).
-> Aqui entra a versão final, resumida, para o PDF.
 
 ### 5.1 Dataset e recorte
 
@@ -406,22 +966,15 @@ Fonte: `out/parte2/dijkstra_*.json`.
 
 #### Critérios de escolha
 
-##### Bellman-Ford
+Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver seção 5.2).
 
-- **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
-- **Caso sem ciclo negativo:** escolher a carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, pois, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
+Foram analisadas cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo foi comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
 
-##### Dijkstra
+As origens são as mesmas carteiras usadas no BFS e na DFS, exceto no par Lícita → Ilícita, explicado abaixo.
 
-Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver "Design dos pesos").
+**Critério do destino:** foi selecionado o primeiro destino da classe desejada na ordem de visita do BFS, desde que esteja a pelo menos 3 passos da origem. Assim, conseguimos analisar trajetórias com carteiras intermediárias, em vez de considerar apenas transferências diretas.
 
-Quero analisar cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo é comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
-
-As origens são as mesmas carteiras usadas no BFS e na DFS.
-
-**Critério do destino:** selecionar o primeiro destino da classe desejada na ordem de visita do BFS, desde que esteja a pelo menos 3 passos da origem. Assim, conseguimos analisar trajetórias com carteiras intermediárias, em vez de considerar apenas transferências diretas.
-
-**Origem do par Lícita → Ilícita:** a carteira lícita usada no BFS só alcança carteiras ilícitas a até 2 passos. Utilizar outra carteira lícita como origem mantém o critério de pelo menos 3 passos uniforme entre as combinações do Dijkstra, evitando uma exceção metodológica. Para selecionar a origem: escolher a carteira lícita que alcança o maior número de carteiras ilícitas a partir de 3 passos de distância. Em caso de empate, utilizar a que apresentar a maior distância mínima média até os destinos ilícitos selecionados.
+**Origem do par Lícita → Ilícita:** a carteira lícita usada no BFS só alcança carteiras ilícitas a até 2 passos. Utilizar outra carteira lícita como origem mantém o critério de pelo menos 3 passos uniforme entre as combinações do Dijkstra, evitando uma exceção metodológica. Para selecionar a origem, escolhemos a carteira lícita que alcança o maior número de carteiras ilícitas a partir de 3 passos de distância. Em caso de empate, o critério seguinte foi a carteira que apresentasse a maior distância mínima média até os destinos ilícitos selecionados.
 
 Como as cinco carteiras empataram nos dois primeiros critérios (quantidade de destinos ilícitos alcançados e distância média), utilizamos o número de transações como terceiro critério de desempate. Isso privilegia a carteira com maior atividade transacional e oferece uma origem mais representativa para a análise de caminhos.
 
@@ -454,6 +1007,11 @@ A comparação entre o número de arcos também demonstra que o caminho de menor
 ### 5.5 Bellman-Ford
 
 Fonte: `out/parte2/bellman_ford_*.json`.
+
+#### Critérios de escolha
+
+- **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
+- **Caso sem ciclo negativo:** carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, escolhida porque, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
 
 #### Resultados do Bellman-Ford
 
@@ -509,7 +1067,7 @@ No caso da carteira `3Fzzji5n…`, classificada como lícita, o algoritmo não i
 
 Por outro lado, na análise da carteira `1MFXYK1X…`, classificada como desconhecida, foi identificado um ciclo negativo composto por três carteiras: duas classificadas como desconhecidas (`1MFXYK1X…` e `3GwfdNG4…`) e uma classificada como lícita (`1MFcDAzG…`). Nesse caso, a própria carteira de origem participa do ciclo, uma vez que está presente na sequência de vértices que fecha o circuito.
 
-Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre o grafo completo, apresentada na seção 6.4.
+Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre todas as carteiras do recorte, apresentada na seção 6.4.
 
 ### 5.6 Desempenho e escalabilidade
 
@@ -630,7 +1188,7 @@ Outro resultado relevante do Dijkstra foi a identificação de uma trajetória e
 
 A aplicação do algoritmo de Bellman-Ford identificou um ciclo negativo em uma das duas execuções, mas esse resultado deve ser interpretado considerando a classificação das carteiras envolvidas e a composição do ciclo encontrado. No caso da carteira `1MFXYK1X…`, foi identificado um ciclo negativo de três carteiras, composto por duas carteiras desconhecidas e uma lícita. Já na análise da carteira `3Fzzji5n…`, classificada como lícita, não foi identificado ciclo negativo alcançável a partir da origem. Esses resultados demonstram que a identificação de ciclos negativos não implica, por si só, associação com atividades ilícitas.
 
-Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando o grafo completo do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
+Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando todas as carteiras do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
 
 Por fim, devem ser consideradas as limitações metodológicas da investigação. O recorte utilizado apresenta viés de seleção, pois foi construído a partir de carteiras previamente identificadas, não representando necessariamente a distribuição real das classes na rede completa. Além disso, a quantidade reduzida de pares analisados pelo Dijkstra e de origens utilizadas pelo Bellman-Ford limita a generalização dos resultados.
 
@@ -814,7 +1372,8 @@ Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos d
 
 ## 7. Testes
 
-Executados com `pytest`: 588 testes passando em 24/11/2026.
+Executados com `pytest`: 739 testes passando em 26/11/2026. O teste da animação do HTML interativo roda à parte, com
+Node: `node tests/test_animacao_html.cjs out/parte1/html/labirinto_interativo.html`.
 
 | Arquivo | O que confere |
 |---|---|
@@ -828,6 +1387,8 @@ Executados com `pytest`: 588 testes passando em 24/11/2026.
 | `tests/parte1/`, `test_solve.py`, `test_cli_parte1.py` | saídas da Parte 1 e CLI: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
 | `test_carga_parte2.py`, `test_casos_parte2.py`, `test_graus_parte2.py` | carga do recorte, casos obrigatórios e graus da Parte 2 |
 | `test_mapa_surpresa.py` | mapas novos de borda contados à mão e formatos de arquivo (BOM, linha em branco e espaço no fim, comentário indentado, arquivo fora do UTF-8) |
+| `test_150_mapas_surpresa.py` | 150 casos reproduzíveis: 100 mapas gerados comparados com o NetworkX, 40 entradas inválidas com mensagem de erro e 10 execuções da CLI com saídas e HTML |
+| `test_animacao_html.cjs` (Node) | reprodução sincronizada dos quatro algoritmos no HTML, conclusão, reinício e mapa sem solução |
 | `test_benchmark.py`, `test_benchmark_parte1.py` | medição de tempo, memória e escalabilidade nas duas partes |
 | `test_mapa_front.py`, `test_exportar_parte2_front.py`, `test_rotular_transacoes.py` | mapa enviado pelo front, exportação dos casos da Parte 2 e rótulo das transações |
 | `test_viz.py`, `test_visualizar_parte1.py`, `test_gerar_html_front.py` | figuras da Parte 1 e geração do HTML interativo |
@@ -837,13 +1398,15 @@ Executados com `pytest`: 588 testes passando em 24/11/2026.
 
 ## 8. Limitações
 
-> **[A ESCREVER — todos]** Pontos já levantados que podem entrar:
-> - Parte 1: (a preencher)
-> - Benchmark: ver o fim da seção 5.6
+### Parte 1
+
+O grafo de estados registra a posição do jogador, as chaves coletadas e os bônus consumidos. Essas informações permitem respeitar as regras do labirinto, mas também aumentam o número de vértices possíveis. Para P posições, k chaves e b consumíveis, o limite teórico é de P × 2^(k+b) estados físicos. Embora a construção inclua apenas os estados alcançáveis, mapas com muitos itens ainda podem exigir muito tempo e memória. Para lidar com instâncias maiores, seria possível explorar os estados sob demanda e avaliar técnicas de poda que preservem as garantias da busca.
+
+Os resultados também dependem das regras e dos custos adotados. A BFS minimiza o número de movimentos, enquanto Dijkstra exige pesos não negativos para encontrar caminhos de menor custo. Já quando um ciclo negativo é alcançável e permite chegar à saída, não há custo mínimo finito. No m06, tornar a fonte consumível elimina o ciclo identificado, mas modifica a regra do problema. Portanto, mudanças nas regras ou nos custos exigem uma nova análise e a escolha de um algoritmo adequado.
+
+Os mapas disponibilizados e os dois criados pelo grupo ilustram os comportamentos estudados, mas não abrangem todas as configurações possíveis. Além disso, as medições da seção 3 consideram a execução dos algoritmos sobre o grafo já construído e não incluem a leitura do mapa, a construção do grafo ou a exportação dos resultados. Uma avaliação mais ampla poderia variar o tamanho dos mapas e a quantidade de itens, além de medir essas etapas em execuções repetidas sob as mesmas condições.
 
 ### Parte 2
-
-A metodologia apresenta três limitações principais: as carteiras ilícitas representam 37% do recorte, mas apenas 1,7% do dataset completo, gerando um possível viés; no Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso; e o valor_btc representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
 
 A pergunta de pesquisa definida pelo grupo é:
 
@@ -853,7 +1416,9 @@ Os resultados atuais permitem observar diferenças entre as três fontes analisa
 
 #### Quantidade limitada de carteiras
 
-Foram analisadas apenas três carteiras específicas, uma de cada classe.
+Na BFS e na DFS foram analisadas apenas três carteiras específicas, uma de cada classe. O Dijkstra partiu de três
+origens para formar os cinco pares, e o Bellman-Ford, de duas. Só a busca de ciclos da seção 6.4 cobre todas as
+carteiras do recorte.
 
 Essa quantidade é insuficiente para representar o comportamento de todas as carteiras ilícitas, lícitas e desconhecidas do dataset.
 
@@ -883,6 +1448,11 @@ Essa característica pode favorecer tanto o alcance na BFS quanto a identificaç
 
 Consequentemente, as carteiras selecionadas não representam necessariamente uma carteira típica de cada classe.
 
+#### Limitações dos pesos
+
+No Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso, o saldo dessa carteira. No
+Dijkstra, o `valor_btc` representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
+
 #### Limitações da análise com pesos negativos
 
 A análise realizada com o Bellman-Ford permitiu identificar um ciclo negativo no recorte estudado. Entretanto, os resultados estão limitados à quantidade de origens selecionadas e às estruturas alcançáveis a partir delas. Foram analisadas apenas duas origens, o que não permite estabelecer uma comparação estatisticamente representativa entre carteiras lícitas, ilícitas e desconhecidas.
@@ -905,7 +1475,19 @@ Essa distinção é fundamental porque a pergunta de pesquisa trata especificame
 
 ## 9. Conclusões
 
-> **[A ESCREVER — todos]**
+### Parte 1
+
+A modelagem por estados permitiu representar o labirinto levando em conta a posição do jogador, as chaves coletadas e os consumíveis utilizados. Essa escolha fez diferença nos mapas m02, m03 e m04: tratar portas como chão produziu percursos inválidos, enquanto tratá-las como parede impediu encontrar caminhos que existiam. Ao registrar as informações necessárias para verificar cada movimento, o grafo de estados encontrou caminhos válidos nos três casos.
+
+Os experimentos também mostraram que o melhor percurso depende do critério escolhido. No m01, a BFS encontrou um caminho de 10 movimentos com custo 30; Dijkstra e Bellman-Ford encontraram um caminho mais longo, de 14 movimentos, mas com custo 20. No m06, o Bellman-Ford identificou um ciclo negativo que pode ser repetido antes da saída, tornando o custo mínimo ilimitado. Na variante em que a fonte é consumível, o algoritmo encontrou custo 10. Já no m07, a saída é inalcançável porque a chave necessária está bloqueada por uma porta que exige essa mesma chave.
+
+Os resultados reforçam que alcançar a saída, minimizar movimentos e minimizar custo são objetivos distintos. Para responder a cada um deles, é necessário representar as regras do labirinto e escolher um algoritmo adequado aos pesos. A abordagem permitiu analisar os mapas estudados, embora o crescimento do espaço de estados possa limitar sua aplicação a instâncias maiores, como discutido na seção 8.
+
+### Parte 2
+
+Neste trabalho, aplicamos BFS, DFS, Dijkstra e Bellman-Ford a um recorte do Elliptic++. O recorte tem 14.182 carteiras e 25.111 arcos e foi extraído de um grafo com 822.942 carteiras e 2,87 milhões de arcos. Usamos dois esquemas de peso: no Dijkstra, a soma dos valores das transações entre as duas carteiras (valor_btc); no Bellman-Ford, o saldo da carteira de destino, que admite pesos negativos. A BFS mostrou que o alcance depende muito da origem: 1.737 carteiras a partir da origem ilícita, 81 a partir da lícita e 1.267 a partir da desconhecida. A DFS encontrou arcos de retorno a partir das origens ilícita (103) e desconhecida (98), mas nenhum a partir da lícita. Isso indica que há ciclos na região alcançável, e não que a própria origem participe deles. Nos cinco pares testados, o Dijkstra encontrou caminhos mínimos com custo entre 5,54 e 59,81 BTC, e o trecho 39sfuA8p → 1MLvzsdb → 1FAv42Ga aparece em três deles. O Bellman-Ford não encontrou ciclo negativo a partir da origem lícita. A partir da desconhecida, encontrou um ciclo de três carteiras (duas desconhecidas e uma lícita) com custo de −1.677,39, quase todo concentrado em um único arco. No recorte inteiro, o Bellman-Ford levou 18,41 ms, contra 32,62 ms da DFS, porque parou na primeira passada ao detectar o ciclo.
+
+Quanto à pergunta de pesquisa, a resposta no recorte é negativa. A busca de ciclos em todo o recorte (Seção 6.4) encontrou 116 carteiras em ciclos: 83 lícitas, 33 desconhecidas e nenhuma ilícita. A busca por ciclos negativos de duas carteiras encontrou 8, nenhum com carteira ilícita, e o ciclo de três carteiras achado pelo Bellman-Ford também não inclui nenhuma. A forma como o recorte foi construído reforça esse resultado. A amostragem em bola de neve partiu de carteiras ilícitas, que são 37% do recorte e apenas 1,7% do dataset. Se elas participassem mais de ciclos negativos, este seria um cenário favorável para encontrá-las. Esse argumento tem um limite, porque o recorte é um subgrafo induzido. A bola de neve inclui as vizinhas das ilícitas, mas não necessariamente o caminho de volta até elas, então um ciclo que passe por carteiras de fora do recorte foi cortado. Por isso, a conclusão vale só para as 14.182 carteiras analisadas e não se estende à rede Bitcoin. O recorte não é uma amostra representativa, e o saldo do destino é só uma das formas possíveis de definir um peso negativo. Para estender a resposta, seria preciso repetir a busca em recortes aleatórios ou no grafo completo e testar outras definições de peso.
 
 ---
 
@@ -926,29 +1508,26 @@ Essa distinção é fundamental porque a pergunta de pesquisa trata especificame
 
 ### 10.2 Commits por integrante e pacote
 
-Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 19/11/2026, gerada por
+Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 26/11/2026, gerada por
 `python -m scripts.matriz_contribuicao`. Um commit conta uma vez em cada pacote cujos arquivos ele altera. P5c inclui as
 linhas do `REGISTRO_IA.md`, que cada um adiciona. A CLI, o `requirements.txt` e os mapas fornecidos não entram em
 nenhum pacote.
 
 | Integrante | P1 | P2 | P3 | P4a | P4b | P5a | P5b | P5c | Pacotes com commit | Commits |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Matheus | 5 | 1 | 39 |  |  |  |  | 10 | 4 | 46 |
-| Thomaz |  | 9 |  |  |  | 11 |  | 19 | 3 | 20 |
-| Davi | 2 | 2 | 2 | 23 |  | 2 | 1 | 35 | 7 | 47 |
-| Vagner |  |  |  | 2 | 4 | 5 | 2 | 11 | 5 | 12 |
+| Matheus | 6 | 1 | 49 |  |  | 10 |  | 25 | 5 | 70 |
+| Thomaz |  | 10 |  |  |  | 17 |  | 28 | 3 | 30 |
+| Davi | 3 | 2 | 2 | 24 | 1 | 11 | 1 | 72 | 8 | 87 |
+| Vagner |  |  |  | 3 | 8 | 6 | 13 | 26 | 5 | 27 |
 
 PRs mergeados que cada integrante revisou ou mergeou sem ser o autor (`--revisoes`):
 
 | Integrante | PRs revisados |
 |---|---|
-| Matheus | #3, #10, #12, #14, #17, #30, #31 |
-| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32 |
-| Davi | #6, #8, #10, #13, #17, #19 |
-| Vagner | #2, #16, #19, #21, #22, #25 |
-
-> **[COMPLETAR — Davi]** Rodar `python -m scripts.matriz_contribuicao --revisoes` na véspera da entrega e colar as
-> duas tabelas.
+| Matheus | #3, #10, #12, #14, #17, #30, #31, #49, #53, #58, #59 |
+| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32, #34, #35, #36, #39, #40, #41, #48, #51, #52, #65 |
+| Davi | #6, #8, #10, #13, #17, #19, #37, #42, #43, #45, #50, #64 |
+| Vagner | #2, #16, #19, #21, #22, #25, #38, #44, #54, #56 |
 
 ---
 
@@ -963,6 +1542,106 @@ O histórico detalhado, com ferramenta, finalidade e arquivos afetados, está em
 [`docs/REGISTRO_IA.md`](../REGISTRO_IA.md). Os trechos de código feitos com apoio de IA são identificados com comentários
 `[IA]`, usando a sintaxe adequada a cada arquivo.
 
-A declaração de uso de IA deve ser assinada por todos e adicionada em `docs/DECLARACAO_IA.pdf` antes da entrega.
+### Reflexão do grupo
 
-> **[A ESCREVER — todos]** Reflexão curta do grupo sobre o uso de IA, se a declaração pedir.
+A Inteligência Artificial teve papel fundamental no desenvolvimento deste projeto, do início ao fim. Começamos usando a ferramenta para estruturar os diretórios e a hierarquia do projeto, o que nos deu uma base organizada desde as primeiras etapas. Ao longo do desenvolvimento, ela também ajudou a acompanhar em tempo real os requisitos pedidos pela professora. Assim, conseguíamos conferir os checklists, identificar o que ainda faltava e definir os próximos passos com clareza.
+
+A IA também ajudou na organização do grupo. Com ela, dividimos as responsabilidades entre os membros de forma equilibrada, levando em conta as demandas do projeto e distribuindo as tarefas da melhor maneira possível. Na parte técnica, apoiou o versionamento do código: o uso do Git, a organização do repositório no GitHub e a escrita e revisão dos pull requests. Isso deixou o fluxo de trabalho mais padronizado e o histórico do projeto mais fácil de acompanhar. Por fim, contribuímos com a ferramenta na documentação, deixando o projeto mais claro e acessível.
+
+Apesar desses ganhos, entendemos que a IA funcionou como apoio, e não como substituta do nosso trabalho. Todas as sugestões passaram por análise crítica do grupo, porque nem sempre as respostas estavam corretas ou adequadas ao nosso contexto. As decisões finais ficaram sempre com a equipe. Essa experiência mostrou que, usada com responsabilidade, a IA aumenta a produtividade e a organização, mas o entendimento do que está sendo construído continua sendo nosso.
+
+---
+
+## Apêndice A — Reprodução e conferência das métricas e figuras
+
+Esta seção documenta como reproduzir as tabelas e as cinco figuras utilizadas na Parte 1. Os comandos devem ser executados na raiz do repositório, utilizando as dependências instaladas de `requirements.txt`. As imagens correspondem aos arquivos de `out/parte1/figuras/`; não são imagens de demonstração.
+
+### A.1. Arquivos de entrada e módulos utilizados
+
+| Resultado | Arquivo ou módulo de origem | Como verificar |
+|---|---|---|
+| BFS: passos, pais e camadas | `src/graphs/algorithms.py`, função bfs | `tests/test_bfs.py` e `out/parte1/csv/solucoes.csv` |
+| Caminhos, passos e custo | `out/parte1/csv/solucoes.csv` | Filtrar mapa e algoritmo; distinguir passos de custo |
+| Dimensão e ocupação de G_pos/G_est | `out/parte1/json/metricas_global.json` | Conferir as oito linhas da tabela de métricas |
+| Tempo e pico de memória | `out/parte1/csv/benchmark.csv` | Conferir repeticoes, tempo_medio_ms e memoria_pico_bytes |
+| Percursos m03 e m08 | `src/viz.py: desenhar_percurso`; `src/visualizar_parte1.py: gerar_figuras` | Abrir PNG e conferir cores e título |
+| Camadas do m02 | `src/viz.py: desenhar_camadas` | Conferir grupos sem chave e com chave |
+| Árvore BFS do m02 | `src/viz.py: desenhar_arvore_bfs` | Conferir níveis e distinção entre estados com/sem chave |
+| Heatmap do m08 | `src/viz.py: desenhar_heatmap` | Conferir contagens e barra de cores |
+| Labirinto interativo | `out/parte1/html/labirinto_interativo.html` | Abrir no navegador; selecionar m07 e marcar armadilhas |
+
+### A.2. Comandos de reprodução
+
+```bash
+# Executar a partir da raiz de Projetos-Grafos
+python -m pip install -r requirements.txt
+
+# Executar a suíte de testes dos algoritmos e das visualizações
+python -m pytest tests/test_bfs.py tests/test_dfs.py tests/test_viz.py tests/test_visualizar_parte1.py -v
+
+# Regerar os arquivos e as figuras da Parte 1
+python -m src.cli --todos-mapas --out ./out/parte1/ --interactive
+
+# Alternativa específica para as figuras do P5a
+python -m src.visualizar_parte1 --mapas data/mapas --mapas-grupo data/mapas_grupo --out out/parte1
+
+# Conferir as tabelas reproduzidas a partir do conjunto de saídas
+python -m scripts.tabelas_relatorio_parte1 4.4 4.8
+
+```
+
+Os comandos `src.cli` e `src.visualizar_parte1` podem sobrescrever as mesmas figuras. Para a entrega, utilize um único conjunto de arquivos regenerados com a versão atual do código, confira as imagens abertas e execute os testes antes de enviá-las ao repositório.
+
+### A.3. Relação dos cinco arquivos exigidos
+
+| Figura | Caminho relativo à raiz do repositório | Conferência visual |
+|---|---|---|
+| 4.1: percurso m03 | `out/parte1/figuras/percurso_m03.png` | Quatro cores realmente visíveis no traçado: nenhuma, a, ab, abc |
+| 4.2: percurso m08 | `out/parte1/figuras/percurso_m08.png` | Cores do caminho, título com m08 e eixos |
+| 4.3: camadas m02 | `out/parte1/figuras/camadas_m02.png` | Camadas e mudanças de camada; título identifica m02 |
+| 4.4: árvore BFS m02 | `out/parte1/figuras/arvore_bfs_m02.png` | Níveis BFS e rótulos distintos para estados na mesma casa com/sem chave |
+| 4.5: heatmap m08 | `out/parte1/figuras/heatmap_m08.png` | Legenda, barra de intensidade, Linha e Coluna |
+
+A figura 4.1 foi regenerada com traços de espessuras diferentes para preservar as quatro cores nos trechos sobrepostos. A inspeção visual confirmou sua presença; a legibilidade deve ser conferida também no PDF final.
+
+### A.4. Leitura de resultados da BFS e comparação de custos
+
+No arquivo `out/parte1/csv/solucoes.csv`, cada linha identifica mapa, algoritmo, passos, custo, status e caminho. A distância da BFS é medida em arestas e não pelos pesos do mapa. Para conferir os valores usados no texto:
+
+| Mapa | Busca | Passos | Custo | Status |
+|---|---|---:|---:|---|
+| m01 | BFS | 10 | 30 | OK |
+| m01 | Dijkstra | 14 | 20 | OK |
+| m03 | BFS | 87 | 119 | OK |
+| m03 | Dijkstra | 91 | 99 | OK |
+
+Esses valores foram retirados do `out/parte1/csv/solucoes.csv` da main consultada em 25/11. Quando os arquivos forem regerados, os números do relatório precisam ser conferidos novamente.
+### A.5. Quadro consolidado para revisão da seção 4.4 com Matheus
+
+A comparação entre o grafo de posições (G_pos) e o grafo de estados (G_est) foi feita a partir da quantidade de vértices, de arcos, da densidade e da ocupação em relação ao teto teórico. O G_pos representa as posições físicas do mapa. Já no G_est, a mesma posição pode corresponder a vários vértices, pois as chaves e os bônus consumidos fazem parte do estado do jogador. As métricas abaixo consideram os grafos sem o nó virtual ALVO.
+
+| Mapa | G_pos: vértices | G_pos: arcos | Densidade G_pos | G_est: estados | G_est: arcos | Densidade G_est | Teto teórico | Ocupação |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| m01 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 100,0% |
+| m02 | 23 | 43 | 0,0850 | 39 | 74 | 0,0499 | 46 | 84,8% |
+| m03 | 76 | 167 | 0,0293 | 213 | 466 | 0,0103 | 608 | 35,0% |
+| m04 | 24 | 39 | 0,0707 | 37 | 66 | 0,0495 | 48 | 77,1% |
+| m05 | 44 | 90 | 0,0476 | 215 | 438 | 0,0095 | 352 | 61,1% |
+| m06 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 100,0% |
+| m07 | 31 | 69 | 0,0742 | 16 | 38 | 0,1583 | 62 | 25,8% |
+| m08 | 1.169 | 2.574 | 0,0019 | 2.919 | 6.364 | 0,0007 | 18.704 | 15,6% |
+
+Fonte: `out/parte1/json/metricas_global.json`, valores publicados na main.
+
+O aumento da quantidade de estados fica mais evidente nos mapas que exigem acompanhar mudanças durante o percurso. No m03, as 76 posições físicas dão origem a 213 estados, enquanto no m08 o grafo passa de 1.169 posições para 2.919 estados. Isso não significa que todas as combinações de chaves e bônus sejam possíveis: o teto teórico do m08 chega a 18.704 estados, mas apenas 2.919 aparecem na modelagem alcançável, o equivalente a 15,6%. Já no m07, o grafo de estados tem somente 16 vértices alcançáveis a partir da origem, apesar das 31 posições consideradas no grafo físico.
+
+A densidade foi calculada pela razão entre o número de arcos e o máximo de arcos possíveis em um grafo dirigido sem laços, V × (V − 1). Por isso, mapas com um número maior de estados podem apresentar densidades menores mesmo quando possuem mais arcos. A leitura das métricas por camada, especialmente no m02, complementa essa comparação, identificando os estados associados a cada conjunto de chaves e as transições que ligam essas camadas.
+
+### A.6. Conferência material antes do PDF
+
+1. A imagem `docs/relatorio/img/m07_armadilhas.png` é uma captura do HTML com m07 e os estados-armadilha destacados; conferir sua legibilidade no PDF final.
+2. O arquivo `percurso_m03.png` foi regenerado e as quatro cores foram conferidas na imagem; verificar sua legibilidade no PDF final.
+3. Os títulos, rótulos dos eixos e legendas das cinco figuras precisam estar visíveis na versão final. A figura da árvore BFS deve distinguir estados com e sem chave.
+4. Os valores de `benchmark.csv` e `metricas_global.json` foram copiados dos resultados publicados na main; se o grupo regenerar `out/`, é preciso comparar os números novamente.
+5. A seção 4.4 e seus comentários são responsabilidade de Matheus. A tabela deste apêndice é um apoio à revisão, e não uma substituição automática da parte dele.
+6. As explicações e legendas analíticas não podem ser entregues como produção integralmente autoral sem respeitar as regras de IA da disciplina.
