@@ -8,10 +8,6 @@ Matheus Araujo · Thomaz Lima · Davi Marques Oliveira · Vagner Montenegro de M
 
 Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/2026
 
-> **Estado da redação.** Os blocos **[A ESCREVER]** indicam conteúdo ainda pendente. A seção 4.3 registra
-> a contagem do mapa mínimo conferida manualmente por Matheus. As seções 4.1 a 4.10 estão preenchidas,
-> incluindo o desenho à mão do G_est do m02 e a prova do m05.
-
 ---
 
 ## Sumário
@@ -27,6 +23,8 @@ Repositório: <https://github.com/davimqz/Projetos-Grafos> · Entrega: 26/11/202
 9. Conclusões
 10. Matriz de contribuição
 11. Uso de IA
+
+Apêndice A — Reprodução e conferência das métricas e figuras
 
 ---
 
@@ -103,7 +101,8 @@ O painel de informações acompanha cada etapa e apresenta a posição atual, as
 
 ![Interface do m07 com armadilhas destacadas](img/m07_armadilhas.png)
 
-*Figura 2.2 — Interface do labirinto interativo no mapa m07, com os estados-armadilha destacados.*
+*Figura 2.1 — Interface do labirinto interativo no mapa m07, com os estados-armadilha destacados.*
+
 ### 2.5 Front-end em React (extra)
 
 ```bash
@@ -114,7 +113,7 @@ cd front-react && npm install && npm run dev
 O front tem quatro abas: **Labirinto** (percurso passo a passo de cada mapa, comparação 2×2 dos quatro algoritmos e upload de um `.txt` próprio), **Grafos e mapas** (figuras da Parte 1), **Rede de carteiras** (BFS, DFS, Dijkstra e Bellman-Ford da Parte 2 desenhados sobre a rede de transações) e **Análise de dados** (gráficos da AVD).
 
 ![Aba Rede de carteiras do front-end](img/front_rede_carteiras.jpg)
-*Figura 2.1 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
+*Figura 2.2 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
 
 ---
 
@@ -787,9 +786,6 @@ O mapa de calor do m08 reúne a quantidade de estados associados a cada posiçã
 ---
 ## 5. Parte 2 — Elliptic++
 
-> O conteúdo detalhado já está em [`parte2.md`](parte2.md) e em [`../PARTE2_DATASET.md`](../PARTE2_DATASET.md).
-> Aqui entra a versão final, resumida, para o PDF.
-
 ### 5.1 Dataset e recorte
 
 Fonte: Elliptic++ (<https://github.com/git-disl/EllipticPlusPlus>), grafo de carteiras (endereço → endereço).
@@ -962,22 +958,15 @@ Fonte: `out/parte2/dijkstra_*.json`.
 
 #### Critérios de escolha
 
-##### Bellman-Ford
+Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver seção 5.2).
 
-- **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
-- **Caso sem ciclo negativo:** escolher a carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, pois, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
+Foram analisadas cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo foi comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
 
-##### Dijkstra
+As origens são as mesmas carteiras usadas no BFS e na DFS, exceto no par Lícita → Ilícita, explicado abaixo.
 
-Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver "Design dos pesos").
+**Critério do destino:** foi selecionado o primeiro destino da classe desejada na ordem de visita do BFS, desde que esteja a pelo menos 3 passos da origem. Assim, conseguimos analisar trajetórias com carteiras intermediárias, em vez de considerar apenas transferências diretas.
 
-Quero analisar cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo é comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
-
-As origens são as mesmas carteiras usadas no BFS e na DFS.
-
-**Critério do destino:** selecionar o primeiro destino da classe desejada na ordem de visita do BFS, desde que esteja a pelo menos 3 passos da origem. Assim, conseguimos analisar trajetórias com carteiras intermediárias, em vez de considerar apenas transferências diretas.
-
-**Origem do par Lícita → Ilícita:** a carteira lícita usada no BFS só alcança carteiras ilícitas a até 2 passos. Utilizar outra carteira lícita como origem mantém o critério de pelo menos 3 passos uniforme entre as combinações do Dijkstra, evitando uma exceção metodológica. Para selecionar a origem: escolher a carteira lícita que alcança o maior número de carteiras ilícitas a partir de 3 passos de distância. Em caso de empate, utilizar a que apresentar a maior distância mínima média até os destinos ilícitos selecionados.
+**Origem do par Lícita → Ilícita:** a carteira lícita usada no BFS só alcança carteiras ilícitas a até 2 passos. Utilizar outra carteira lícita como origem mantém o critério de pelo menos 3 passos uniforme entre as combinações do Dijkstra, evitando uma exceção metodológica. Para selecionar a origem, escolhemos a carteira lícita que alcança o maior número de carteiras ilícitas a partir de 3 passos de distância. Em caso de empate, o critério seguinte foi a carteira que apresentasse a maior distância mínima média até os destinos ilícitos selecionados.
 
 Como as cinco carteiras empataram nos dois primeiros critérios (quantidade de destinos ilícitos alcançados e distância média), utilizamos o número de transações como terceiro critério de desempate. Isso privilegia a carteira com maior atividade transacional e oferece uma origem mais representativa para a análise de caminhos.
 
@@ -1010,6 +999,11 @@ A comparação entre o número de arcos também demonstra que o caminho de menor
 ### 5.5 Bellman-Ford
 
 Fonte: `out/parte2/bellman_ford_*.json`.
+
+#### Critérios de escolha
+
+- **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
+- **Caso sem ciclo negativo:** carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, escolhida porque, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
 
 #### Resultados do Bellman-Ford
 
@@ -1065,7 +1059,7 @@ No caso da carteira `3Fzzji5n…`, classificada como lícita, o algoritmo não i
 
 Por outro lado, na análise da carteira `1MFXYK1X…`, classificada como desconhecida, foi identificado um ciclo negativo composto por três carteiras: duas classificadas como desconhecidas (`1MFXYK1X…` e `3GwfdNG4…`) e uma classificada como lícita (`1MFcDAzG…`). Nesse caso, a própria carteira de origem participa do ciclo, uma vez que está presente na sequência de vértices que fecha o circuito.
 
-Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre o grafo completo, apresentada na seção 6.4.
+Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre todas as carteiras do recorte, apresentada na seção 6.4.
 
 ### 5.6 Desempenho e escalabilidade
 
@@ -1186,7 +1180,7 @@ Outro resultado relevante do Dijkstra foi a identificação de uma trajetória e
 
 A aplicação do algoritmo de Bellman-Ford identificou um ciclo negativo em uma das duas execuções, mas esse resultado deve ser interpretado considerando a classificação das carteiras envolvidas e a composição do ciclo encontrado. No caso da carteira `1MFXYK1X…`, foi identificado um ciclo negativo de três carteiras, composto por duas carteiras desconhecidas e uma lícita. Já na análise da carteira `3Fzzji5n…`, classificada como lícita, não foi identificado ciclo negativo alcançável a partir da origem. Esses resultados demonstram que a identificação de ciclos negativos não implica, por si só, associação com atividades ilícitas.
 
-Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando o grafo completo do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
+Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando todas as carteiras do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
 
 Por fim, devem ser consideradas as limitações metodológicas da investigação. O recorte utilizado apresenta viés de seleção, pois foi construído a partir de carteiras previamente identificadas, não representando necessariamente a distribuição real das classes na rede completa. Além disso, a quantidade reduzida de pares analisados pelo Dijkstra e de origens utilizadas pelo Bellman-Ford limita a generalização dos resultados.
 
@@ -1370,7 +1364,8 @@ Escolhemos barras horizontais porque conseguimos passar a ideia de dois pontos d
 
 ## 7. Testes
 
-Executados com `pytest`: 588 testes passando em 24/11/2026.
+Executados com `pytest`: 739 testes passando em 26/11/2026. O teste da animação do HTML interativo roda à parte, com
+Node: `node tests/test_animacao_html.cjs out/parte1/html/labirinto_interativo.html`.
 
 | Arquivo | O que confere |
 |---|---|
@@ -1384,6 +1379,8 @@ Executados com `pytest`: 588 testes passando em 24/11/2026.
 | `tests/parte1/`, `test_solve.py`, `test_cli_parte1.py` | saídas da Parte 1 e CLI: arestas, métricas, camadas, graus, comparação de modelagens, soluções, DFS, armadilhas e mapas do grupo |
 | `test_carga_parte2.py`, `test_casos_parte2.py`, `test_graus_parte2.py` | carga do recorte, casos obrigatórios e graus da Parte 2 |
 | `test_mapa_surpresa.py` | mapas novos de borda contados à mão e formatos de arquivo (BOM, linha em branco e espaço no fim, comentário indentado, arquivo fora do UTF-8) |
+| `test_150_mapas_surpresa.py` | 150 casos reproduzíveis: 100 mapas gerados comparados com o NetworkX, 40 entradas inválidas com mensagem de erro e 10 execuções da CLI com saídas e HTML |
+| `test_animacao_html.cjs` (Node) | reprodução sincronizada dos quatro algoritmos no HTML, conclusão, reinício e mapa sem solução |
 | `test_benchmark.py`, `test_benchmark_parte1.py` | medição de tempo, memória e escalabilidade nas duas partes |
 | `test_mapa_front.py`, `test_exportar_parte2_front.py`, `test_rotular_transacoes.py` | mapa enviado pelo front, exportação dos casos da Parte 2 e rótulo das transações |
 | `test_viz.py`, `test_visualizar_parte1.py`, `test_gerar_html_front.py` | figuras da Parte 1 e geração do HTML interativo |
@@ -1399,8 +1396,6 @@ Executados com `pytest`: 588 testes passando em 24/11/2026.
 
 ### Parte 2
 
-A metodologia apresenta três limitações principais: as carteiras ilícitas representam 37% do recorte, mas apenas 1,7% do dataset completo, gerando um possível viés; no Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso; e o valor_btc representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
-
 A pergunta de pesquisa definida pelo grupo é:
 
 > Carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?
@@ -1409,7 +1404,9 @@ Os resultados atuais permitem observar diferenças entre as três fontes analisa
 
 #### Quantidade limitada de carteiras
 
-Foram analisadas apenas três carteiras específicas, uma de cada classe.
+Na BFS e na DFS foram analisadas apenas três carteiras específicas, uma de cada classe. O Dijkstra partiu de três
+origens para formar os cinco pares, e o Bellman-Ford, de duas. Só a busca de ciclos da seção 6.4 cobre todas as
+carteiras do recorte.
 
 Essa quantidade é insuficiente para representar o comportamento de todas as carteiras ilícitas, lícitas e desconhecidas do dataset.
 
@@ -1438,6 +1435,11 @@ Isso significa que as carteiras analisadas possuem muitas conexões em comparaç
 Essa característica pode favorecer tanto o alcance na BFS quanto a identificação de ciclos na DFS.
 
 Consequentemente, as carteiras selecionadas não representam necessariamente uma carteira típica de cada classe.
+
+#### Limitações dos pesos
+
+No Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso, o saldo dessa carteira. No
+Dijkstra, o `valor_btc` representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
 
 #### Limitações da análise com pesos negativos
 
@@ -1482,29 +1484,26 @@ Essa distinção é fundamental porque a pergunta de pesquisa trata especificame
 
 ### 10.2 Commits por integrante e pacote
 
-Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 19/11/2026, gerada por
+Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 25/11/2026, gerada por
 `python -m scripts.matriz_contribuicao`. Um commit conta uma vez em cada pacote cujos arquivos ele altera. P5c inclui as
 linhas do `REGISTRO_IA.md`, que cada um adiciona. A CLI, o `requirements.txt` e os mapas fornecidos não entram em
 nenhum pacote.
 
 | Integrante | P1 | P2 | P3 | P4a | P4b | P5a | P5b | P5c | Pacotes com commit | Commits |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Matheus | 5 | 1 | 39 |  |  |  |  | 10 | 4 | 46 |
-| Thomaz |  | 9 |  |  |  | 11 |  | 19 | 3 | 20 |
-| Davi | 2 | 2 | 2 | 23 |  | 2 | 1 | 35 | 7 | 47 |
-| Vagner |  |  |  | 2 | 4 | 5 | 2 | 11 | 5 | 12 |
+| Matheus | 6 | 1 | 48 |  |  | 10 |  | 20 | 5 | 65 |
+| Thomaz |  | 10 |  |  |  | 12 |  | 21 | 3 | 22 |
+| Davi | 3 | 2 | 2 | 24 |  | 11 | 1 | 64 | 7 | 79 |
+| Vagner |  |  |  | 3 | 8 | 6 | 13 | 26 | 5 | 27 |
 
 PRs mergeados que cada integrante revisou ou mergeou sem ser o autor (`--revisoes`):
 
 | Integrante | PRs revisados |
 |---|---|
-| Matheus | #3, #10, #12, #14, #17, #30, #31 |
-| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32 |
-| Davi | #6, #8, #10, #13, #17, #19 |
-| Vagner | #2, #16, #19, #21, #22, #25 |
-
-> **[COMPLETAR — Davi]** Rodar `python -m scripts.matriz_contribuicao --revisoes` na véspera da entrega e colar as
-> duas tabelas.
+| Matheus | #3, #10, #12, #14, #17, #30, #31, #49, #53 |
+| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32, #34, #35, #36, #39, #40, #41, #48, #51, #52 |
+| Davi | #6, #8, #10, #13, #17, #19, #37, #42, #43, #45, #50 |
+| Vagner | #2, #16, #19, #21, #22, #25, #38, #44, #54 |
 
 ---
 
