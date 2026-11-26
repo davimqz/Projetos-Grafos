@@ -117,18 +117,19 @@ def desenhar_percurso(grade: list[str], percurso: list[str], arquivo: str | Path
              for i, chaves in enumerate(conjuntos)}
     fig, ax = plt.subplots(figsize=(max(7, len(grade[0]) * .5), max(5, len(grade) * .5)))
     _base_mapa(ax, grade)
-    for indice in range(len(estados) - 1):
-        l1, c1, chaves, _ = estados[indice]
-        l2, c2, _, _ = estados[indice + 1]
-        ax.plot([c1, c2], [l1, l2], color=cores[chaves], linewidth=3.4,
-                alpha=.87, zorder=7, solid_capstyle="round")
-    # [IA] Codex – agrupa marcadores para evitar um objeto gráfico por estado.
-    ax.scatter([c for _, c, _, _ in estados], [l for l, _, _, _ in estados],
-               s=18, color=[cores[chaves] for _, _, chaves, _ in estados], zorder=8)
+    # [IA] Codex – traços encaixados preservam as cores nos corredores repetidos.
+    for camada, conjunto in enumerate(conjuntos):
+        for primeiro, segundo in zip(estados, estados[1:]):
+            l1, c1, chaves, _ = primeiro
+            l2, c2, _, _ = segundo
+            if chaves == conjunto:
+                ax.plot([c1, c2], [l1, l2], color=cores[chaves],
+                        linewidth=3 + 2.4 * (len(conjuntos) - camada - 1),
+                        zorder=7 + camada, solid_capstyle="round")
     ax.scatter(estados[0][1], estados[0][0], s=110, marker="o",
-               facecolors="white", edgecolors="#125E6A", linewidths=2, zorder=9)
+               facecolors="white", edgecolors="#125E6A", linewidths=2, zorder=20)
     ax.scatter(estados[-1][1], estados[-1][0], s=110, marker="s",
-               facecolors="white", edgecolors="#9B4D5F", linewidths=2, zorder=9)
+               facecolors="white", edgecolors="#9B4D5F", linewidths=2, zorder=20)
     from matplotlib.lines import Line2D
     itens = [Line2D([0], [0], color=cores[chaves], lw=3,
                     label=f"Chaves: {chaves or 'nenhuma'}") for chaves in conjuntos]
@@ -139,6 +140,8 @@ def desenhar_percurso(grade: list[str], percurso: list[str], arquivo: str | Path
     ax.legend(handles=itens, loc="upper center", bbox_to_anchor=(.5, -.02),
               ncol=min(4, len(itens)), frameon=False, fontsize=9)
     ax.set_title(titulo, fontsize=13, color="#233143", pad=14)
+    ax.set_xlabel("Coluna")
+    ax.set_ylabel("Linha")
     return _salvar(fig, arquivo)
 
 
@@ -181,7 +184,7 @@ def _desenhar_rede(grupos: dict[str, list[str]], arcos: list[tuple[str, str]],
             try:
                 dados = ler_rotulo(nome)
                 # [IA] Codex – distingue estados da mesma posição por seus bônus.
-                rotulo = f"({dados[0]},{dados[1]})" if dados else nome
+                rotulo = f"({dados[0]},{dados[1]})|{dados[2] or '-'}" if dados else nome
                 if dados and dados[3]:
                     rotulo += " {" + ",".join(map(str, dados[3])) + "}"
             except ValueError:
@@ -210,7 +213,7 @@ def _desenhar_rede(grupos: dict[str, list[str]], arcos: list[tuple[str, str]],
 
 
 def desenhar_camadas(grafo: Any, arquivo: str | Path,
-                      max_nos: int = 250) -> Path:
+                      max_nos: int = 250, titulo: str = "Grafo de estados por conjunto de chaves") -> Path:
     """Desenha G_est agrupado por conjunto de chaves; destaca troca de camada.
 
     Erra explicitamente se o grafo for grande demais para um diagrama legível.
@@ -226,12 +229,12 @@ def desenhar_camadas(grafo: Any, arquivo: str | Path,
     ordenado = dict(sorted(grupos.items(), key=lambda x: (0 if x[0] == "sem chaves" else len(x[0]), x[0])))
     arcos = [(u, v) for u, v, _ in grafo.arestas() if u != "ALVO" and v != "ALVO"]
     return _desenhar_rede(ordenado, arcos, arquivo,
-                         "Grafo de estados por conjunto de chaves", True,
+                         titulo, True,
                          mostrar_nomes=len(nos) <= 100)
 
 
 def desenhar_arvore_bfs(resultado_bfs: dict, arquivo: str | Path,
-                        max_nos: int = 250) -> Path:
+                        max_nos: int = 250, titulo: str = "Árvore BFS por nível") -> Path:
     """Desenha a árvore BFS a partir de camadas e arestas já calculadas."""
     camadas = resultado_bfs.get("camadas")
     arcos = resultado_bfs.get("arvore")
@@ -242,10 +245,11 @@ def desenhar_arvore_bfs(resultado_bfs: dict, arquivo: str | Path,
     if quantidade > max_nos:
         raise ValueError(f"Árvore com {quantidade} nós: aumente max_nos ou use um recorte explícito")
     return _desenhar_rede(grupos, arcos, arquivo,
-                         "Árvore BFS por nível", mostrar_nomes=quantidade <= 100)
+                         titulo, mostrar_nomes=quantidade <= 100)
 
 
-def desenhar_heatmap(grade: list[str], grafo: Any, arquivo: str | Path) -> Path:
+def desenhar_heatmap(grade: list[str], grafo: Any, arquivo: str | Path,
+                     titulo: str = "Multiplicidade de estados por posição") -> Path:
     """Exibe quantidade de estados distintos de G_est por posição física."""
     n_linhas, n_colunas = _verificar_grade(grade)
     quantidades = [[0] * n_colunas for _ in range(n_linhas)]
@@ -270,7 +274,7 @@ def desenhar_heatmap(grade: list[str], grafo: Any, arquivo: str | Path) -> Path:
                         fontsize=8, color=cor)
     ax.set_xticks(range(n_colunas)); ax.set_yticks(range(n_linhas))
     ax.set_xlabel("Coluna"); ax.set_ylabel("Linha")
-    ax.set_title("Multiplicidade de estados por posição", fontsize=13, pad=14)
+    ax.set_title(titulo, fontsize=13, pad=14)
     fig.colorbar(imagem, ax=ax, fraction=.045, pad=.02, label="Estados distintos")
     return _salvar(fig, arquivo)
 
