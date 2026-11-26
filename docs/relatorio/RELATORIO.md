@@ -1398,9 +1398,13 @@ Node: `node tests/test_animacao_html.cjs out/parte1/html/labirinto_interativo.ht
 
 ## 8. Limitações
 
-> **[A ESCREVER — todos]** Pontos já levantados que podem entrar:
-> - Parte 1: (a preencher)
-> - Benchmark: ver o fim da seção 5.6
+### Parte 1
+
+O grafo de estados registra a posição do jogador, as chaves coletadas e os bônus consumidos. Essas informações permitem respeitar as regras do labirinto, mas também aumentam o número de vértices possíveis. Para P posições, k chaves e b consumíveis, o limite teórico é de P × 2^(k+b) estados físicos. Embora a construção inclua apenas os estados alcançáveis, mapas com muitos itens ainda podem exigir muito tempo e memória. Para lidar com instâncias maiores, seria possível explorar os estados sob demanda e avaliar técnicas de poda que preservem as garantias da busca.
+
+Os resultados também dependem das regras e dos custos adotados. A BFS minimiza o número de movimentos, enquanto Dijkstra exige pesos não negativos para encontrar caminhos de menor custo. Já quando um ciclo negativo é alcançável e permite chegar à saída, não há custo mínimo finito. No m06, tornar a fonte consumível elimina o ciclo identificado, mas modifica a regra do problema. Portanto, mudanças nas regras ou nos custos exigem uma nova análise e a escolha de um algoritmo adequado.
+
+Os mapas disponibilizados e os dois criados pelo grupo ilustram os comportamentos estudados, mas não abrangem todas as configurações possíveis. Além disso, as medições da seção 3 consideram a execução dos algoritmos sobre o grafo já construído e não incluem a leitura do mapa, a construção do grafo ou a exportação dos resultados. Uma avaliação mais ampla poderia variar o tamanho dos mapas e a quantidade de itens, além de medir essas etapas em execuções repetidas sob as mesmas condições.
 
 ### Parte 2
 
@@ -1473,7 +1477,11 @@ Essa distinção é fundamental porque a pergunta de pesquisa trata especificame
 
 ### Parte 1
 
-> **[A ESCREVER — Matheus e Thomaz]**
+A modelagem por estados permitiu representar o labirinto levando em conta a posição do jogador, as chaves coletadas e os consumíveis utilizados. Essa escolha fez diferença nos mapas m02, m03 e m04: tratar portas como chão produziu percursos inválidos, enquanto tratá-las como parede impediu encontrar caminhos que existiam. Ao registrar as informações necessárias para verificar cada movimento, o grafo de estados encontrou caminhos válidos nos três casos.
+
+Os experimentos também mostraram que o melhor percurso depende do critério escolhido. No m01, a BFS encontrou um caminho de 10 movimentos com custo 30; Dijkstra e Bellman-Ford encontraram um caminho mais longo, de 14 movimentos, mas com custo 20. No m06, o Bellman-Ford identificou um ciclo negativo que pode ser repetido antes da saída, tornando o custo mínimo ilimitado. Na variante em que a fonte é consumível, o algoritmo encontrou custo 10. Já no m07, a saída é inalcançável porque a chave necessária está bloqueada por uma porta que exige essa mesma chave.
+
+Os resultados reforçam que alcançar a saída, minimizar movimentos e minimizar custo são objetivos distintos. Para responder a cada um deles, é necessário representar as regras do labirinto e escolher um algoritmo adequado aos pesos. A abordagem permitiu analisar os mapas estudados, embora o crescimento do espaço de estados possa limitar sua aplicação a instâncias maiores, como discutido na seção 8.
 
 ### Parte 2
 
