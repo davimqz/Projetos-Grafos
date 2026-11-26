@@ -15,16 +15,15 @@ export function PercursoLabirinto({ M, alg, comparacao = false }) {
   const temCaminho = fim >= 0
 
   useEffect(() => { setPasso(0); setTocando(false) }, [M, alg])
+  // [IA] Codex – mantém a atualização do passo pura e encerra ao atingir o último percurso.
   useEffect(() => {
     if (!tocando) return undefined
-    const t = setInterval(() => {
-      setPasso((p) => {
-        if (p >= fim) { setTocando(false); return p }
-        return p + 1
-      })
-    }, 1000 / vel)
+    const t = setInterval(() => setPasso((p) => Math.min(p + 1, fim)), 1000 / vel)
     return () => clearInterval(t)
   }, [tocando, vel, fim])
+  useEffect(() => {
+    if (tocando && passo >= fim) setTocando(false)
+  }, [passo, fim, tocando])
 
   const rotuloBotao = tocando ? 'Pausar' : passo >= fim && passo > 0 ? 'Recomeçar' : 'Animar'
 
@@ -38,7 +37,7 @@ export function PercursoLabirinto({ M, alg, comparacao = false }) {
               const atual = Math.min(passo, Math.max(0, percurso.length - 1))
               return <article key={nome} aria-label={`Percurso ${NOME_ALG[nome]}`}>
                 <h3>{NOME_ALG[nome]}</h3>
-                <p className={percurso.length ? 'status' : 'status alerta'}>{M.status[nome]}</p>
+                <p className={percurso.length ? 'status' : 'status alerta'}>{percurso.length ? (atual === percurso.length - 1 ? 'Percurso concluído.' : 'Em andamento.') : M.status[nome]}</p>
                 <Grade grade={M.grade} caminho={percurso} passo={percurso.length ? atual : null}
                   duracao={tocando && passo > 0 && passo < percurso.length ? 1000 / vel : 0} />
                 <EstadoPercurso caminho={percurso} custos={M.custos?.[nome] || []} passo={atual} />
