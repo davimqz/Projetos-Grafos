@@ -97,7 +97,7 @@ def diagrama(titulo, rotas, arquivo, alinhar_destinos=False):
 
 
 def main():
-    resultados = ler_resultado("parte2_report.json")
+    resultados = ler_resultado("parte2_report.json")["escalabilidade"]  # [IA] Claude Code – report novo (V1)
     rotas = []
     for legenda, origem, destino in PARES:
         caso = ler_resultado(f"dijkstra_{origem}_{destino}.json")

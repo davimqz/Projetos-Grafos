@@ -105,7 +105,10 @@ python -m scripts.exportar_front
 cd front-react && npm install && npm run dev
 ```
 
-> **[A ESCREVER — Vagner]** Uma frase sobre o que o front mostra e 1 captura de tela.
+O front tem quatro abas: **Labirinto** (percurso passo a passo de cada mapa, comparação 2×2 dos quatro algoritmos e upload de um `.txt` próprio), **Grafos e mapas** (figuras da Parte 1), **Rede de carteiras** (BFS, DFS, Dijkstra e Bellman-Ford da Parte 2 desenhados sobre a rede de transações) e **Análise de dados** (gráficos da AVD).
+
+![Aba Rede de carteiras do front-end](img/front_rede_carteiras.jpg)
+*Figura 2.1 — Aba Rede de carteiras, com a árvore da BFS a partir da carteira `1MFXYK1X…` e as carteiras coloridas por classe.*
 
 ---
 
@@ -518,14 +521,36 @@ As porcentagens de 10%, 50% e 100% se referem aos vértices do recorte. Cada amo
 
 | Algoritmo | Média 10% (ms) | Média 50% (ms) | Média 100% (ms) | Latência 100% (ms) | Pico de memória em 10% / 50% / 100% (KiB) | Complexidade |
 |---|---:|---:|---:|---:|---|---|
-| BFS | 0,36 | 2,48 | 6,03 | 4,33 a 8,85 | 270 / 1.131 / 2.265 | O(V + E) |
-| DFS | 0,88 | 6,31 | 21,77 | 17,42 a 24,82 | 306 / 1.693 / 4.380 | O(V + E) |
-| Dijkstra | 0,37 | 3,25 | 6,16 | 5,77 a 6,52 | 169 / 726 / 1.454 | O((V + E) log V) |
-| Bellman-Ford | 0,51 | 5.538,81 | 42.610,19 | 41.337,47 a 44.237,39 | 220 / 1.195 / 3.497 | O(V · E) |
+| BFS | 0,66 | 3,37 | 8,13 | 6,92 a 8,73 | 270 / 1.131 / 2.265 | O(V + E) |
+| DFS | 1,58 | 11,19 | 32,62 | 29,83 a 37,11 | 306 / 1.693 / 4.380 | O(V + E) |
+| Dijkstra | 0,80 | 4,66 | 11,58 | 9,97 a 14,30 | 169 / 726 / 1.454 | O((V + E) log V) |
+| Bellman-Ford | 1,58 | 5,62 | 18,41 | 16,86 a 19,91 | 292 / 1.195 / 3.497 | O(V · E) |
 
 ![Tempo médio por tamanho do grafo para BFS, DFS, Dijkstra e Bellman-Ford](../../out/parte2/benchmark_escalabilidade.png)
 
-**Latência.** Na amostra de 100%, BFS e Dijkstra levaram, em média, cerca de 6 ms. A diferença apareceu na variação entre as cinco execuções. A BFS levou de 4,33 a 8,85 ms, enquanto o Dijkstra ficou entre 5,77 e 6,52 ms. Para o Bellman-Ford, a média foi de 42,61 segundos, com as cinco execuções entre 41,34 e 44,24 segundos.
+#### Casos obrigatórios
+
+<!-- [IA] Claude Code – tabela gerada a partir da lista "casos" de out/parte2/parte2_report.json (V1), a pedido do Vagner -->
+Os casos obrigatórios da seção 5 (BFS e DFS nas 3 fontes, Dijkstra nos 5 pares e Bellman-Ford nos 2 casos) foram medidos no grafo inteiro, com 5 execuções cada. Os números estão na lista `casos` de `out/parte2/parte2_report.json`.
+
+| Algoritmo | Origem | Destino | Status | Alcançadas | Média (ms) | Latência (ms) | Pico de memória (KiB) | Execuções |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| BFS | `1MFXYK1X…` | — | — | 1.267 | 8,02 | 7,10 a 9,24 | 2.265 | 5 |
+| DFS | `1MFXYK1X…` | — | — | 1.267 | 7,32 | 6,88 a 7,67 | 1.935 | 5 |
+| BFS | `35fNF5Uw…` | — | — | 81 | 6,88 | 6,19 a 7,55 | 2.265 | 5 |
+| DFS | `35fNF5Uw…` | — | — | 81 | 5,07 | 4,49 a 5,62 | 1.935 | 5 |
+| BFS | `39sfuA8p…` | — | — | 1.737 | 8,57 | 8,03 a 9,20 | 2.265 | 5 |
+| DFS | `39sfuA8p…` | — | — | 1.737 | 8,24 | 7,05 a 10,42 | 1.935 | 5 |
+| Dijkstra | `39sfuA8p…` | `17uQbqBG…` | OK | 1.737 | 10,60 | 10,33 a 10,95 | 1.454 | 5 |
+| Dijkstra | `39sfuA8p…` | `16PaWFJt…` | OK | 1.737 | 10,88 | 10,53 a 11,77 | 1.454 | 5 |
+| Dijkstra | `3MTTgd2B…` | `17tqJV8U…` | OK | 1.279 | 10,14 | 9,48 a 10,76 | 1.454 | 5 |
+| Dijkstra | `1MFXYK1X…` | `1GeFfWdv…` | OK | 1.267 | 10,12 | 9,42 a 11,01 | 1.454 | 5 |
+| Dijkstra | `39sfuA8p…` | `1J5U1rN5…` | OK | 1.737 | 11,37 | 9,67 a 12,99 | 1.454 | 5 |
+| Bellman-Ford | `3Fzzji5n…` | — | OK | 45 | 48,31 | 45,73 a 50,64 | 4.264 | 5 |
+| Bellman-Ford | `1MFXYK1X…` | — | ciclo negativo | 1.162 | 14,36 | 13,77 a 15,15 | 3.498 | 5 |
+
+
+**Latência.** Nas cinco execuções, a BFS levou em média 8,13 ms, com tempos entre 6,92 e 8,73 ms. O Dijkstra levou em média 11,58 ms, com tempos entre 9,97 e 14,30 ms. A diferença entre a execução mais rápida e a mais lenta foi maior no Dijkstra (4,33 ms) do que na BFS (1,81 ms). Para o Bellman-Ford, a média foi de 18,41 ms, com as cinco execuções entre 16,86 e 19,91 ms.
 
 **Memória.** A DFS apresentou o maior pico de memória nos três tamanhos. Na amostra de 10%, a BFS usou cerca de 270 KiB mesmo alcançando apenas quatro carteiras, pois prepara estruturas de visita para todos os vértices da amostra. De 50% para 100%, o número de vértices dobrou e o pico de memória da BFS e do Dijkstra também praticamente dobrou. No mesmo intervalo, o pico da DFS cresceu cerca de 2,6 vezes e o do Bellman-Ford, 2,9 vezes.
 
@@ -533,13 +558,15 @@ As porcentagens de 10%, 50% e 100% se referem aos vértices do recorte. Cada amo
 
 Para comparar os tempos com a teoria, calculamos quantas vezes o tempo médio aumentou de uma amostra para outra e quantas vezes a expressão de pior caso cresceu no mesmo intervalo. Usamos o número de vértices (V) e de arcos (E) de cada amostra para calcular essas expressões.
 
-De 10% para 50%, o tempo da DFS cresceu 7,17 vezes, o da BFS cresceu 6,89 vezes e o do Dijkstra cresceu 8,78 vezes. Nesse intervalo, V + E, expressão de referência para DFS e BFS, cresceu 8,76 vezes. Para o Dijkstra, (V + E) log V cresceu 10,71 vezes. A DFS percorreu a amostra inteira e levou mais tempo que a BFS e o Dijkstra nos três tamanhos. No caso da BFS, o número de carteiras alcançadas passou de 4 para 537, cerca de 134 vezes, enquanto o tempo aumentou 6,89 vezes. A quantidade de carteiras visitadas explica apenas parte do tempo, já que a BFS também prepara estruturas para todos os vértices. Na amostra de 10%, os quatro tempos médios ficaram abaixo de 1 ms, o que torna as razões mais sensíveis a pequenas variações na medição.
+De 10% para 50%, o tempo da DFS cresceu 7,08 vezes, o da BFS cresceu 5,11 vezes e o do Dijkstra cresceu 5,83 vezes. Nesse intervalo, V + E, expressão de referência para DFS e BFS, cresceu 8,76 vezes. Para o Dijkstra, (V + E) log V cresceu 10,71 vezes. A DFS percorreu a amostra inteira e levou mais tempo que a BFS e o Dijkstra nos três tamanhos. No caso da BFS, o número de carteiras alcançadas passou de 4 para 537, cerca de 134 vezes, enquanto o tempo aumentou 5,11 vezes. A quantidade de carteiras visitadas explica apenas parte do tempo, já que a BFS também prepara estruturas para todos os vértices.
 
-De 50% para 100%, o tempo da DFS cresceu 3,45 vezes, acima das 2,90 vezes de crescimento de V + E. A BFS tem a mesma complexidade de pior caso, mas seu tempo cresceu 2,43 vezes. Como ela só percorre os arcos que saem das carteiras alcançadas, parte dos arcos da amostra fica fora da busca. O tempo do Dijkstra cresceu 1,90 vez, enquanto (V + E) log V cresceu 3,12 vezes. A implementação verifica os pesos de todos os arcos e usa a fila de prioridade apenas na região alcançável a partir da origem.
+Na amostra de 10%, apenas a BFS (0,66 ms) e o Dijkstra (0,80 ms) ficaram abaixo de 1 ms em média. A DFS e o Bellman-Ford levaram 1,58 ms cada. Como esses tempos são curtos, uma diferença de poucos décimos de milissegundo na média inicial já altera o fator de crescimento calculado de 10% para 50%.
 
-O Bellman-Ford teve o maior salto de 10% para 50%. Seu tempo cresceu cerca de 10.860 vezes, enquanto V × E cresceu cerca de 249 vezes. Na amostra de 10%, o algoritmo parou antes. Não havia ciclo negativo alcançável a partir da origem e, depois de uma rodada sem mudança nas distâncias, a busca terminou. Na amostra de 50%, havia um ciclo negativo alcançável. As distâncias continuaram diminuindo, e o algoritmo executou todas as rodadas. Essa mudança de comportamento, junto com o aumento do grafo, ajuda a explicar o salto no tempo.
+**DFS.** Como a DFS visita todas as carteiras e percorre todos os arcos, seu tempo tende a acompanhar V + E. De 50% para 100%, os dois cresceram quase na mesma proporção: o tempo aumentou 2,92 vezes e V + E aumentou 2,90 vezes. De 10% para 50%, o tempo cresceu 7,08 vezes e V + E cresceu 8,76 vezes. Parte dessa diferença pode vir da medição curta na amostra de 10%, em que a DFS levou apenas 1,58 ms em média.
 
-Na amostra de 100%, o Bellman-Ford também executou todas as rodadas. Entre 50% e 100%, o tempo médio passou de 5,54 para 42,61 segundos, um aumento de 7,69 vezes. Nesse intervalo, o crescimento observado ficou próximo das 7,75 vezes de crescimento de V × E.
+De 50% para 100%, o tempo da BFS cresceu 2,41 vezes, embora ela tenha a mesma complexidade de pior caso que a DFS. Como ela só percorre os arcos que saem das carteiras alcançadas, parte dos arcos da amostra fica fora da busca. O tempo do Dijkstra cresceu 2,48 vezes, enquanto (V + E) log V cresceu 3,12 vezes. A implementação verifica os pesos de todos os arcos e usa a fila de prioridade apenas na região alcançável a partir da origem.
+
+**Bellman-Ford.** A complexidade O(V · E) descreve o pior caso. Na amostra de 10%, o algoritmo parou após duas passadas pelos arcos, pois na segunda nenhuma distância melhorou. Nas amostras de 50% e 100%, ele identificou um ciclo negativo ao fim da primeira passada e encerrou a busca. Assim, nenhuma das três amostras exigiu as V − 1 passadas do pior caso. De 10% para 50%, o tempo cresceu 3,56 vezes, enquanto V × E cresceu cerca de 249 vezes. De 50% para 100%, o tempo cresceu 3,28 vezes, enquanto V × E cresceu 7,75 vezes. Isso explica por que, no grafo inteiro, o Bellman-Ford terminou em 18,41 ms, enquanto a DFS levou 32,62 ms para percorrer todas as carteiras e classificar todos os arcos.
 
 #### Gráficos complementares do benchmark
 
@@ -572,7 +599,7 @@ A escolha da carteira de maior grau de saída como origem na BFS, no Dijkstra e 
 
 O gráfico de tempo é um gráfico de linha, escolhido por ser simples.
 
-A tabela mostra a latência apenas da amostra de 100% para não ficar larga demais e porque, nesse tamanho, as execuções duram o suficiente para a variação entre elas ser comparável. Na amostra de 10%, todas ficaram abaixo de 1 ms. Os intervalos das outras amostras estão no JSON.
+Para manter a tabela compacta, mostramos os tempos mínimo e máximo apenas para a amostra de 100%. Na amostra de 10%, as médias variaram de 0,66 a 1,58 ms. Os intervalos de tempo de todas as amostras estão em `out/parte2/parte2_report.json`.
 
 
 #### Limitações
@@ -633,7 +660,7 @@ A densidade do grafo é próxima de 0, então é um grafo esparso: cada carteira
 
 O grafo é formado por 2.555 transações. Uma transação pode gerar várias arestas, e uma aresta pode juntar várias transações do mesmo par. Por isso, a forma que escolhemos de juntar as ligações em uma aresta poderia fazer uma mesma aresta reunir uma transação lícita e outra ilícita. Mas em nenhum caso do recorte isso ocorre. Das 2.555 transações, 1.130 são desconhecidas, 644 são ilícitas e 781 são lícitas.
 
-Nenhuma aresta ou carteira está repetida. Como cada transação é um conjunto de arestas e não há arestas repetidas, também não há transações repetidas.
+Nenhuma aresta ou carteira está repetida. Isso já era esperado, porque as arestas repetidas foram juntadas em uma só na preparação dos dados (47.346 duplicatas agregadas, `recorte_info.json`).
 
 #### Distribucional
 

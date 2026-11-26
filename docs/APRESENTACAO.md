@@ -154,20 +154,26 @@ Parte 2, média de 5 execuções com `timeit`, latência (execução mais rápid
 
 | Algoritmo | Média 10% (ms) | Média 50% (ms) | Média 100% (ms) | Latência 100% (ms) | Pico de memória 10% / 50% / 100% (KiB) | Complexidade |
 |---|---:|---:|---:|---:|---|---|
-| BFS | 0,36 | 2,48 | 6,03 | 4,33 a 8,85 | 270 / 1.131 / 2.265 | O(V + E) |
-| DFS | 0,88 | 6,31 | 21,77 | 17,42 a 24,82 | 306 / 1.693 / 4.380 | O(V + E) |
-| Dijkstra | 0,37 | 3,25 | 6,16 | 5,77 a 6,52 | 169 / 726 / 1.454 | O((V + E) log V) |
-| Bellman-Ford | 0,51 | 5.538,81 | 42.610,19 | 41.337,47 a 44.237,39 | 220 / 1.195 / 3.497 | O(V · E) |
+| BFS | 0,66 | 3,37 | 8,13 | 6,92 a 8,73 | 270 / 1.131 / 2.265 | O(V + E) |
+| DFS | 1,58 | 11,19 | 32,62 | 29,83 a 37,11 | 306 / 1.693 / 4.380 | O(V + E) |
+| Dijkstra | 0,80 | 4,66 | 11,58 | 9,97 a 14,30 | 169 / 726 / 1.454 | O((V + E) log V) |
+| Bellman-Ford | 1,58 | 5,62 | 18,41 | 16,86 a 19,91 | 292 / 1.195 / 3.497 | O(V · E) |
 
 Falas: seção 5.6 ("Latência", "Memória" e "Comparação com a complexidade teórica").
 
 Falta, pelo pedido R7: os mesmos números para a Parte 1.
 
-### 10. AVD (2 min) **[A PREENCHER — Vagner, explanatórias]**
+### 10. AVD (2 min)
 
-- Os 4 pilares da exploração (seção 6.1), dados faltantes e outliers (6.2), análise multivariada (6.3).
-- Uma ou duas das exploratórias de `out/parte2/avd/` (seção 6.4), cada uma com o insight dela.
-- As 2 figuras explanatórias e a mensagem de cada uma (seções 6.5 e 6.6, ainda não escritas).
+- Os 4 pilares da exploração (seção 6.1) e análise multivariada (6.3).
+- **Faltantes e outliers (6.2):** o que falta é o rótulo: 33,2% das carteiras são `desconhecido`. Não tiramos, porque excluir essas carteiras removeria 55% das arestas. Os outliers (IQR) são carteiras reais e foram mantidos. Destaque: 93% das carteiras acima do limite de taxas são ilícitas.
+- Ordem: exploratória 2 → explanatória 1; exploratórias 3 e 4 → explanatória 2.
+- **Exploratória 2:** quantas arestas cada transação gera. A maioria gera poucas; a maior gera 500.
+- **Explanatória 1:** faixas 1–10 (azul) e 11–1000 (vermelho). 84,5% das transações geram até 10 arestas; os 15,5% restantes geram 84,4% das arestas. Muitas transações usam poucas arestas, e poucas transações geram muitas.
+- **Exploratória 3:** carteiras em algum ciclo: 0 ilícitas, 83 lícitas e 33 desconhecidas.
+- **Exploratória 4:** os 8 ciclos negativos de 2 carteiras têm 8 lícitas e 2 desconhecidas.
+- **Explanatória 2 (pergunta de pesquisa):** as lícitas participam de ciclos negativos e as ilícitas de nenhum. Resposta: não, as ilícitas não participam mais.
+- Destaques: cor e comprimento das barras (seção 6.5).
 
 ### 11. Pergunta de pesquisa e limitações (1 min)
 
@@ -186,14 +192,15 @@ Falta, pelo pedido R7: os mesmos números para a Parte 1.
 
 Cada um escreve a resposta da sua parte e todos leem antes do ensaio.
 
-| Pergunta | Quem responde no texto |
-|---|---|
-| O que é vértice e o que é aresta em G_est? E na Parte 2? | Matheus / Davi |
-| Por que o Dijkstra recusa o m05? | Matheus |
-| Por que o peso do Bellman-Ford é o saldo do destino e não a diferença de saldos? | Davi |
-| Por que o Bellman-Ford leva 42,6 s no grafo inteiro e os outros levam milissegundos? (refazer depois do novo benchmark: com o PR #49 ele para ao achar o ciclo) | Vagner |
-| Por que a DFS alcança todas as carteiras no benchmark e a BFS não? | Vagner |
-| Como o front sabe o resultado da Parte 2? | Thomaz |
+| Pergunta | Quem responde no texto | Resposta |
+|---|---|---|
+| O que é vértice e o que é aresta em G_est? E na Parte 2? | Matheus / Davi | |
+| Por que o Dijkstra recusa o m05? | Matheus | |
+| Por que o peso do Bellman-Ford é o saldo do destino e não a diferença de saldos? | Davi | |
+| Por que o Bellman-Ford, que no pior caso é O(V · E), leva só 18,41 ms no grafo inteiro, menos que a DFS (32,62 ms)? | Vagner | O(V · E) descreve o pior caso. Nesse teste, o Bellman-Ford encontrou um ciclo de custo negativo já na 1ª passada, das até 14.181 possíveis (V − 1), e parou. Levou 18,41 ms. A DFS percorreu as 14.182 carteiras e classificou os 25.111 arcos, o que levou 32,62 ms. |
+| Por que a DFS alcança todas as carteiras no teste de escalabilidade e a BFS não? | Vagner | No teste de escalabilidade, quando a DFS termina de explorar uma região, ela recomeça em outra carteira ainda não visitada. A BFS parte de uma única carteira. Seguindo o sentido das transações, ela consegue chegar a 1.267 carteiras a partir dessa origem. |
+| Por que com 10% dos nós sobram só 130 arestas? | Vagner | O sorteio escolhe carteiras. Uma ligação de A para B só entra na amostra se A e B forem sorteadas. Das 25.111 ligações, só 130 ficaram com as duas pontas na amostra. |
+| Como o front sabe o resultado da Parte 2? | Thomaz | |
 
 ## Checklist do ensaio (24/11)
 
