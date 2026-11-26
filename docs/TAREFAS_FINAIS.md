@@ -57,7 +57,7 @@ O resto da Parte 1 (todos os CSVs e JSONs, inclusive o ciclo do m06) e o caso se
 
 Se a professora rodar a CLI, ela vê o ciclo novo e o relatório mostra o antigo. Por isso:
 
-### [ ] D12. Regerar as saídas do Bellman-Ford e reescrever o que depende delas
+### [x] D12. Regerar as saídas do Bellman-Ford e reescrever o que depende delas
 - **Andamento (24/11, noite):** feito pelo Davi o passo 1 (JSON regerado), o passo 4 (5.5 e 5.7 reescritas) e o
   front (`parte2.json` regerado, aba Rede de carteiras já mostra o ciclo de 3 carteiras). Bloco 8 do `APRESENTACAO.md`
   atualizado. **Faltam:** passo 2 (Matheus, `comparacao_bonus_m05.json`) e passo 3 (Vagner, benchmark e seção 5.6,
@@ -87,11 +87,11 @@ Se a professora rodar a CLI, ela vê o ciclo novo e o relatório mostra o antigo
 
 ## O que zera a nota se faltar (prioridade máxima)
 
-| Item | Consequência | Situação em 24/11 | Tarefa |
+| Item | Consequência | Situação em 26/11 | Tarefa |
 |---|---|---|---|
-| `docs/DECLARACAO_IA.pdf` assinada pelos 4 | Zero no projeto | **Não existe.** Rascunho com 25 campos pendentes | D1, G3 |
-| Todo uso de IA declarado | Zero no projeto | Registro quase completo; há 1 linha com autor "Não informado" | T7, D1 |
-| Todos sabem explicar todo o código | Zero no projeto | Depende do estudo e do ensaio | G4, G5 |
+| `docs/DECLARACAO_IA.pdf` assinada pelos 4 | Zero no projeto | Assinada pelos 4 pelo gov.br em 26/11 (p. 21) | D1, G3 |
+| Todo uso de IA declarado | Zero no projeto | Registro completo; cada integrante conferiu os próprios blocos da declaração | T7, D1 |
+| Todos sabem explicar todo o código | Zero no projeto | Estudo e ensaio feitos | G4, G5 |
 | Entregar as duas partes | Apresentação zerada | As duas existem | — |
 | Os 4 postam no Classroom | Falta de entrega individual | — | G6 |
 
@@ -102,7 +102,7 @@ Se a professora rodar a CLI, ela vê o ciclo novo e o relatório mostra o antigo
 O grosso do que falta é texto da seção 4 do relatório. São 0,8 + 0,4 + 0,4 + 0,8 + 0,2 pontos que hoje estão com o
 código pronto e o texto vazio.
 
-### [ ] M1. Relatório 4.1: modelagem de G_pos e G_est
+### [x] M1. Relatório 4.1: modelagem de G_pos e G_est
 - **Critério:** construção do grafo de estados (0,8) e PDF técnico, "modelagem do estado" (0,4). A professora pediu na
   reunião de 19/11 para mostrar como a modelagem foi feita.
 - **Arquivo:** `docs/relatorio/RELATORIO.md`, bloco `[A ESCREVER — Matheus]` da 4.1.
@@ -119,7 +119,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** a foto está no relatório, bate com o CSV, e alguém de fora entende por que uma casa vira vários nós.
 - **IA:** proibida para escrever. Pode revisar ortografia depois (registrar).
 
-### [ ] M2. Relatório 4.2: por que o grafo é dirigido
+### [x] M2. Relatório 4.2: por que o grafo é dirigido
 - **Critério:** construção (0,8); slides: "Grafo dirigido: nada de espelhar arcos".
 - **Passo a passo:** pegue em `out/parte1/csv/arestas_m04.csv` um arco que sai de uma esteira e, em
   `arestas_m02.csv`, o arco que entra na casa da chave `a` (linha 3, coluna 11). Para cada um, mostre o estado de origem
@@ -127,7 +127,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** tem os dois exemplos concretos (esteira e chave), cada um com os rótulos dos estados.
 - **IA:** proibida para escrever.
 
-### [ ] M3. Mapa mínimo 2D contado à mão + teste + relatório 4.3
+### [x] M3. Mapa mínimo 2D contado à mão + teste + relatório 4.3
 - **Critério:** testes obrigatórios (0,4): "um mapa mínimo criado pelo grupo (até 5×7), com número de estados e de arcos
   calculado à mão no PDF e conferido pelo teste".
 - **Situação:** `tests/test_estados.py` só tem grades de **uma linha** (`SG`, `S^G`, `S+G`...). Atende ao pé da letra,
@@ -148,7 +148,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** teste novo passando e a contagem à mão no relatório.
 - **IA:** pode sugerir o caso de teste; a contagem tem que ser de vocês (registrar).
 
-### [ ] M4. Relatório 4.4: métricas globais e por camada
+### [x] M4. Relatório 4.4: métricas globais e por camada
 - **Critério:** métricas, camadas e graus (0,4).
 - **Passo a passo:**
   1. `python -m scripts.tabelas_relatorio_parte1 4.4` e cole as tabelas no lugar da tabela vazia.
@@ -161,7 +161,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** tabela dos 10 mapas, tabela de camadas e um parágrafo para cada pergunta.
 - **IA:** tabela pode ser gerada pelo script; texto proibido.
 
-### [ ] M5. Relatório 4.5: graus, multiplicidade e becos
+### [x] M5. Relatório 4.5: graus, multiplicidade e becos
 - **Critério:** métricas, camadas e graus (0,4).
 - **Passo a passo:**
   1. `python -m scripts.tabelas_relatorio_parte1 4.5`.
@@ -173,7 +173,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** o "por quê" do 5 e os becos do m04 estão escritos.
 - **IA:** texto proibido.
 
-### [ ] M6. Relatório 4.6: comparação de modelagens
+### [x] M6. Relatório 4.6: comparação de modelagens
 - **Critério:** comparação de modelagens e prova do m05 (0,4).
 - **Passo a passo:** `python -m scripts.tabelas_relatorio_parte1 4.6`. Números: m02 = 10 / falha / 34 passos;
   m03 = 21 / falha / 87; m04 = 14 / falha / 20 (porta como chão / porta como parede / G_est). Explique, com um mapa
@@ -181,7 +181,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** (a) e (b) têm cada um uma explicação ligada a um mapa.
 - **IA:** texto proibido.
 
-### [ ] M7. Relatório 4.7: m05 e a prova (SEM IA)
+### [x] M7. Relatório 4.7: m05 e a prova (SEM IA)
 - **Critério:** comparação de modelagens e prova do m05 (0,4) e PDF técnico (0,4).
 - **Passo a passo:**
   1. `python -m scripts.tabelas_relatorio_parte1 4.7`. Fatos em `out/parte1/json/comparacao_bonus_m05.json`: no G_pos
@@ -193,7 +193,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** tabela e prova no relatório, lida por pelo menos mais uma pessoa.
 - **IA:** **totalmente proibida** para a prova, inclusive "dar uma olhada". Dúvida: grupo ou professora.
 
-### [ ] M8. Relatório 4.8: caminhos e discussões de m01, m06 e m07 (com Thomaz)
+### [x] M8. Relatório 4.8: caminhos e discussões de m01, m06 e m07 (com Thomaz)
 - **Critério:** caminhos com os 4 algoritmos (0,8): "discussão de m01, m06 e m07".
 - **Passo a passo:**
   1. `python -m scripts.tabelas_relatorio_parte1 4.8`.
@@ -209,7 +209,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** as 3 discussões estão escritas e a tabela tem os 10 mapas.
 - **IA:** texto proibido.
 
-### [ ] M9. Relatório 4.9: estados-armadilha
+### [x] M9. Relatório 4.9: estados-armadilha
 - **Critério:** caminhos (0,8), "estados-armadilha (m04 e m07)".
 - **Passo a passo:** `python -m scripts.tabelas_relatorio_parte1 4.9`. Números: m04 = 4 estados
   (`out/parte1/csv/armadilhas_m04.csv`), m07 = 16, g02 = 37 de 89. Explique o método em termos de grafo (busca a partir
@@ -218,7 +218,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** método explicado e exemplos do m04.
 - **IA:** texto proibido.
 
-### [ ] M10. Mapas do grupo: conferência e relatório 4.10
+### [x] M10. Mapas do grupo: conferência e relatório 4.10
 - **Critério:** mapas do grupo (0,2). Mapas "iguais ou muito semelhantes" aos de outro grupo = plágio.
 - **Situação:** os dois mapas foram **sugeridos pelo Codex** e os gabaritos dizem "não foi feita contagem manual".
   Conferi em 24/11 que os requisitos batem: o caminho de menor custo do g01 (Bellman-Ford, custo 38) coleta os 2 bônus
@@ -236,7 +236,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** os dois mapas no relatório com gabarito e a conferência descrita.
 - **IA:** texto proibido; registro já existe (linha 110), atualizar se os mapas mudarem.
 
-### [ ] M11. Regerar as saídas da Parte 1 com a mão de vocês
+### [x] M11. Regerar as saídas da Parte 1 com a mão de vocês
 - **Por quê:** o enunciado proíbe "pedir que a IA produza as saídas obrigatórias", e parte das saídas foi gerada por
   agente (ver `GUIA_RELATORIO.md`, "Pontos para o grupo decidir"). Os arquivos saem iguais, mas o registro passa a dizer
   que a execução foi do grupo.
@@ -250,7 +250,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** commit feito por um integrante.
 - **IA:** não usar.
 
-### [ ] M12. Formato do custo da BFS em `solucoes.csv` (achado 7)
+### [x] M12. Formato do custo da BFS em `solucoes.csv` (achado 7)
 - **Situação:** a BFS sai com `30.0` e os outros algoritmos com `20`. Aparece na demonstração ao vivo.
 - **Onde:** `src/solve.py` (escrita do `solucoes.csv`, por volta da linha 183) e o resumo em
   `src/parte1/interface_cli.py` (linha 95). Não é arquivo proibido.
@@ -259,14 +259,14 @@ código pronto e o texto vazio.
 - **Pronto quando:** `solucoes.csv` sem `.0` e testes passando.
 - **IA:** pode ajudar (é IO), com registro.
 
-### [ ] M13. Benchmark da Parte 1 (R7)
+### [x] M13. Benchmark da Parte 1 (R7)
 - **Situação:** `out/parte1/csv/benchmark.csv` e `json/benchmark.json` existem; falta medir na máquina da apresentação
   e colocar os números no bloco 9 da apresentação.
 - **Passo a passo:** na máquina que vai ser usada no dia, `python -m src.cli --todos-mapas --benchmark --out
   ./out/parte1/`, commitar, e copiar tempo e memória por algoritmo para o bloco 9 do `APRESENTACAO.md`.
 - **Pronto quando:** números da Parte 1 no bloco 9.
 
-### [ ] M14. Apresentação: blocos 2, 3, 4, 5, 9 e limitações da Parte 1
+### [x] M14. Apresentação: blocos 2, 3, 4, 5, 9 e limitações da Parte 1
 - **Arquivo:** `docs/APRESENTACAO.md`, blocos com `[A PREENCHER — Matheus]`.
 - **Passo a passo:**
   - Bloco 3: preencher a tabela vértice / aresta / dirigido para G_pos e G_est (a professora pediu "o que é vértice, o
@@ -276,7 +276,7 @@ código pronto e o texto vazio.
   - Blocos 2, 4 e 9 e a linha de limitações da Parte 1: tirar do relatório depois que M1 a M9 estiverem prontos.
 - **Pronto quando:** nenhum `[A PREENCHER — Matheus]` no arquivo.
 
-### [ ] M15. Declaração: os campos do Matheus
+### [x] M15. Declaração: os campos do Matheus
 - Nome completo e matrícula na seção 1; versão/plano do Codex que usou (seção 4); conferir os 4 blocos com
   `[CONFIRMAR — Matheus]` na seção 5 e corrigir o que estiver errado. Mandar para o Davi até **24/11, 23h**.
 
@@ -284,7 +284,7 @@ código pronto e o texto vazio.
 
 ## Thomaz (P2 Algoritmos + P5a Visualização da Parte 1; revisor: Matheus)
 
-### [ ] T1. Relatório 2.4: como usar o labirinto interativo
+### [x] T1. Relatório 2.4: como usar o labirinto interativo
 - **Critério:** visualizações e HTML (0,4) e README/manual.
 - **Passo a passo:**
   1. Abra `out/parte1/html/labirinto_interativo.html` direto no navegador (não precisa de servidor).
@@ -295,7 +295,7 @@ código pronto e o texto vazio.
   4. Cite cada requisito da seção 9 do enunciado: seleção, passo a passo, estado atual, armadilhas, camadas, velocidade.
 - **Pronto quando:** os 6 requisitos citados e a captura no relatório.
 
-### [ ] T2. Relatório 3: decisões de implementação
+### [x] T2. Relatório 3: decisões de implementação
 - **Critério:** PDF técnico e domínio conceitual.
 - **Passo a passo:** um parágrafo para cada, apontando função e trecho em `src/graphs/algorithms.py`:
   1. Como a DFS classifica os arcos (tempos de descoberta e término; ordem N, L, S, O).
@@ -306,7 +306,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** 3 parágrafos, cada um com o nome da função.
 - **IA:** texto proibido.
 
-### [ ] T3. Corrigir `percurso_m03.png` (cores escondidas)
+### [x] T3. Corrigir `percurso_m03.png` (cores escondidas)
 - **Critério:** visualizações (0,4): "percurso sobre o mapa (m03, m08) com a cor do caminho mudando a cada chave".
 - **Problema conferido em 24/11:** no m03 o caminho vai e volta pelos mesmos corredores, e os trechos desenhados
   depois cobrem os anteriores. A legenda mostra 4 cores (nenhuma, a, ab, abc), mas na figura **só aparecem verde e
@@ -322,7 +322,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** as 4 cores visíveis no m03 e testes passando.
 - **IA:** permitida (sintaxe do matplotlib), com `# [IA]` e registro. A escolha de como destacar é do grupo.
 
-### [ ] T4. Títulos e rótulos das figuras da Parte 1
+### [x] T4. Títulos e rótulos das figuras da Parte 1
 - **Critério:** enunciado, seção 8: "título, legenda e rótulos em todas as figuras".
 - **Problemas conferidos em 24/11:**
   - `camadas_m02.png` ("Grafo de estados por conjunto de chaves"), `arvore_bfs_m02.png` ("Árvore BFS por nível") e
@@ -337,7 +337,7 @@ código pronto e o texto vazio.
 - **Pronto quando:** as 5 figuras obrigatórias com título que diz o mapa, legenda e eixos.
 - **IA:** permitida (sintaxe), com registro.
 
-### [ ] T5. Relatório 4.11: figuras com legenda
+### [x] T5. Relatório 4.11: figuras com legenda
 - **Critério:** visualizações (0,4).
 - **Passo a passo:** depois de T3 e T4, insira as 5 figuras (`percurso_m03.png`, `percurso_m08.png`,
   `camadas_m02.png`, `arvore_bfs_m02.png`, `heatmap_m08.png`), numeradas, cada uma com uma frase **escrita por vocês**
@@ -345,28 +345,28 @@ código pronto e o texto vazio.
 - **Pronto quando:** 5 figuras numeradas, cada uma com a frase.
 - **IA:** frases proibidas.
 
-### [ ] T6. Relatório 4.8: parte do Bellman-Ford (com Matheus)
+### [x] T6. Relatório 4.8: parte do Bellman-Ford (com Matheus)
 - Ver M8, passo 3: detecção e exibição do ciclo do m06 e a resposta finita com `--fonte-consumivel`.
 
-### [ ] T7. Corrigir a linha "Não informado" do registro de IA
+### [x] T7. Corrigir a linha "Não informado" do registro de IA
 - **Situação:** em `docs/REGISTRO_IA.md` há uma linha de 23/11 com integrante "Não informado", ferramenta Codex:
   "Integração e formatação de seis testes de Bellman-Ford fornecidos pelo usuário". É do PR #49.
 - **Passo a passo:** trocar "Não informado" pelo nome de quem usou (provavelmente Thomaz). Avisar o Davi para a
   declaração.
 - **Pronto quando:** nenhuma linha sem autor no registro.
 
-### [ ] T8. Apresentação: bloco 6 e plano B
+### [x] T8. Apresentação: bloco 6 e plano B
 - **Arquivo:** `docs/APRESENTACAO.md`, bloco 6.
 - **Passo a passo:** roteiro da demonstração no front (comparação 2×2, upload de `.txt`, aba Rede de carteiras) e o
   **plano B se o front falhar**: abrir `out/parte1/html/labirinto_interativo.html` direto no navegador (não depende do
   Vite nem de internet).
 - **Pronto quando:** sem `[A PREENCHER]` no bloco 6.
 
-### [ ] T9. Declaração: os campos do Thomaz
+### [x] T9. Declaração: os campos do Thomaz
 - Nome completo e matrícula; versão do Codex (seção 4); conferir os 2 blocos com `[CONFIRMAR — Thomaz]`. Mandar para o
   Davi até **24/11, 23h**.
 
-### [ ] T10. Revisar os PRs do Matheus (revisor de P1 e P3)
+### [x] T10. Revisar os PRs do Matheus (revisor de P1 e P3)
 - Para cada seção 4.x: os números batem com `out/parte1/`? O bloco `[A ESCREVER]` foi apagado? Na 4.7, tente achar um
   furo na prova.
 
@@ -437,14 +437,14 @@ apresentação.
 - Nome completo e matrícula; versão do Claude Code ou ChatGPT que usou; conferir os 2 blocos com
   `[CONFIRMAR — Vagner]`. Mandar para o Davi até **24/11, 23h**.
 
-### [ ] V6. Revisar os PRs do Davi (revisor de P4a)
+### [x] V6. Revisar os PRs do Davi (revisor de P4a)
 - Principalmente D2 (saídas da Parte 2 regeneradas) e D5 (revisão da seção 5).
 
 ---
 
 ## Davi (P4a Dados + P5c README, PDF e declaração)
 
-### [ ] D1. Declaração de IA completa e assinada
+### [x] D1. Declaração de IA completa e assinada
 - **Critério:** declaração e uso responsável de IA (0,3) e **condição para não zerar o projeto**.
 - **Arquivo:** `docs/declaracao/DECLARACAO_IA_rascunho.html` → `docs/DECLARACAO_IA.pdf`.
 - **Passo a passo:**
@@ -458,7 +458,7 @@ apresentação.
      exato). Conferir que tem **4 assinaturas**.
 - **Pronto quando:** `docs/DECLARACAO_IA.pdf` na `main` com 4 assinaturas e sem nenhum `[PREENCHER]`/`[CONFIRMAR]`.
 
-### [ ] D2. Regerar as saídas da Parte 2 com a mão do grupo
+### [x] D2. Regerar as saídas da Parte 2 com a mão do grupo
 - **Andamento (24/11, noite):** Davi rodou a CLI para as 3 fontes, os 5 pares e os 2 casos do Bellman-Ford; os 12
   JSONs saíram idênticos aos commitados (só a quebra de linha difere no Windows). Declaração atualizada. **Falta:** o
   `--benchmark` depois do merge do V1.
@@ -468,21 +468,21 @@ apresentação.
   rodar o `--benchmark` depois do merge dele.
 - **Pronto quando:** commit feito por você, sem diferença de números.
 
-### [ ] D3. Testes: tirar os `xfail` e atualizar a seção 7
+### [x] D3. Testes: tirar os `xfail` e atualizar a seção 7
 - **Situação:** `pytest` dá **583 passed, 5 xpassed**. Os 5 `xfail` de `tests/test_mapa_surpresa.py` (linhas 118 a 139)
   passaram porque o Matheus corrigiu o `io.py`. A seção 7 do relatório ainda diz "503 testes passando em 19/11".
 - **Passo a passo:** remover os 5 `@pytest.mark.xfail` e o parágrafo do topo do arquivo que fala deles; rodar `pytest`
   (tem que dar 588 passed); atualizar a seção 7 com a contagem e a data e incluir `test_mapa_surpresa.py` na tabela.
 - **Pronto quando:** sem `xfail`/`xpassed` e seção 7 atualizada.
 
-### [ ] D4. Matriz de contribuição (seção 10.2)
+### [x] D4. Matriz de contribuição (seção 10.2)
 - **Critério:** participação equilibrada e registro de contribuições (0,3).
 - **Passo a passo:** na véspera, depois dos últimos merges, `python -m scripts.matriz_contribuicao --revisoes`, colar as
   duas tabelas no lugar das de 19/11 e apagar o bloco `[COMPLETAR — Davi]`. Conferir que os 4 têm commits em pelo menos
   2 pacotes.
 - **Pronto quando:** tabelas com data de 25/11.
 
-### [ ] D5. Revisar as seções 5.1 a 5.7 contra os JSONs
+### [x] D5. Revisar as seções 5.1 a 5.7 contra os JSONs
 - **Passo a passo:** para cada número das seções 5.x, abrir o JSON de `out/parte2/` citado e conferir. Atenção à 5.6
   depois do V1.
 - **Pronto quando:** nenhum número diferente dos arquivos.
@@ -491,14 +491,14 @@ apresentação.
 - **Critério:** proposta e descrição do dataset (0,5): "proposta aprovada no checkpoint (até 12/10)".
 - **Passo a passo:** guardar o print da entrega e da aprovação no Classroom e citar a data na seção 5.1.
 
-### [ ] D7. README final
+### [x] D7. README final
 - **Critério:** README (0,2) e organização do repositório (0,3).
 - **Passo a passo:** comando do mapa surpresa em destaque no topo; conferir instalação (`pip install -r
   requirements.txt`), exemplos das duas partes, estrutura de pastas; citar o `labirinto_interativo.html` e o front.
   Rodar os comandos do README em um clone limpo.
 - **Pronto quando:** todos os comandos do README funcionam num clone novo.
 
-### [ ] D8. Fechar o relatório e gerar o PDF
+### [x] D8. Fechar o relatório e gerar o PDF
 - **Critério:** PDF técnico (0,4): modelagem do estado, prova do m05, correção do m06, resultados, visualizações,
   limitações, conclusões e matriz.
 - **Passo a passo:**
@@ -509,15 +509,15 @@ apresentação.
   5. Abrir o PDF e conferir figuras, tabelas e acentos página por página.
 - **Pronto quando:** PDF gerado, zero marcadores, conferido.
 
-### [ ] D9. Slides
+### [x] D9. Slides
 - A partir do `APRESENTACAO.md`, depois de M14, T8 e V3. Incluir a foto do G_est do m02 desenhado à mão (pedido da
   reunião) e a tabela vértice/aresta das duas partes.
 
-### [ ] D10. Atualizar `PROXIMOS_PASSOS.md`
+### [x] D10. Atualizar `PROXIMOS_PASSOS.md`
 - Marcar como resolvidos os achados 1 a 6 (leitura do `io.py` no commit 808271e e Bellman-Ford no PR #49) e apontar
   para esta lista.
 
-### [ ] D11. Revisar o PR do Vagner (V1)
+### [x] D11. Revisar o PR do Vagner (V1)
 - Conferir que as fontes e os pares do report são os mesmos dos JSONs e da seção 5, e que há 5 repetições em cada
   tarefa.
 - **Andamento (25/11):** conferido no PR #55. As fontes e os pares do report são os mesmos dos JSONs (o teste novo
@@ -531,7 +531,7 @@ apresentação.
 
 ## Grupo inteiro
 
-### [ ] G1. Seções 8 (limitações da Parte 1) e 9 (conclusões), escritas juntas e sem IA
+### [x] G1. Seções 8 (limitações da Parte 1) e 9 (conclusões), escritas juntas e sem IA
 - **Critério:** PDF técnico (0,4).
 - **8:** cada limitação diz o que limita e qual seria a saída. Pontos que podem ser avaliados: crescimento do número
   de estados com chaves e bônus (teto × alcançáveis); mapas do grupo sugeridos por IA (se não forem editados);
@@ -539,16 +539,16 @@ apresentação.
 - **9:** dá para ler só a conclusão e saber os principais resultados das duas partes e a resposta à pergunta de
   pesquisa.
 
-### [ ] G2. Reflexão sobre o uso de IA (10 a 15 linhas), sem IA
+### [x] G2. Reflexão sobre o uso de IA (10 a 15 linhas), sem IA
 - **Critério:** declaração e uso responsável de IA (0,3): "reflexão de 10 a 15 linhas".
 - O mesmo texto vai na seção 7 da declaração e na seção 11 do relatório. A declaração pergunta: onde a IA ajudou, onde
   errou ou sugeriu algo inadequado, como o grupo verificou e o que aprendeu. Os fatos para exemplo estão no fim do
   `GUIA_RELATORIO.md`.
 
-### [ ] G3. Assinar a declaração (25/11)
+### [x] G3. Assinar a declaração (25/11)
 - gov.br ou à mão, no PDF que o Davi mandar. Sem as 4 assinaturas = zero.
 
-### [ ] G4. Estudar o que não fez
+### [x] G4. Estudar o que não fez
 - **Critério:** domínio conceitual e perguntas individuais (0,5). A professora pode escolher quem apresenta, e a nota
   dessa pessoa vale para o grupo. Falas divididas ("cada um fala da sua parte") têm redução severa.
 - Todo mundo precisa saber explicar: o estado e o rótulo; por que o grafo é dirigido; a prova do m05; a correção do m06;
@@ -556,7 +556,7 @@ apresentação.
   é caminho mínimo e ciclo negativo no Elliptic++; a pergunta de pesquisa e a resposta; cada gráfico da AVD; e qualquer
   trecho feito com IA.
 
-### [ ] G5. Ensaio com mapa surpresa (25/11 à noite)
+### [x] G5. Ensaio com mapa surpresa (25/11 à noite)
 - **Critério:** demonstração ao vivo (0,4) e clareza da apresentação (0,3), 15 a 20 min.
 - Cada um roda, no próprio computador, um mapa de `data/mapas_treino/` que não conhece:
   `python -m src.cli --mapa ./data/mapas_treino/t02_esteiras_fonte.txt --out ./out/surpresa/ --armadilhas --interactive`
