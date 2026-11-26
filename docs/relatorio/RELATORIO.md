@@ -960,13 +960,13 @@ Fonte: `out/parte2/dijkstra_*.json`.
 
 Peso: `valor_btc`, a soma dos valores das transações entre as duas carteiras (ver seção 5.2).
 
-Quero analisar cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo é comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
+Foram analisadas cinco combinações: Ilícita → Ilícita; Ilícita → Lícita; Lícita → Ilícita; Desconhecida → Ilícita; Ilícita → Desconhecida. O objetivo foi comparar a circulação entre as classes e investigar principalmente as relações entre carteiras lícitas e ilícitas, considerando os dois sentidos das conexões.
 
-As origens são as mesmas carteiras usadas no BFS e na DFS.
+As origens são as mesmas carteiras usadas no BFS e na DFS, exceto no par Lícita → Ilícita, explicado abaixo.
 
-**Critério do destino:** selecionar o primeiro destino da classe desejada na ordem de visita do BFS, desde que esteja a pelo menos 3 passos da origem. Assim, conseguimos analisar trajetórias com carteiras intermediárias, em vez de considerar apenas transferências diretas.
+**Critério do destino:** foi selecionado o primeiro destino da classe desejada na ordem de visita do BFS, desde que esteja a pelo menos 3 passos da origem. Assim, conseguimos analisar trajetórias com carteiras intermediárias, em vez de considerar apenas transferências diretas.
 
-**Origem do par Lícita → Ilícita:** a carteira lícita usada no BFS só alcança carteiras ilícitas a até 2 passos. Utilizar outra carteira lícita como origem mantém o critério de pelo menos 3 passos uniforme entre as combinações do Dijkstra, evitando uma exceção metodológica. Para selecionar a origem: escolher a carteira lícita que alcança o maior número de carteiras ilícitas a partir de 3 passos de distância. Em caso de empate, utilizar a que apresentar a maior distância mínima média até os destinos ilícitos selecionados.
+**Origem do par Lícita → Ilícita:** a carteira lícita usada no BFS só alcança carteiras ilícitas a até 2 passos. Utilizar outra carteira lícita como origem mantém o critério de pelo menos 3 passos uniforme entre as combinações do Dijkstra, evitando uma exceção metodológica. Para selecionar a origem, escolhemos a carteira lícita que alcança o maior número de carteiras ilícitas a partir de 3 passos de distância. Em caso de empate, o critério seguinte foi a carteira que apresentasse a maior distância mínima média até os destinos ilícitos selecionados.
 
 Como as cinco carteiras empataram nos dois primeiros critérios (quantidade de destinos ilícitos alcançados e distância média), utilizamos o número de transações como terceiro critério de desempate. Isso privilegia a carteira com maior atividade transacional e oferece uma origem mais representativa para a análise de caminhos.
 
@@ -1003,7 +1003,7 @@ Fonte: `out/parte2/bellman_ford_*.json`.
 #### Critérios de escolha
 
 - **Caso com ciclo negativo:** carteira desconhecida `1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm`, a mesma usada no BFS e na DFS.
-- **Caso sem ciclo negativo:** escolher a carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, pois, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
+- **Caso sem ciclo negativo:** carteira lícita `3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS`, escolhida porque, entre as carteiras que atendem ao requisito de pesos negativos sem ciclo negativo, é a que alcança a maior quantidade de arcos negativos (29).
 
 #### Resultados do Bellman-Ford
 
@@ -1059,7 +1059,7 @@ No caso da carteira `3Fzzji5n…`, classificada como lícita, o algoritmo não i
 
 Por outro lado, na análise da carteira `1MFXYK1X…`, classificada como desconhecida, foi identificado um ciclo negativo composto por três carteiras: duas classificadas como desconhecidas (`1MFXYK1X…` e `3GwfdNG4…`) e uma classificada como lícita (`1MFcDAzG…`). Nesse caso, a própria carteira de origem participa do ciclo, uma vez que está presente na sequência de vértices que fecha o circuito.
 
-Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre o grafo completo, apresentada na seção 6.4.
+Dessa forma, os resultados individuais do Bellman-Ford não permitem estabelecer uma relação direta entre a classificação de uma carteira e sua participação em ciclos negativos. Para responder à pergunta de pesquisa de maneira mais abrangente dentro do recorte, é necessário considerar também a análise estrutural realizada sobre todas as carteiras do recorte, apresentada na seção 6.4.
 
 ### 5.6 Desempenho e escalabilidade
 
@@ -1180,7 +1180,7 @@ Outro resultado relevante do Dijkstra foi a identificação de uma trajetória e
 
 A aplicação do algoritmo de Bellman-Ford identificou um ciclo negativo em uma das duas execuções, mas esse resultado deve ser interpretado considerando a classificação das carteiras envolvidas e a composição do ciclo encontrado. No caso da carteira `1MFXYK1X…`, foi identificado um ciclo negativo de três carteiras, composto por duas carteiras desconhecidas e uma lícita. Já na análise da carteira `3Fzzji5n…`, classificada como lícita, não foi identificado ciclo negativo alcançável a partir da origem. Esses resultados demonstram que a identificação de ciclos negativos não implica, por si só, associação com atividades ilícitas.
 
-Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando o grafo completo do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
+Entretanto, como o Bellman-Ford responde à existência de ciclos negativos alcançáveis a partir de uma origem e não realiza, por si só, o levantamento exaustivo de todos os ciclos do grafo, a análise foi complementada pela busca estrutural apresentada na seção 6.4. Considerando todas as carteiras do recorte, foram identificadas 116 carteiras participantes de ciclos, sendo 83 lícitas, 33 desconhecidas e nenhuma ilícita. Além disso, foram encontrados oito ciclos negativos de duas carteiras, também sem participação de carteiras ilícitas. Portanto, dentro do recorte analisado, os resultados indicam que as carteiras ilícitas não participam dos ciclos identificados, não sustentando a hipótese de que apresentam maior participação em ciclos negativos do que as carteiras lícitas.
 
 Por fim, devem ser consideradas as limitações metodológicas da investigação. O recorte utilizado apresenta viés de seleção, pois foi construído a partir de carteiras previamente identificadas, não representando necessariamente a distribuição real das classes na rede completa. Além disso, a quantidade reduzida de pares analisados pelo Dijkstra e de origens utilizadas pelo Bellman-Ford limita a generalização dos resultados.
 
@@ -1396,8 +1396,6 @@ Node: `node tests/test_animacao_html.cjs out/parte1/html/labirinto_interativo.ht
 
 ### Parte 2
 
-A metodologia apresenta três limitações principais: as carteiras ilícitas representam 37% do recorte, mas apenas 1,7% do dataset completo, gerando um possível viés; no Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso; e o valor_btc representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
-
 A pergunta de pesquisa definida pelo grupo é:
 
 > Carteiras ilícitas participam mais de ciclos de repasse (ciclos negativos) do que as lícitas?
@@ -1406,7 +1404,9 @@ Os resultados atuais permitem observar diferenças entre as três fontes analisa
 
 #### Quantidade limitada de carteiras
 
-Foram analisadas apenas três carteiras específicas, uma de cada classe.
+Na BFS e na DFS foram analisadas apenas três carteiras específicas, uma de cada classe. O Dijkstra partiu de três
+origens para formar os cinco pares, e o Bellman-Ford, de duas. Só a busca de ciclos da seção 6.4 cobre todas as
+carteiras do recorte.
 
 Essa quantidade é insuficiente para representar o comportamento de todas as carteiras ilícitas, lícitas e desconhecidas do dataset.
 
@@ -1435,6 +1435,11 @@ Isso significa que as carteiras analisadas possuem muitas conexões em comparaç
 Essa característica pode favorecer tanto o alcance na BFS quanto a identificação de ciclos na DFS.
 
 Consequentemente, as carteiras selecionadas não representam necessariamente uma carteira típica de cada classe.
+
+#### Limitações dos pesos
+
+No Bellman-Ford, todas as arestas que chegam à mesma carteira recebem o mesmo peso, o saldo dessa carteira. No
+Dijkstra, o `valor_btc` representa o valor total da transação, não necessariamente a quantia exata enviada de A para B.
 
 #### Limitações da análise com pesos negativos
 
