@@ -4,9 +4,9 @@
     "status": "CICLO_NEGATIVO",
     "tem_ciclo_negativo": true,
     "ciclo_negativo": [
-      "(5,3)",
-      "(5,4)",
-      "(5,3)"
+      "(3,3)",
+      "(3,2)",
+      "(3,3)"
     ],
     "custo_ciclo": -3
   },
