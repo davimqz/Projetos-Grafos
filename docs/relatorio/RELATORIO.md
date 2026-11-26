@@ -1508,26 +1508,26 @@ Quanto à pergunta de pesquisa, a resposta no recorte é negativa. A busca de ci
 
 ### 10.2 Commits por integrante e pacote
 
-Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 25/11/2026, gerada por
+Contagem de commits (sem merges) que alteram arquivos de cada pacote, na `main` em 26/11/2026, gerada por
 `python -m scripts.matriz_contribuicao`. Um commit conta uma vez em cada pacote cujos arquivos ele altera. P5c inclui as
 linhas do `REGISTRO_IA.md`, que cada um adiciona. A CLI, o `requirements.txt` e os mapas fornecidos não entram em
 nenhum pacote.
 
 | Integrante | P1 | P2 | P3 | P4a | P4b | P5a | P5b | P5c | Pacotes com commit | Commits |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Matheus | 6 | 1 | 48 |  |  | 10 |  | 20 | 5 | 65 |
-| Thomaz |  | 10 |  |  |  | 12 |  | 21 | 3 | 22 |
-| Davi | 3 | 2 | 2 | 24 |  | 11 | 1 | 64 | 7 | 79 |
+| Matheus | 6 | 1 | 49 |  |  | 10 |  | 25 | 5 | 70 |
+| Thomaz |  | 10 |  |  |  | 17 |  | 28 | 3 | 30 |
+| Davi | 3 | 2 | 2 | 24 | 1 | 11 | 1 | 72 | 8 | 87 |
 | Vagner |  |  |  | 3 | 8 | 6 | 13 | 26 | 5 | 27 |
 
 PRs mergeados que cada integrante revisou ou mergeou sem ser o autor (`--revisoes`):
 
 | Integrante | PRs revisados |
 |---|---|
-| Matheus | #3, #10, #12, #14, #17, #30, #31, #49, #53 |
-| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32, #34, #35, #36, #39, #40, #41, #48, #51, #52 |
-| Davi | #6, #8, #10, #13, #17, #19, #37, #42, #43, #45, #50 |
-| Vagner | #2, #16, #19, #21, #22, #25, #38, #44, #54 |
+| Matheus | #3, #10, #12, #14, #17, #30, #31, #49, #53, #58, #59 |
+| Thomaz | #7, #9, #11, #15, #18, #20, #23, #24, #26, #27, #28, #29, #32, #34, #35, #36, #39, #40, #41, #48, #51, #52, #65 |
+| Davi | #6, #8, #10, #13, #17, #19, #37, #42, #43, #45, #50, #64 |
+| Vagner | #2, #16, #19, #21, #22, #25, #38, #44, #54, #56 |
 
 ---
 
@@ -1541,8 +1541,6 @@ revisão ou sugestões daqueles em que escreveu código; as decisões e interpre
 O histórico detalhado, com ferramenta, finalidade e arquivos afetados, está em
 [`docs/REGISTRO_IA.md`](../REGISTRO_IA.md). Os trechos de código feitos com apoio de IA são identificados com comentários
 `[IA]`, usando a sintaxe adequada a cada arquivo.
-
-A declaração de uso de IA deve ser assinada por todos e adicionada em `docs/DECLARACAO_IA.pdf` antes da entrega.
 
 ### Reflexão do grupo
 
@@ -1590,11 +1588,7 @@ python -m src.visualizar_parte1 --mapas data/mapas --mapas-grupo data/mapas_grup
 # Conferir as tabelas reproduzidas a partir do conjunto de saídas
 python -m scripts.tabelas_relatorio_parte1 4.4 4.8
 
-# Verificação automática de presença e dimensões dos PNGs
-python scripts/conferir_p5a.py
 ```
-
-> **[PENDENTE]** O script `scripts/conferir_p5a.py` não está presente neste checkout; a verificação automática indicada acima ainda precisa ser disponibilizada.
 
 Os comandos `src.cli` e `src.visualizar_parte1` podem sobrescrever as mesmas figuras. Para a entrega, utilize um único conjunto de arquivos regenerados com a versão atual do código, confira as imagens abertas e execute os testes antes de enviá-las ao repositório.
 
