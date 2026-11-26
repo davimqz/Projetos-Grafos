@@ -95,9 +95,15 @@ python -m src.cli --dataset ./data/dataset_parte2/ --benchmark --out ./out/parte
 
 ### 2.4 Labirinto interativo
 
-> **[A ESCREVER — Thomaz]** Como abrir o `out/parte1/html/labirinto_interativo.html` e o que cada controle faz (seleção de
-> mapa e algoritmo, passo a passo, velocidade, camadas, armadilhas). Incluir 1 captura de tela.
+Além das figuras geradas para os mapas, o projeto possui uma versão interativa do labirinto, que permite acompanhar os percursos sem depender apenas de uma imagem estática. O arquivo `out/parte1/html/labirinto_interativo.html` pode ser aberto diretamente no navegador, sem precisar iniciar um servidor. Na interface, o usuário escolhe o mapa e o algoritmo que deseja visualizar e acompanha a sequência de estados correspondente à execução.
 
+A navegação pode ser feita manualmente, pelos botões Anterior e Próximo, ou de forma automática, pela opção Animar. A barra de posição permite acessar diretamente uma etapa do percurso, enquanto o controle de velocidade ajusta a reprodução de 1 a 20 passos por segundo. Também é possível selecionar a camada exibida, de acordo com o conjunto de chaves do estado, e ativar a opção Mostrar armadilhas para destacar os estados que não possuem caminho até o objetivo.
+
+O painel de informações acompanha cada etapa e apresenta a posição atual, as chaves coletadas, os bônus consumidos, a camada correspondente e o custo acumulado. Dessa forma, as mudanças de estado ficam disponíveis junto do percurso, o que é especialmente útil nos mapas em que o jogador retorna à mesma casa depois de obter uma chave ou utilizar um bônus.
+
+![Interface do m07 com armadilhas destacadas](img/m07_armadilhas.png)
+
+*Figura 2.2 — Interface do labirinto interativo no mapa m07, com os estados-armadilha destacados.*
 ### 2.5 Front-end em React (extra)
 
 ```bash
@@ -114,22 +120,43 @@ O front tem quatro abas: **Labirinto** (percurso passo a passo de cada mapa, com
 
 ## 3. Implementação comum (grafo e algoritmos)
 
-Os algoritmos estão em `src/graphs/algorithms.py`, sobre a lista de adjacência dirigida de `src/graphs/graph.py`
-(vizinhos na ordem N, L, S, O). As mesmas funções são usadas nas duas partes. O `networkx` aparece só em `tests/`,
-como oráculo.
+A implementação dos algoritmos foi concentrada em `src/graphs/algorithms.py`, utilizando a representação de grafo dirigido por listas de adjacência disponível em `src/graphs/graph.py`. A mesma estrutura é utilizada nas duas partes do projeto, o que permite executar as buscas tanto nos estados dos labirintos quanto na rede de carteiras. A biblioteca networkx ficou restrita aos testes, utilizados para comparar os resultados das funções implementadas pelo grupo.
 
-| Algoritmo | Entrada | Saída | Complexidade |
+| Algoritmo | Entrada | Resultado | Complexidade |
 |---|---|---|---|
-| BFS | grafo, origem | ordem, nível de cada nó, árvore | O(V + E) |
-| DFS | grafo, origem | ordem, arcos de árvore/retorno/avanço/cruzamento, existência de ciclo | O(V + E) |
-| Dijkstra (`heapq`) | grafo com pesos ≥ 0, origem | distâncias e caminho; recusa peso negativo | O((V + E) log V) |
-| Bellman-Ford | grafo, origem | distâncias e caminho, ou o ciclo negativo reconstruído | O(V · E) |
+| BFS | Grafo e origem | Ordem de visita, distâncias em arestas, níveis e árvore BFS | O(V + E) |
+| DFS | Grafo e origem opcional | Ordem de visita, tempos, classificação de arcos e presença de ciclos | O(V + E) |
+| Dijkstra | Grafo sem pesos negativos e origem | Distâncias e predecessores | O((V + E) log V) |
+| Bellman-Ford | Grafo e origem | Distâncias e predecessores ou ciclo negativo reconstruído | O(V · E) |
 
-> **[A ESCREVER — Thomaz]** Decisões de implementação que valem explicar: como a DFS classifica cada arco (tempos de
-> descoberta/término), como o Dijkstra recusa peso negativo, como o Bellman-Ford reconstrói o ciclo.
+A BFS utiliza uma fila FIFO implementada com deque, mantendo a exploração em largura a partir de uma origem definida. Cada vértice é marcado como visitado no momento em que entra na fila, evitando inserções repetidas, e sua distância corresponde ao número de arestas percorridas desde a origem. A implementação também registra o vértice pai, a camada de descoberta e as arestas da árvore BFS, permitindo recuperar trajetos e visualizar os níveis da busca. Os pesos das arestas não participam desse cálculo: o algoritmo encontra caminhos com menor quantidade de passos, o que não significa, necessariamente, menor custo acumulado. Essa diferença aparece no m01, em que a BFS encontra um percurso de 10 passos e custo 30, enquanto o Dijkstra encontra um caminho de 14 passos e custo 20. Esses resultados vêm de `out/parte1/csv/solucoes.csv` e ilustram as duas medidas que o projeto compara.
+
+Na DFS, a exploração segue um caminho em profundidade antes de retornar aos vértices anteriores. A primeira implementação utilizava recursão, mas foi substituída por uma pilha explícita, pois uma sequência muito longa de vértices poderia ultrapassar o limite de chamadas do Python. A pilha mantém o vértice atual, seus vizinhos e a próxima posição a ser examinada, preservando a ordem de exploração prevista para os mapas. Os arcos são classificados durante a busca: os que descobrem novos vértices entram na árvore; aqueles que apontam para um vértice ainda aberto são de retorno; os que chegam a um descendente já encerrado são de avanço; e os demais são de cruzamento. Os tempos de descoberta e término também são registrados para permitir a conferência da classificação.
+
+O Dijkstra foi implementado com uma fila de prioridade, utilizando heapq para selecionar o próximo vértice com menor custo conhecido. Antes de começar, a função percorre as arestas e verifica seus pesos. Se encontrar algum valor negativo, interrompe a execução com ValueError, indicando a aresta e o peso que causaram a recusa. Essa verificação evita aplicar o algoritmo em casos incompatíveis, como os mapas com bônus de custo negativo. Neles, a busca por menor custo precisa ser feita com Bellman-Ford, desde que o resultado não seja afetado por um ciclo negativo alcançável.
+
+O Bellman-Ford mantém o relaxamento sucessivo das arestas, registrando os predecessores e os pesos que levaram às atualizações das distâncias. Para identificar ciclos negativos, a implementação atual verifica, após cada passada com alterações, se a cadeia de predecessores contém um ciclo e calcula a soma de seus pesos. Quando o custo é negativo, a sequência de vértices é reconstruída e devolvida junto do status CICLO_NEGATIVO. Essa verificação foi acrescentada depois dos testes com grafos maiores, nos quais a presença de um ciclo podia fazer o algoritmo percorrer praticamente todas as V−1 passadas. O resultado também informa `passadas_executadas`, permitindo acompanhar a interrupção antecipada. Quando há ciclo negativo, as distâncias registradas até o encerramento são parciais e não representam caminhos mínimos definitivos para os vértices afetados.
+
+### Medições de desempenho
+
+O projeto também registra o tempo de execução e o pico de memória associado a cada algoritmo. As medições de tempo foram realizadas cinco vezes por caso, sobre o grafo já construído, sem incluir a leitura do mapa ou a geração dos arquivos de saída. A memória foi medida separadamente, como pico de alocações durante a chamada do algoritmo, e não como consumo total do processo. A tabela apresenta os valores registrados para m03 e m08, que possuem tamanhos diferentes e aparecem nas visualizações produzidas na Parte 1.
+
+| Mapa | Algoritmo | Repetições | Tempo médio (ms) | Pico de memória (KiB) |
+|---|---|---:|---:|---:|
+| m03 | BFS | 5 | 0,1988 | 42,3 |
+| m03 | DFS | 5 | 0,3415 | 48,6 |
+| m03 | Dijkstra | 5 | 0,2312 | 28,0 |
+| m03 | Bellman-Ford | 5 | 0,6635 | 27,7 |
+| m08 | BFS | 5 | 2,8998 | 659,7 |
+| m08 | DFS | 5 | 4,1004 | 929,1 |
+| m08 | Dijkstra | 5 | 3,4339 | 451,2 |
+| m08 | Bellman-Ford | 5 | 14,1109 | 720,0 |
+
+Fonte: `out/parte1/csv/benchmark.csv`, resultados publicados na main. Os tempos e a memória podem variar de acordo com a máquina e com a execução.
+
+Nos dois mapas, os quatro algoritmos terminaram com status OK. Em m03, os tempos médios ficaram abaixo de 1 ms, enquanto m08 apresentou valores maiores para todas as buscas. O Bellman-Ford registrou 14,1109 ms no m08, diante de 2,8998 ms da BFS. Esses resultados descrevem a execução registrada pelo grupo e precisam ser considerados junto das finalidades de cada algoritmo: BFS mede distâncias em número de arestas, DFS explora a estrutura do grafo e os algoritmos de caminhos mínimos consideram os pesos das transições.
 
 ---
-
 ## 4. Parte 1 — Labirinto com Chaves
 
 ### 4.1 Modelagem: G_pos e G_est
@@ -567,6 +594,10 @@ por isso Dijkstra continua recusando o grafo.
 Com `--fonte-consumivel` (`out/parte1/fonte_consumivel/`): Bellman-Ford OK, custo 10, 10 passos. O caminho é o
 mesmo da BFS no m06 padrão, seguindo direto pelo corredor superior, na linha 1, sem visitar a fonte.
 
+No m06, a execução do Bellman-Ford identifica o ciclo (3,6) → (3,5) → (3,6), com custo total de −1. Como esse ciclo pode ser percorrido novamente, seu custo continua diminuindo, de modo que não existe um menor custo finito enquanto a fonte de energia puder ser utilizada sem limite. O algoritmo devolve o status CICLO_NEGATIVO e a sequência de estados que compõem o ciclo, em vez de apresentar esse resultado como um caminho mínimo até a saída.
+
+Para testar uma regra alternativa, o projeto permite executar o mapa com a opção `--fonte-consumivel`. Nesse caso, a utilização da fonte passa a integrar o estado do jogador, impedindo que o mesmo benefício seja obtido indefinidamente. O resultado registrado para essa variante é OK, com custo de 10 até o objetivo. Assim, o mesmo mapa pode ser analisado sob as duas regras, deixando explícito o efeito da fonte sobre a existência do ciclo negativo.
+
 #### m07: impossibilidade
 
 No m07, BFS, Dijkstra e Bellman-Ford retornam `SEM_SOLUCAO`; a DFS também não alcança `ALVO`. O mapa contém uma
@@ -725,17 +756,35 @@ saída aponta para o sul. Nenhum desses 37 estados possui caminho até `G`.
 
 ### 4.11 Visualizações
 
-Figuras em `out/parte1/figuras/`:
+As visualizações da Parte 1 foram preparadas a partir dos percursos e dos grafos de estados obtidos na execução. Foram utilizados dois mapas para apresentar os caminhos sobre o próprio labirinto, além de representações em camadas, da árvore BFS e da multiplicidade de estados por posição. A proposta foi manter as figuras próximas dos resultados que aparecem nas tabelas, de forma que o percurso e a estrutura do grafo possam ser examinados em conjunto.
 
-- `percurso_m03.png` e `percurso_m08.png`: percurso de menor custo, com a cor mudando a cada chave;
-- `camadas_m02.png`: G_est do m02 por camada, destacando os arcos entre camadas;
-- `arvore_bfs_m02.png`: árvore BFS do m02 com os níveis;
-- `heatmap_m08.png`: multiplicidade das casas do m08.
+No m03, o caminho registrado pelo Dijkstra possui 91 passos e custo 99. Ao longo desse percurso, os conjuntos de chaves passam por quatro situações: nenhuma chave, a, ab e abc. Como algumas posições são visitadas novamente depois da coleta de chaves, a diferenciação por cor precisa continuar visível mesmo nos trechos sobrepostos. No m08, a mesma representação foi utilizada para mostrar o percurso em um mapa maior.
 
-> **[A ESCREVER — Thomaz]** Inserir as figuras com legenda e uma frase sobre o que cada uma mostra.
+![Percurso do m03](../../out/parte1/figuras/percurso_m03.png)
+
+*Figura 4.1 — Percurso calculado para o m03, separado pelas etapas de coleta das chaves.*
+
+![Percurso do m08](../../out/parte1/figuras/percurso_m08.png)
+
+*Figura 4.2 — Percurso calculado para o m08, com destaque para as mudanças no conjunto de chaves.*
+
+A árvore BFS do m02 decorre do mesmo processo utilizado para calcular os níveis da busca. No m02, a primeira representação organiza o G_est de acordo com os conjuntos de chaves disponíveis em cada estado, incluindo as transições entre camadas. A segunda mostra a árvore produzida pela BFS, mantendo os níveis alcançados a partir da origem. São duas formas de observar o mesmo grafo: uma a partir da informação que compõe os estados e outra pela ordem de descoberta da busca.
+
+![Camadas do m02](../../out/parte1/figuras/camadas_m02.png)
+
+*Figura 4.3 — Grafo de estados do m02 organizado por conjunto de chaves.*
+
+![Árvore BFS do m02](../../out/parte1/figuras/arvore_bfs_m02.png)
+
+*Figura 4.4 — Árvore de busca em largura do m02, organizada por níveis.*
+
+O mapa de calor do m08 reúne a quantidade de estados associados a cada posição física. Ele permite localizar as casas que aparecem com diferentes combinações de chaves ou bônus, sem precisar desenhar individualmente todos os vértices do grafo de estados. Essa representação complementa o percurso e apresenta outra dimensão da diferença entre G_pos e G_est.
+
+![Mapa de calor do m08](../../out/parte1/figuras/heatmap_m08.png)
+
+*Figura 4.5 — Quantidade de estados distintos por posição física no m08.*
 
 ---
-
 ## 5. Parte 2 — Elliptic++
 
 > O conteúdo detalhado já está em [`parte2.md`](parte2.md) e em [`../PARTE2_DATASET.md`](../PARTE2_DATASET.md).
@@ -1473,3 +1522,103 @@ O histórico detalhado, com ferramenta, finalidade e arquivos afetados, está em
 A declaração de uso de IA deve ser assinada por todos e adicionada em `docs/DECLARACAO_IA.pdf` antes da entrega.
 
 > **[A ESCREVER — todos]** Reflexão curta do grupo sobre o uso de IA, se a declaração pedir.
+
+---
+
+## Apêndice A — Reprodução e conferência das métricas e figuras
+
+Esta seção documenta como reproduzir as tabelas e as cinco figuras utilizadas na Parte 1. Os comandos devem ser executados na raiz do repositório, utilizando as dependências instaladas de `requirements.txt`. As imagens correspondem aos arquivos de `out/parte1/figuras/`; não são imagens de demonstração.
+
+### A.1. Arquivos de entrada e módulos utilizados
+
+| Resultado | Arquivo ou módulo de origem | Como verificar |
+|---|---|---|
+| BFS: passos, pais e camadas | `src/graphs/algorithms.py`, função bfs | `tests/test_bfs.py` e `out/parte1/csv/solucoes.csv` |
+| Caminhos, passos e custo | `out/parte1/csv/solucoes.csv` | Filtrar mapa e algoritmo; distinguir passos de custo |
+| Dimensão e ocupação de G_pos/G_est | `out/parte1/json/metricas_global.json` | Conferir as oito linhas da tabela de métricas |
+| Tempo e pico de memória | `out/parte1/csv/benchmark.csv` | Conferir repeticoes, tempo_medio_ms e memoria_pico_bytes |
+| Percursos m03 e m08 | `src/viz.py: desenhar_percurso`; `src/visualizar_parte1.py: gerar_figuras` | Abrir PNG e conferir cores e título |
+| Camadas do m02 | `src/viz.py: desenhar_camadas` | Conferir grupos sem chave e com chave |
+| Árvore BFS do m02 | `src/viz.py: desenhar_arvore_bfs` | Conferir níveis e distinção entre estados com/sem chave |
+| Heatmap do m08 | `src/viz.py: desenhar_heatmap` | Conferir contagens e barra de cores |
+| Labirinto interativo | `out/parte1/html/labirinto_interativo.html` | Abrir no navegador; selecionar m07 e marcar armadilhas |
+
+### A.2. Comandos de reprodução
+
+```bash
+# Executar a partir da raiz de Projetos-Grafos
+python -m pip install -r requirements.txt
+
+# Executar a suíte de testes dos algoritmos e das visualizações
+python -m pytest tests/test_bfs.py tests/test_dfs.py tests/test_viz.py tests/test_visualizar_parte1.py -v
+
+# Regerar os arquivos e as figuras da Parte 1
+python -m src.cli --todos-mapas --out ./out/parte1/ --interactive
+
+# Alternativa específica para as figuras do P5a
+python -m src.visualizar_parte1 --mapas data/mapas --mapas-grupo data/mapas_grupo --out out/parte1
+
+# Conferir as tabelas reproduzidas a partir do conjunto de saídas
+python -m scripts.tabelas_relatorio_parte1 4.4 4.8
+
+# Verificação automática de presença e dimensões dos PNGs
+python scripts/conferir_p5a.py
+```
+
+> **[PENDENTE]** O script `scripts/conferir_p5a.py` não está presente neste checkout; a verificação automática indicada acima ainda precisa ser disponibilizada.
+
+Os comandos `src.cli` e `src.visualizar_parte1` podem sobrescrever as mesmas figuras. Para a entrega, utilize um único conjunto de arquivos regenerados com a versão atual do código, confira as imagens abertas e execute os testes antes de enviá-las ao repositório.
+
+### A.3. Relação dos cinco arquivos exigidos
+
+| Figura | Caminho relativo à raiz do repositório | Conferência visual |
+|---|---|---|
+| 4.1: percurso m03 | `out/parte1/figuras/percurso_m03.png` | Quatro cores realmente visíveis no traçado: nenhuma, a, ab, abc |
+| 4.2: percurso m08 | `out/parte1/figuras/percurso_m08.png` | Cores do caminho, título com m08 e eixos |
+| 4.3: camadas m02 | `out/parte1/figuras/camadas_m02.png` | Camadas e mudanças de camada; título identifica m02 |
+| 4.4: árvore BFS m02 | `out/parte1/figuras/arvore_bfs_m02.png` | Níveis BFS e rótulos distintos para estados na mesma casa com/sem chave |
+| 4.5: heatmap m08 | `out/parte1/figuras/heatmap_m08.png` | Legenda, barra de intensidade, Linha e Coluna |
+
+A figura 4.1 foi regenerada com traços de espessuras diferentes para preservar as quatro cores nos trechos sobrepostos. A inspeção visual confirmou sua presença; a legibilidade deve ser conferida também no PDF final.
+
+### A.4. Leitura de resultados da BFS e comparação de custos
+
+No arquivo `out/parte1/csv/solucoes.csv`, cada linha identifica mapa, algoritmo, passos, custo, status e caminho. A distância da BFS é medida em arestas e não pelos pesos do mapa. Para conferir os valores usados no texto:
+
+| Mapa | Busca | Passos | Custo | Status |
+|---|---|---:|---:|---|
+| m01 | BFS | 10 | 30 | OK |
+| m01 | Dijkstra | 14 | 20 | OK |
+| m03 | BFS | 87 | 119 | OK |
+| m03 | Dijkstra | 91 | 99 | OK |
+
+Esses valores foram retirados do `out/parte1/csv/solucoes.csv` da main consultada em 25/11. Quando os arquivos forem regerados, os números do relatório precisam ser conferidos novamente.
+### A.5. Quadro consolidado para revisão da seção 4.4 com Matheus
+
+A comparação entre o grafo de posições (G_pos) e o grafo de estados (G_est) foi feita a partir da quantidade de vértices, de arcos, da densidade e da ocupação em relação ao teto teórico. O G_pos representa as posições físicas do mapa. Já no G_est, a mesma posição pode corresponder a vários vértices, pois as chaves e os bônus consumidos fazem parte do estado do jogador. As métricas abaixo consideram os grafos sem o nó virtual ALVO.
+
+| Mapa | G_pos: vértices | G_pos: arcos | Densidade G_pos | G_est: estados | G_est: arcos | Densidade G_est | Teto teórico | Ocupação |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| m01 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 100,0% |
+| m02 | 23 | 43 | 0,0850 | 39 | 74 | 0,0499 | 46 | 84,8% |
+| m03 | 76 | 167 | 0,0293 | 213 | 466 | 0,0103 | 608 | 35,0% |
+| m04 | 24 | 39 | 0,0707 | 37 | 66 | 0,0495 | 48 | 77,1% |
+| m05 | 44 | 90 | 0,0476 | 215 | 438 | 0,0095 | 352 | 61,1% |
+| m06 | 24 | 46 | 0,0833 | 24 | 46 | 0,0833 | 24 | 100,0% |
+| m07 | 31 | 69 | 0,0742 | 16 | 38 | 0,1583 | 62 | 25,8% |
+| m08 | 1.169 | 2.574 | 0,0019 | 2.919 | 6.364 | 0,0007 | 18.704 | 15,6% |
+
+Fonte: `out/parte1/json/metricas_global.json`, valores publicados na main.
+
+O aumento da quantidade de estados fica mais evidente nos mapas que exigem acompanhar mudanças durante o percurso. No m03, as 76 posições físicas dão origem a 213 estados, enquanto no m08 o grafo passa de 1.169 posições para 2.919 estados. Isso não significa que todas as combinações de chaves e bônus sejam possíveis: o teto teórico do m08 chega a 18.704 estados, mas apenas 2.919 aparecem na modelagem alcançável, o equivalente a 15,6%. Já no m07, o grafo de estados tem somente 16 vértices alcançáveis a partir da origem, apesar das 31 posições consideradas no grafo físico.
+
+A densidade foi calculada pela razão entre o número de arcos e o máximo de arcos possíveis em um grafo dirigido sem laços, V × (V − 1). Por isso, mapas com um número maior de estados podem apresentar densidades menores mesmo quando possuem mais arcos. A leitura das métricas por camada, especialmente no m02, complementa essa comparação, identificando os estados associados a cada conjunto de chaves e as transições que ligam essas camadas.
+
+### A.6. Conferência material antes do PDF
+
+1. A imagem `docs/relatorio/img/m07_armadilhas.png` é uma captura do HTML com m07 e os estados-armadilha destacados; conferir sua legibilidade no PDF final.
+2. O arquivo `percurso_m03.png` foi regenerado e as quatro cores foram conferidas na imagem; verificar sua legibilidade no PDF final.
+3. Os títulos, rótulos dos eixos e legendas das cinco figuras precisam estar visíveis na versão final. A figura da árvore BFS deve distinguir estados com e sem chave.
+4. Os valores de `benchmark.csv` e `metricas_global.json` foram copiados dos resultados publicados na main; se o grupo regenerar `out/`, é preciso comparar os números novamente.
+5. A seção 4.4 e seus comentários são responsabilidade de Matheus. A tabela deste apêndice é um apoio à revisão, e não uma substituição automática da parte dele.
+6. As explicações e legendas analíticas não podem ser entregues como produção integralmente autoral sem respeitar as regras de IA da disciplina.

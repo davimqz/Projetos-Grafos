@@ -104,4 +104,4 @@ def test_camadas_identifica_bonus_no_rotulo(tmp_path, monkeypatch):
     grafo = GrafoPequeno()
     grafo._nos = ["(1,1)|a|{}", "(1,1)|a|{0}", "(1,1)|a|{0,2}"]
     desenhar_camadas(grafo, tmp_path / "bonus.png")
-    assert rotulos == ["(1,1)", "(1,1) {0}", "(1,1) {0,2}"]
+    assert rotulos == ["(1,1)|a", "(1,1)|a {0}", "(1,1)|a {0,2}"]

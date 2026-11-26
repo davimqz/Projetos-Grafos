@@ -69,10 +69,10 @@ def exportar_figuras(execucao, apresentacao, saida, gravar):
         gravar(desenhar_percurso, dados.grade, apresentacao["algoritmos"][algoritmo],
                caminho_saida(saida, f"percurso_{dados.nome}.png"), titulo=f"{dados.nome} — {algoritmo}")
     if dados.nome == "m02":
-        gravar(desenhar_camadas, dados.grafo_estados, caminho_saida(saida, "camadas_m02.png"))
-        gravar(desenhar_arvore_bfs, execucao.buscas["BFS"], caminho_saida(saida, "arvore_bfs_m02.png"))
+        gravar(desenhar_camadas, dados.grafo_estados, caminho_saida(saida, "camadas_m02.png"), titulo="m02 — Grafo de estados por conjunto de chaves")
+        gravar(desenhar_arvore_bfs, execucao.buscas["BFS"], caminho_saida(saida, "arvore_bfs_m02.png"), titulo="m02 — Árvore BFS por nível")
     if dados.nome == "m08":
-        gravar(desenhar_heatmap, dados.grade, dados.grafo_estados, caminho_saida(saida, "heatmap_m08.png"))
+        gravar(desenhar_heatmap, dados.grade, dados.grafo_estados, caminho_saida(saida, "heatmap_m08.png"), titulo="m08 — Multiplicidade de estados por posição")
 
 
 def gerar_mapa(arquivo, saida, *, algoritmo="DIJKSTRA", interactive=False, fonte_consumivel=False,
@@ -111,10 +111,10 @@ def gerar_figuras(arquivos, saida):
             desenhar_percurso(dados["grade"], caminho, caminho_saida(saida, f"percurso_{nome}.png"),
                               titulo=f"{nome} — Dijkstra (menor custo)")
         if nome == "m02":
-            desenhar_camadas(grafo, caminho_saida(saida, "camadas_m02.png"))
-            desenhar_arvore_bfs(resultados["BFS"], caminho_saida(saida, "arvore_bfs_m02.png"))
+            desenhar_camadas(grafo, caminho_saida(saida, "camadas_m02.png"), titulo="m02 — Grafo de estados por conjunto de chaves")
+            desenhar_arvore_bfs(resultados["BFS"], caminho_saida(saida, "arvore_bfs_m02.png"), titulo="m02 — Árvore BFS por nível")
         if nome == "m08":
-            desenhar_heatmap(dados["grade"], grafo, caminho_saida(saida, "heatmap_m08.png"))
+            desenhar_heatmap(dados["grade"], grafo, caminho_saida(saida, "heatmap_m08.png"), titulo="m08 — Multiplicidade de estados por posição")
     gerar_html_interativo(mapas, caminho_saida(saida, "labirinto_interativo.html"))
 
 
