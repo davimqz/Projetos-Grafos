@@ -159,7 +159,9 @@ Parte 2, média de 5 execuções com `timeit`, latência (execução mais rápid
 | Dijkstra | 0,80 | 4,66 | 11,58 | 9,97 a 14,30 | 169 / 726 / 1.454 | O((V + E) log V) |
 | Bellman-Ford | 1,58 | 5,62 | 18,41 | 16,86 a 19,91 | 292 / 1.195 / 3.497 | O(V · E) |
 
-Falas: seção 5.6 ("Latência", "Memória" e "Comparação com a complexidade teórica").
+Falas: seção 5.6 ("Latência", "Memória" e "Comparação com a complexidade teórica"). Os tempos de cada tarefa
+obrigatória (3 fontes, 5 pares e 2 casos do Bellman-Ford) estão na tabela "Casos obrigatórios" da mesma seção, se a
+professora perguntar por tarefa.
 
 Falta, pelo pedido R7: os mesmos números para a Parte 1.
 

@@ -62,6 +62,10 @@ Se a professora rodar a CLI, ela vê o ciclo novo e o relatório mostra o antigo
   front (`parte2.json` regerado, aba Rede de carteiras já mostra o ciclo de 3 carteiras). Bloco 8 do `APRESENTACAO.md`
   atualizado. **Faltam:** passo 2 (Matheus, `comparacao_bonus_m05.json`) e passo 3 (Vagner, benchmark e seção 5.6,
   junto com o V1); depois do V1, rodar de novo `python -m scripts.exportar_parte2_front` para os tempos do front.
+- **Andamento (25/11):** passo 3 feito pelo Vagner no PR #55 (benchmark rodado por ele, seção 5.6 com tabela e texto
+  novos, `parte2.json` do front regerado). No grafo inteiro o Bellman-Ford caiu de 42,6 s para 18,41 ms, porque para
+  ao achar o ciclo na 1ª passada. Passo 5 conferido: blocos 8 e 9 e a pergunta do `APRESENTACAO.md` e o slide de
+  desempenho com os números novos. **Falta:** passo 2 (Matheus).
 - **Quem:** Davi (seção 5.5 e 5.7), Vagner (5.6, junto com o V1), Matheus (4.7, que já deve usar o ciclo novo do m05),
   Thomaz (confirmar que o novo `alcancados` menor é o comportamento esperado da parada antecipada e explicar na seção
   3).
@@ -373,7 +377,10 @@ código pronto e o texto vazio.
 A parte de AVD está completa (6 figuras, seções 6.1 a 6.6). O que falta é o report da Parte 2, o front no relatório e a
 apresentação.
 
-### [ ] V1. `parte2_report.json` com casos obrigatórios e repetições
+### [x] V1. `parte2_report.json` com casos obrigatórios e repetições
+- **Andamento (25/11):** feito no PR #55. O report agora é um dicionário com `repeticoes: 5`, `escalabilidade` (12
+  linhas) e `casos` (BFS e DFS nas 3 fontes, Dijkstra nos 5 pares, Bellman-Ford nos 2 casos), e a 5.6 ganhou a tabela
+  "Casos obrigatórios". A frase das duplicadas da 6.1 também foi corrigida.
 - **Andamento (24/11):** o PR #51 (mergeado) limpou os 6 gráficos da AVD e acrescentou a checagem de duplicadas, mas
   **não mexeu** no `parte2_report.json`, no `src/benchmark.py` nem na seção 5.6. Esta tarefa e o passo 3 da D12 continuam
   abertos. Conferido no PR #51: as 6 figuras têm título, legenda e eixos.
@@ -403,25 +410,30 @@ apresentação.
 - **Pronto quando:** o report tem as 12 linhas de escalabilidade e os casos obrigatórios, todos com `repeticoes: 5`.
 - **IA:** permitida para o código de IO/medição, com registro. Interpretação dos tempos é de vocês.
 
-### [ ] V2. Relatório 2.5: front-end
+### [x] V2. Relatório 2.5: front-end
+- **Andamento (25/11):** feito no PR #55 (frase das quatro abas e captura `img/front_rede_carteiras.jpg`).
 - **Passo a passo:** uma frase sobre o que o front mostra (abas Labirinto com comparação 2×2 e upload de `.txt`, Grafos
   e mapas, Rede de carteiras, Análise de dados) e **1 captura** (sugestão: aba Rede de carteiras). Salvar em
   `docs/relatorio/img/`.
 - **Pronto quando:** frase e captura no relatório, bloco apagado.
 
-### [ ] V3. Apresentação: bloco 10 (AVD)
+### [x] V3. Apresentação: bloco 10 (AVD)
+- **Andamento (25/11):** feito no PR #55. O Vagner ainda vai enxugar a fala por causa do tempo.
 - **Situação:** o bloco ainda diz que a 6.5 e a 6.6 "ainda não foram escritas", mas já estão.
 - **Passo a passo:** atualizar o texto; escolher 1 ou 2 exploratórias para mostrar, com o insight de cada uma em uma
   frase sua; as 2 explanatórias com a mensagem e a justificativa dos atributos pré-atentivos.
 - **Pronto quando:** sem `[A PREENCHER]` no bloco 10.
 - **IA:** proibida para interpretação e escolha.
 
-### [ ] V4. Respostas das perguntas previstas
+### [x] V4. Respostas das perguntas previstas
+- **Andamento (25/11):** feito no PR #55. Com o benchmark novo, a pergunta do Bellman-Ford virou "por que leva só
+  18,41 ms, menos que a DFS"; as três respostas estão no `APRESENTACAO.md`.
 - Em `docs/APRESENTACAO.md`, "Perguntas que a professora pode fazer": escrever as respostas das duas que são suas (por
   que o Bellman-Ford leva 42,6 s e os outros milissegundos; por que a DFS alcança todas as carteiras no benchmark e a
   BFS não). Acrescente a sua resposta para "por que com 10% dos nós sobram só 130 arestas?", que tende a aparecer.
 
-### [ ] V5. Declaração: os campos do Vagner
+### [x] V5. Declaração: os campos do Vagner
+- **Andamento (25/11):** feito no PR #55 (versão, usos 18, 20, 21 e 22 e linhas 149 e 150 no Anexo A).
 - Nome completo e matrícula; versão do Claude Code ou ChatGPT que usou; conferir os 2 blocos com
   `[CONFIRMAR — Vagner]`. Mandar para o Davi até **24/11, 23h**.
 
@@ -508,6 +520,12 @@ apresentação.
 ### [ ] D11. Revisar o PR do Vagner (V1)
 - Conferir que as fontes e os pares do report são os mesmos dos JSONs e da seção 5, e que há 5 repetições em cada
   tarefa.
+- **Andamento (25/11):** conferido no PR #55. As fontes e os pares do report são os mesmos dos JSONs (o teste novo
+  `test_casos_obrigatorios_batem_com_os_jsons` garante isso), todas as linhas têm `repeticoes: 5` e as tabelas da 5.6 e
+  do bloco 9 batem com o JSON. Um detalhe: no Bellman-Ford com ciclo, a linha de 100% da escalabilidade dá 1.161
+  alcançadas e o caso obrigatório dá 1.162 (o mesmo do `bellman_ford_1MFXYK1X….json`). A amostra de 100% passa
+  pelo `random.sample`, que embaralha a ordem dos vértices, e como o algoritmo para ao achar o ciclo, essa ordem muda
+  quantas carteiras ele alcança antes de parar. A 5.6 só cita o 1.162.
 
 ---
 
