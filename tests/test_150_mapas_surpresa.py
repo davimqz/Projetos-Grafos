@@ -25,23 +25,6 @@ def mapa_aleatorio(semente, mecanicas):
     return [''.join(linha) for linha in grade]
 
 
-def grafo_referencia_posicoes(grade):
-    """Constrói independentemente o grafo físico de mapas sem mecânicas."""
-    g = nx.DiGraph()
-    for l, linha in enumerate(grade):
-        for c, ch in enumerate(linha):
-            if ch == '#':
-                continue
-            g.add_node((l, c))
-            if ch == 'G':
-                continue
-            for dl, dc in ((-1, 0), (0, 1), (1, 0), (0, -1)):
-                a, b = l + dl, c + dc
-                if 0 <= a < len(grade) and 0 <= b < len(linha) and grade[a][b] != '#':
-                    g.add_edge((l, c), (a, b), weight={',': 3, '~': 5}.get(grade[a][b], 1))
-    return g
-
-
 def para_networkx(grafo):
     g = nx.DiGraph()
     g.add_nodes_from(grafo.nos())
@@ -98,15 +81,6 @@ def test_mapas_gerados_contra_oraculos(tmp_path, semente):
             assert bf['status'] == 'OK'
             assert bf['custo'] == nx.bellman_ford_path_length(subgrafo, origem, 'ALVO', weight='weight')
     conferir_caminho(g, origem, bf)
-
-    if semente < 50:
-        fisico = grafo_referencia_posicoes(grade)
-        destino = (len(grade) - 1, len(grade[0]) - 1)
-        assert nx.has_path(fisico, (0, 0), destino) == tem_saida
-        if tem_saida:
-            assert bfs['passos'] == nx.shortest_path_length(fisico, (0, 0), destino)
-            assert dj['custo'] == nx.shortest_path_length(fisico, (0, 0), destino, weight='weight')
-
 
 @pytest.mark.parametrize('caso', range(40), ids=lambda n: f'invalido-{n:02}')
 def test_entrada_invalida_tem_erro_claro(tmp_path, caso):

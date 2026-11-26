@@ -17,13 +17,15 @@ export function PercursoLabirinto({ M, alg, comparacao = false }) {
   useEffect(() => { setPasso(0); setTocando(false) }, [M, alg])
   // [IA] Codex – mantém a atualização do passo pura e encerra ao atingir o último percurso.
   useEffect(() => {
-    if (!tocando) return undefined
+    if (!tocando || passo >= fim) return undefined
     const t = setInterval(() => setPasso((p) => Math.min(p + 1, fim)), 1000 / vel)
     return () => clearInterval(t)
-  }, [tocando, vel, fim])
+  }, [tocando, vel, fim, passo])
   useEffect(() => {
-    if (tocando && passo >= fim) setTocando(false)
-  }, [passo, fim, tocando])
+    if (!tocando || passo < fim) return undefined
+    const t = setTimeout(() => setTocando(false), 1000 / vel)
+    return () => clearTimeout(t)
+  }, [passo, fim, tocando, vel])
 
   const rotuloBotao = tocando ? 'Pausar' : passo >= fim && passo > 0 ? 'Recomeçar' : 'Animar'
 
