@@ -5,7 +5,8 @@
   pela coluna tempo_por_custo_teorico_ms = tempo / custo do caso medido
 - a DFS percorre o grafo inteiro (floresta); BFS, Dijkstra e Bellman-Ford partem da carteira com
   mais arcos de saída de cada amostra, então não fazem a mesma tarefa que a DFS
-- status OK no Bellman-Ford significa parada antecipada: o tempo não mede V * E
+- o Bellman-Ford para antes das V - 1 passadas: com status OK quando uma passada não muda nada e,
+  desde o PR #49, com CICLO_NEGATIVO assim que acha o ciclo; nos dois casos o tempo não mede V * E
 - latência: tempo de uma execução isolada; o JSON guarda a menor e a maior das 5
 - memória: pico alocado pelo algoritmo (tracemalloc), sem contar o grafo, que já existia
 - casos obrigatórios: as mesmas fontes e pares dos JSONs de out/parte2/ (seção 5), cada um com 5 execuções
@@ -58,12 +59,10 @@ def custo_busca(grafo, retorno):
 
 
 def custo_bellman_ford(grafo, retorno):
-    """V * E, o pior caso; sem ciclo negativo o algoritmo para antes (None).
+    """V * E (pior caso) quando acha ciclo negativo, None quando termina com OK.
 
-    Atenção: desde o PR #49 o Bellman-Ford também para ao achar o ciclo (1 passada no recorte),
-    então com ciclo essa coluna supõe o pior caso e não mede o trabalho feito. O relatório não usa.
+    Desde o PR #49 o algoritmo para assim que acha o ciclo, então V * E aqui é só a referência do pior caso.
     """
-    # [IA] Claude Code – aviso sobre a coluna de custo depois do PR #49, a pedido do Vagner
     if retorno["status"] == "CICLO_NEGATIVO":
         return grafo.ordem() * grafo.tamanho()
     return None

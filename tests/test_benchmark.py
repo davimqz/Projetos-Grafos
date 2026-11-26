@@ -12,7 +12,7 @@ from src.graphs.graph import Grafo
 
 
 def test_relatorio_compara_os_algoritmos(tmp_path):
-    # só 10% dos nós: o Bellman-Ford leva cerca de 45 s por execução no grafo inteiro
+    # só 10% dos nós e sem os casos obrigatórios, para o teste ficar rápido
     executar_benchmark(PASTA_PADRAO, tmp_path, fracoes=[0.1], com_casos=False)
     relatorio = json.loads((tmp_path / "parte2_report.json").read_text(encoding="utf-8"))["escalabilidade"]
     assert all(r["repeticoes"] == 5 for r in relatorio)
