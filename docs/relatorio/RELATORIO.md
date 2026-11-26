@@ -1471,7 +1471,15 @@ Essa distinção é fundamental porque a pergunta de pesquisa trata especificame
 
 ## 9. Conclusões
 
-> **[A ESCREVER — todos]**
+### Parte 1
+
+> **[A ESCREVER — Matheus e Thomaz]**
+
+### Parte 2
+
+Neste trabalho, aplicamos BFS, DFS, Dijkstra e Bellman-Ford a um recorte do Elliptic++. O recorte tem 14.182 carteiras e 25.111 arcos e foi extraído de um grafo com 822.942 carteiras e 2,87 milhões de arcos. Usamos dois esquemas de peso: no Dijkstra, a soma dos valores das transações entre as duas carteiras (valor_btc); no Bellman-Ford, o saldo da carteira de destino, que admite pesos negativos. A BFS mostrou que o alcance depende muito da origem: 1.737 carteiras a partir da origem ilícita, 81 a partir da lícita e 1.267 a partir da desconhecida. A DFS encontrou arcos de retorno a partir das origens ilícita (103) e desconhecida (98), mas nenhum a partir da lícita. Isso indica que há ciclos na região alcançável, e não que a própria origem participe deles. Nos cinco pares testados, o Dijkstra encontrou caminhos mínimos com custo entre 5,54 e 59,81 BTC, e o trecho 39sfuA8p → 1MLvzsdb → 1FAv42Ga aparece em três deles. O Bellman-Ford não encontrou ciclo negativo a partir da origem lícita. A partir da desconhecida, encontrou um ciclo de três carteiras (duas desconhecidas e uma lícita) com custo de −1.677,39, quase todo concentrado em um único arco. No recorte inteiro, o Bellman-Ford levou 18,41 ms, contra 32,62 ms da DFS, porque parou na primeira passada ao detectar o ciclo.
+
+Quanto à pergunta de pesquisa, a resposta no recorte é negativa. A busca de ciclos em todo o recorte (Seção 6.4) encontrou 116 carteiras em ciclos: 83 lícitas, 33 desconhecidas e nenhuma ilícita. A busca por ciclos negativos de duas carteiras encontrou 8, nenhum com carteira ilícita, e o ciclo de três carteiras achado pelo Bellman-Ford também não inclui nenhuma. A forma como o recorte foi construído reforça esse resultado. A amostragem em bola de neve partiu de carteiras ilícitas, que são 37% do recorte e apenas 1,7% do dataset. Se elas participassem mais de ciclos negativos, este seria um cenário favorável para encontrá-las. Esse argumento tem um limite, porque o recorte é um subgrafo induzido. A bola de neve inclui as vizinhas das ilícitas, mas não necessariamente o caminho de volta até elas, então um ciclo que passe por carteiras de fora do recorte foi cortado. Por isso, a conclusão vale só para as 14.182 carteiras analisadas e não se estende à rede Bitcoin. O recorte não é uma amostra representativa, e o saldo do destino é só uma das formas possíveis de definir um peso negativo. Para estender a resposta, seria preciso repetir a busca em recortes aleatórios ou no grafo completo e testar outras definições de peso.
 
 ---
 
