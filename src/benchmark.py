@@ -8,8 +8,10 @@
 - status OK no Bellman-Ford significa parada antecipada: o tempo não mede V * E
 - latência: tempo de uma execução isolada; o JSON guarda a menor e a maior das 5
 - memória: pico alocado pelo algoritmo (tracemalloc), sem contar o grafo, que já existia
+- casos obrigatórios: as mesmas fontes e pares dos JSONs de out/parte2/ (seção 5), cada um com 5 execuções
 """
 # [IA] Claude Code – benchmark da Parte 2
+# [IA] Claude Code – casos obrigatórios e repetições no parte2_report.json (V1), a pedido do Vagner
 
 import json
 import math
@@ -29,6 +31,25 @@ from src.graphs.graph import Grafo
 
 SEED = 42
 FRACOES = [0.1, 0.5, 1.0]
+REPETICOES = 5
+
+# Casos obrigatórios da seção 5 (mesmos nomes dos JSONs em out/parte2/)
+FONTES_BUSCA = [
+    "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",
+    "35fNF5Uwbsoa5ABPCUvKZNyuAV7S9sJTou",
+    "39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K",
+]
+PARES_DIJKSTRA = [
+    ("39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K", "17uQbqBGYLGjHtX8eJHoonfY4iUf8ixCwe"),
+    ("39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K", "16PaWFJttSe54KviUNjyzP459DuQTiB8rT"),
+    ("3MTTgd2BaPndUYkmGjiacaPLkuWsiPUzM3", "17tqJV8U98Q7zin186LbR2pYq4fncJuyLw"),
+    ("1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm", "1GeFfWdvjZ3HNd99e3WVwWcnCN63GQYrG6"),
+    ("39sfuA8pY4UfybgEZi7uvA13jkGzZpsg5K", "1J5U1rN5dBzxK2g6imJZzcimPrDTPYaz7N"),
+]
+FONTES_BELLMAN_FORD = [
+    "3Fzzji5nFaSptmYL8bNsm3KcpYm3qnxqBS",  # caso sem ciclo negativo
+    "1MFXYK1XucKFfhPhW9HDHD3vsM9BKey4qm",  # caso com ciclo negativo
+]
 
 
 def custo_busca(grafo, retorno):
@@ -109,8 +130,42 @@ def contar_alcancados(retorno):
     return sum(d != float("inf") for d in retorno["distancia"].values())
 
 
-def executar_benchmark(pasta, saida, fracoes=FRACOES):
-    """Mede cada algoritmo em cada fração e grava parte2_report.json e o gráfico."""
+def medir_caso(nome, funcao, grafo, origem, destino=None):
+    """Mede um caso obrigatório: 5 execuções do algoritmo a partir da origem, no grafo inteiro."""
+    ultimo = {}
+    tempos = medir_tempos(lambda gr: ultimo.update(funcao(gr, origem)), grafo, REPETICOES)
+    t = sum(tempos) / len(tempos)
+    pico = pico_memoria(lambda gr: funcao(gr, origem), grafo)
+    return {
+        "algoritmo": nome, "origem": origem, "destino": destino,
+        "alcancados": contar_alcancados(ultimo),
+        "status": ultimo.get("status", "-"),
+        "repeticoes": REPETICOES,
+        "tempo_medio_ms": round(t * 1000, 2),
+        "latencia_min_ms": round(min(tempos) * 1000, 2),
+        "latencia_max_ms": round(max(tempos) * 1000, 2),
+        "memoria_pico_kb": round(pico / 1024, 1),
+    }
+
+
+def medir_casos(grafo, grafo_dijkstra):
+    """Casos obrigatórios: BFS e DFS nas 3 fontes, Dijkstra nos 5 pares e Bellman-Ford nos 2 casos."""
+    casos = []
+    for origem in FONTES_BUSCA:
+        casos.append(medir_caso("BFS", bfs, grafo, origem))
+        casos.append(medir_caso("DFS", dfs, grafo, origem))
+    for origem, destino in PARES_DIJKSTRA:
+        casos.append(medir_caso("Dijkstra", dijkstra, grafo_dijkstra, origem, destino))
+    for origem in FONTES_BELLMAN_FORD:
+        casos.append(medir_caso("Bellman-Ford", bellman_ford, grafo, origem))
+    return casos
+
+
+def executar_benchmark(pasta, saida, fracoes=FRACOES, com_casos=True):
+    """Mede cada algoritmo em cada fração e os casos obrigatórios; grava parte2_report.json e o gráfico.
+
+    O JSON tem duas listas: "escalabilidade" (algoritmo x fração) e "casos" (tarefas da seção 5).
+    """
     grafo = carregar_grafo(Grafo(), pasta)
     grafo_dijkstra = carregar_grafo(Grafo(), pasta, coluna_peso="valor_btc")
     resultados = []
@@ -120,7 +175,7 @@ def executar_benchmark(pasta, saida, fracoes=FRACOES):
             g = amostrar(grafo_base, fracao)
             origem = maior_grau_saida(g) if usa_origem else None
             ultimo = {}  # guarda o retorno da última execução, para o relatório
-            tempos = medir_tempos(lambda gr: ultimo.update(funcao(gr, origem)), g)
+            tempos = medir_tempos(lambda gr: ultimo.update(funcao(gr, origem)), g, REPETICOES)
             t = sum(tempos) / len(tempos)
             custo_caso = custo(g, ultimo)
             pico = pico_memoria(lambda gr: funcao(gr, origem), g)
@@ -130,17 +185,23 @@ def executar_benchmark(pasta, saida, fracoes=FRACOES):
                 "origem": origem,
                 "alcancados": contar_alcancados(ultimo),
                 "status": ultimo.get("status", "-"),
+                "repeticoes": REPETICOES,
                 "tempo_medio_ms": round(t * 1000, 2),
                 "latencia_min_ms": round(min(tempos) * 1000, 2),
                 "latencia_max_ms": round(max(tempos) * 1000, 2),
                 "tempo_por_custo_teorico_ms": round(t / custo_caso * 1000, 6) if custo_caso else None,
                 "memoria_pico_kb": round(pico / 1024, 1),
             })
+    relatorio = {
+        "repeticoes": REPETICOES,
+        "escalabilidade": resultados,
+        "casos": medir_casos(grafo, grafo_dijkstra) if com_casos else [],
+    }
     Path(saida).mkdir(parents=True, exist_ok=True)
     with open(Path(saida) / "parte2_report.json", "w", encoding="utf-8") as f:
-        json.dump(resultados, f, ensure_ascii=False, indent=2)
+        json.dump(relatorio, f, ensure_ascii=False, indent=2)
     gerar_grafico(resultados, saida)
-    return resultados
+    return relatorio
 
 
 def gerar_grafico(resultados, saida):
@@ -152,7 +213,7 @@ def gerar_grafico(resultados, saida):
         y = [r["tempo_medio_ms"] for r in linhas]
         plt.plot(x, y, "o-", label=nome)
     plt.xscale("log")  # a comparação com a teoria de cada algoritmo está na coluna de custo do JSON
-    plt.yscale("log")  # o Bellman-Ford fica ordens de grandeza acima dos outros
+    plt.yscale("log")  # os tempos vão de menos de 1 ms (10%) a dezenas de ms (100%)
     plt.minorticks_off()
     tamanhos = sorted({r["nos"] + r["arestas"] for r in resultados})
     plt.xticks(tamanhos, [str(valor) for valor in tamanhos])  # só os tamanhos medidos
